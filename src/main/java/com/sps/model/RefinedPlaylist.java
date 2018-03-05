@@ -9,6 +9,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-public class RefinedPlaylist {
+public class RefinedPlaylist implements Serializable {
     @Id
     private String id;
     private URI uri;

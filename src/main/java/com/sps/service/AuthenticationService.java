@@ -1,17 +1,17 @@
 package com.sps.service;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.SettableFuture;
-import com.wrapper.spotify.Api;
-import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
-import com.wrapper.spotify.models.ClientCredentials;
+import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.model_objects.credentials.ClientCredentials;
+import com.wrapper.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Component
@@ -26,31 +26,22 @@ public class AuthenticationService {
         this.clientSecret = clientSecret;
     }
 
-    public Api clientCredentialFlow() {
-        final Api api = Api.builder()
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
+    public SpotifyApi clientCredentialFlow() {
+        final SpotifyApi api = new SpotifyApi.Builder()
+                .setClientId(this.clientId)
+                .setClientSecret(this.clientSecret)
                 .build();
 
-        final ClientCredentialsGrantRequest request = api.clientCredentialsGrant().build();
+        final ClientCredentialsRequest request = api.clientCredentials().build();
 
-        final SettableFuture<ClientCredentials> responseFuture = request.getAsync();
-
-        Futures.addCallback(responseFuture, new FutureCallback<ClientCredentials>() {
-            @Override
-            public void onSuccess(ClientCredentials clientCredentials) {
-
-                log.info("Successfully retrieved an access token: " + clientCredentials.getAccessToken());
-                log.info("The access token expires in " + clientCredentials.getExpiresIn() + " seconds");
-
-                api.setAccessToken(clientCredentials.getAccessToken());
-
-            }
-            @Override
-            public void onFailure(Throwable throwable) {
-                log.error("Could not retrieve an access token");
-            }
-        });
+        try {
+            final Future<ClientCredentials> responseFuture = request.executeAsync();
+            final ClientCredentials clientCredentials = responseFuture.get();
+            api.setAccessToken(clientCredentials.getAccessToken());
+            log.info("Expires in: {}", clientCredentials.getExpiresIn());
+        } catch (InterruptedException | ExecutionException e) {
+         log.error(e.getCause().getMessage());
+        }
         return api;
     }
 }

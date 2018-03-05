@@ -1,32 +1,33 @@
 package com.sps.utilities;
 
-import com.wrapper.spotify.models.Track;
 import com.sps.model.RefinedArtist;
 import com.sps.model.RefinedPlaylist;
 import com.sps.model.RefinedTrack;
 import com.sps.model.RefinedUser;
+import com.wrapper.spotify.model_objects.specification.*;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DownstreamMapper {
 
     public static RefinedTrack mapSong(Track fullTrack) {
         List<RefinedArtist> minimisedRefinedArtists = new ArrayList<RefinedArtist>();
-        for (int i = 0; i < fullTrack.getArtists().size(); i++) {
-            minimisedRefinedArtists.add(mapSimpleArtist(fullTrack.getArtists().get(i)));
+        for (int i = 0; i < fullTrack.getArtists().length; i++) {
+            minimisedRefinedArtists.add(mapSimpleArtist(fullTrack.getArtists()[i]));
         }
         try {
             return RefinedTrack.builder()
                     .id(fullTrack.getId())
                     .artists(minimisedRefinedArtists)
-                    .availableMarkets(fullTrack.getAvailableMarkets())
+                    .availableMarkets(Arrays.asList(fullTrack.getAvailableMarkets().toString().split(",")))
                     .discNum(fullTrack.getDiscNumber())
-                    .durationMs(fullTrack.getDuration())
-                    .explicit(fullTrack.isExplicit())
+                    .durationMs(fullTrack.getDurationMs())
+                    .explicit(fullTrack.getIsExplicit())
                     .externalURL((new URL(fullTrack.getExternalUrls().get("spotify"))))
                     .href(fullTrack.getHref())
                     .name(fullTrack.getName())
@@ -39,10 +40,10 @@ public class DownstreamMapper {
             return RefinedTrack.builder()
                     .id(fullTrack.getId())
                     .artists(minimisedRefinedArtists)
-                    .availableMarkets(fullTrack.getAvailableMarkets())
+                    .availableMarkets(Arrays.asList(fullTrack.getAvailableMarkets().toString().split(",")))
                     .discNum(fullTrack.getDiscNumber())
-                    .durationMs(fullTrack.getDuration())
-                    .explicit(fullTrack.isExplicit())
+                    .durationMs(fullTrack.getDurationMs())
+                    .explicit(fullTrack.getIsExplicit())
                     .href(fullTrack.getHref())
                     .name(fullTrack.getName())
                     .trackNumber(fullTrack.getTrackNumber())
@@ -52,7 +53,7 @@ public class DownstreamMapper {
         }
     }
 
-    public static RefinedArtist mapSimpleArtist(com.wrapper.spotify.models.SimpleArtist fullArtist) {
+    public static RefinedArtist mapSimpleArtist(ArtistSimplified fullArtist) {
         try {
             return RefinedArtist.builder()
                     .id(fullArtist.getId())
@@ -73,12 +74,12 @@ public class DownstreamMapper {
         }
     }
 
-    public static RefinedArtist mapArtist(com.wrapper.spotify.models.Artist fullArtist) {
+    public static RefinedArtist mapArtist(Artist fullArtist) {
         try {
             return RefinedArtist.builder()
                     .id(fullArtist.getId())
                     .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
-                    .genres(fullArtist.getGenres())
+                    .genres(Arrays.asList(fullArtist.getGenres()))
                     .href(fullArtist.getHref())
                     .name(fullArtist.getName())
                     .type(fullArtist.getType().getType())
@@ -89,7 +90,7 @@ public class DownstreamMapper {
         } catch (MalformedURLException e) {
             return RefinedArtist.builder()
                     .id(fullArtist.getId())
-                    .genres(fullArtist.getGenres())
+                    .genres(Arrays.asList(fullArtist.getGenres()))
                     .href(fullArtist.getHref())
                     .name(fullArtist.getName())
                     .type(fullArtist.getType().getType())
@@ -100,33 +101,33 @@ public class DownstreamMapper {
         }
     }
 
-    public static RefinedUser mapUser(com.wrapper.spotify.models.User fullUser) {
+    public static RefinedUser mapUser(User fullUser) {
         List<String> imageUrls = new ArrayList<String>();
         if( fullUser.getImages()!=null) {
-            for (int i = 0; i < fullUser.getImages().size(); i++) {
-                imageUrls.add(fullUser.getImages().get(i).getUrl());
+            for (int i = 0; i < fullUser.getImages().length; i++) {
+                imageUrls.add(fullUser.getImages()[i].getUrl());
             }
         }
         return RefinedUser.builder()
                 .id(fullUser.getId())
                 .uri(URI.create(fullUser.getUri()))
                 .displayName(fullUser.getDisplayName())
-                .numOfFollowers(fullUser.getFollowers().getTotal())
+                //Possible bug in wrapper not returning followers / not sufficient permissions? .numOfFollowers(fullUser.getFollowers().getTotal())
                 .href(fullUser.getHref())
                 .images(imageUrls)
                 .build();
     }
 
-    public static RefinedPlaylist mapPlaylist(com.wrapper.spotify.models.Playlist fullPlaylist){
+    public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist){
         List<String> imageUrls = new ArrayList<>();
         if(fullPlaylist.getImages()!=null) {
-            for (int i = 0; i < fullPlaylist.getImages().size(); i++) {
-                imageUrls.add(fullPlaylist.getImages().get(i).getUrl());
+            for (int i = 0; i < fullPlaylist.getImages().length; i++) {
+                imageUrls.add(fullPlaylist.getImages()[i].getUrl());
             }
         }
         List<RefinedTrack> formattedRefinedTracks = new ArrayList<RefinedTrack>();
-        for (int n = 0; n < fullPlaylist.getTracks().getItems().size(); n++) {
-            formattedRefinedTracks.add(mapSong(fullPlaylist.getTracks().getItems().get(n).getTrack()));
+        for (int n = 0; n < fullPlaylist.getTracks().getItems().length; n++) {
+            formattedRefinedTracks.add(mapSong(fullPlaylist.getTracks().getItems()[n].getTrack()));
         }
         try {
             return RefinedPlaylist.builder()

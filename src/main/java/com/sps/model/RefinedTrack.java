@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefinedTrack {
+public class RefinedTrack implements Serializable {
     @Id
     private String id;
     @ElementCollection
