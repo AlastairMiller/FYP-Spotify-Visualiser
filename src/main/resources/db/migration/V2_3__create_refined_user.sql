@@ -1,11 +1,11 @@
 CREATE TABLE REFINED_USER (
 
-  id               VARCHAR(100),
-  URI              VARCHAR(2083),
-  DISPLAY_NAME     VARCHAR(100),
-  EXTERNAL_URL     VARCHAR(2083),
+  id               TEXT,
+  URI              TEXT,
+  DISPLAY_NAME     TEXT,
+  EXTERNAL_URL     TEXT,
   NUM_OF_FOLLOWERS INT,
-  HREF             VARCHAR(2083),
-  IMAGES           VARCHAR(2083)
+  HREF             TEXT,
+  IMAGES           TEXT
 
 );

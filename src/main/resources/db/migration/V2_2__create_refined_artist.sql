@@ -1,12 +1,12 @@
 CREATE TABLE REFINED_ARTIST (
 
-  EXTERNALURL VARCHAR(2083),
-  HREF        VARCHAR(2083),
-  ID          VARCHAR(50),
-  NAME        VARCHAR(500),
-  TYPE        VARCHAR(6),
-  URI         VARCHAR(2023),
-  FOLLOWERS   INT,
+  EXTERNALURL TEXT,
+  HREF        TEXT,
+  ID          TEXT,
+  NAME        TEXT,
+  TYPE        TEXT,
+  URI         TEXT,
+  FOLLOWERS   TEXT,
   POPULARITY  INT
 
 );

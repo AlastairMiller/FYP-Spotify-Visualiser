@@ -122,16 +122,16 @@ public class RefreshLocalDbService {
             playlistCleanup(api, fullRefinedPlaylist);
         }
 
-        if (userRepository.findById(fullRefinedPlaylist.getOwner().getId()) == null) {
+        if (userRepository.findById(fullRefinedPlaylist.getRefinedUser().getId()) == null) {
 
-            RefinedUser newRefinedUser = DownstreamMapper.mapUser(pullUser(api, fullRefinedPlaylist.getOwner().getId()));
+            RefinedUser newRefinedUser = DownstreamMapper.mapUser(pullUser(api, fullRefinedPlaylist.getRefinedUser().getId()));
             userRepository.saveAndFlush(newRefinedUser);
 
         }
         ArrayList<String> songIdArrayList = new ArrayList<>();
-        for (int i = 0; i < fullRefinedPlaylist.getTracks().size(); i++) {
-            if (trackRepository.findById(fullRefinedPlaylist.getTracks().get(i).getId()) == null) {
-                songIdArrayList.add(fullRefinedPlaylist.getTracks().get(i).getId());
+        for (int i = 0; i < fullRefinedPlaylist.getRefinedTracks().size(); i++) {
+            if (trackRepository.findById(fullRefinedPlaylist.getRefinedTracks().get(i).getId()) == null) {
+                songIdArrayList.add(fullRefinedPlaylist.getRefinedTracks().get(i).getId());
             }
         }
         if (songIdArrayList.size() > 0) {
@@ -283,7 +283,7 @@ public class RefreshLocalDbService {
     }
 
     Playlist pullPlaylist(SpotifyApi api, RefinedPlaylist refinedPlaylistToPull) {
-        return pullPlaylist(api, refinedPlaylistToPull.getOwner().getId(), refinedPlaylistToPull.getId());
+        return pullPlaylist(api, refinedPlaylistToPull.getRefinedUser().getId(), refinedPlaylistToPull.getId());
     }
 
     private Playlist pullPlaylist(SpotifyApi api, String ownerId, String playlistId) {
@@ -299,13 +299,13 @@ public class RefreshLocalDbService {
     }
 
     private void playlistCleanup(SpotifyApi api, RefinedPlaylist newRefinedPlaylist) {
-        List<RefinedTrack> storedTracks = playlistRepository.findOne(newRefinedPlaylist.getId()).getTracks();
+        List<RefinedTrack> storedTracks = playlistRepository.findOne(newRefinedPlaylist.getId()).getRefinedTracks();
         for (int i = 0; i < storedTracks.size(); i++) {
             Boolean remove = true;
-            for (int p = 0; p < newRefinedPlaylist.getTracks().size(); p++) {
-                if (storedTracks.get(i).getId().equals(newRefinedPlaylist.getTracks().get(p).getId())) {
+            for (int p = 0; p < newRefinedPlaylist.getRefinedTracks().size(); p++) {
+                if (storedTracks.get(i).getId().equals(newRefinedPlaylist.getRefinedTracks().get(p).getId())) {
                     remove = false;
-                    p = newRefinedPlaylist.getTracks().size() - 1;
+                    p = newRefinedPlaylist.getRefinedTracks().size() - 1;
                 }
             }
             if (remove) {

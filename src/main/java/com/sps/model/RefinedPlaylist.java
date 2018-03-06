@@ -5,10 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
@@ -29,8 +26,8 @@ public class RefinedPlaylist implements Serializable {
     @ElementCollection
     private List<String> images;
     private String name;
-    @ManyToOne
-    private RefinedUser owner;
-    @ElementCollection()
-    private List<RefinedTrack> tracks;
+    @ManyToOne(targetEntity = RefinedUser.class)
+    private RefinedUser refinedUser;
+    @ManyToMany(targetEntity = RefinedTrack.class)
+    private List<RefinedTrack> refinedTracks;
 }

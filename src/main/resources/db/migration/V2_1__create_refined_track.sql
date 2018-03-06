@@ -1,17 +1,15 @@
 CREATE TABLE REFINED_TRACK (
 
-  DISC_NUM          INT,
-  DURATION_MS       INT,
+  DISC_NUM         INT,
+  DURATION_MS      INT,
   EXPLICIT         BOOLEAN,
-  EXTERNALURL      VARCHAR(2083),
-  HREF             VARCHAR(2083),
-  ID               VARCHAR(50),
-  ISPLAYABLE       BOOLEAN,
-  LINKEDFROM       VARCHAR(2083),
-  NAME             VARCHAR(200),
-  PREVIEWURL       VARCHAR(2083),
-  TRACK_NUMBER      INT,
+  EXTERNALURL      TEXT,
+  HREF             TEXT,
+  ID               TEXT,
+  NAME             TEXT,
+  PREVIEWURL       TEXT,
+  TRACK_NUMBER     INT,
   POPULARITY       INT,
-  URI              VARCHAR(2083)
+  URI              TEXT
 
 );

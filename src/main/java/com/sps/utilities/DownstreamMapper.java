@@ -23,7 +23,7 @@ public class DownstreamMapper {
         try {
             return RefinedTrack.builder()
                     .id(fullTrack.getId())
-                    .artists(minimisedRefinedArtists)
+                    .refinedArtists(minimisedRefinedArtists)
                     .availableMarkets(Arrays.asList(fullTrack.getAvailableMarkets().toString().split(",")))
                     .discNum(fullTrack.getDiscNumber())
                     .durationMs(fullTrack.getDurationMs())
@@ -39,7 +39,7 @@ public class DownstreamMapper {
         } catch (MalformedURLException e) {
             return RefinedTrack.builder()
                     .id(fullTrack.getId())
-                    .artists(minimisedRefinedArtists)
+                    .refinedArtists(minimisedRefinedArtists)
                     .availableMarkets(Arrays.asList(fullTrack.getAvailableMarkets().toString().split(",")))
                     .discNum(fullTrack.getDiscNumber())
                     .durationMs(fullTrack.getDurationMs())
@@ -138,8 +138,8 @@ public class DownstreamMapper {
                     .href(fullPlaylist.getHref())
                     .images(imageUrls)
                     .name(fullPlaylist.getName())
-                    .owner(mapUser(fullPlaylist.getOwner()))
-                    .tracks(formattedRefinedTracks)
+                    .refinedUser(mapUser(fullPlaylist.getOwner()))
+                    .refinedTracks(formattedRefinedTracks)
                     .build();
         } catch (MalformedURLException e) {
             return RefinedPlaylist.builder()
@@ -149,8 +149,8 @@ public class DownstreamMapper {
                     .href(fullPlaylist.getHref())
                     .images(imageUrls)
                     .name(fullPlaylist.getName())
-                    .owner(mapUser(fullPlaylist.getOwner()))
-                    .tracks(formattedRefinedTracks)
+                    .refinedUser(mapUser(fullPlaylist.getOwner()))
+                    .refinedTracks(formattedRefinedTracks)
                     .build();
         }
 

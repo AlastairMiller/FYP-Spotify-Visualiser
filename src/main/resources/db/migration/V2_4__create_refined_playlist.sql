@@ -1,12 +1,11 @@
 CREATE TABLE REFINED_PLAYLIST (
 
-  URI              VARCHAR(2083),
-  EXTERNALURL      VARCHAR(2083),
+  URI              TEXT,
+  EXTERNALURL      TEXT,
   NUM_OF_FOLLOWERS INT,
-  HREF             VARCHAR(2083),
-  ID               VARCHAR(100),
-  NAME             VARCHAR(100),
-  OWNER_ID         VARCHAR(100),
-  SNAPSHOTID       VARCHAR(100)
-
+  HREF             TEXT,
+  REFINED_USER_ID  TEXT,
+  ID               TEXT,
+  NAME             TEXT,
+  OWNER_ID         TEXT
 );

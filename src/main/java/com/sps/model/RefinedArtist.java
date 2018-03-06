@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
@@ -24,6 +25,8 @@ public class RefinedArtist implements Serializable {
     private URL externalURL;
     @ElementCollection
     private List<String> genres;
+    @ManyToMany(targetEntity = RefinedArtist.class)
+    private List<RefinedArtist> refinedArtists;
     private String href;
     private String name;
     private String type;
