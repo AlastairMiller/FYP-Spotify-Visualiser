@@ -1,4 +1,4 @@
-package sps;
+package com.sv.sps;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

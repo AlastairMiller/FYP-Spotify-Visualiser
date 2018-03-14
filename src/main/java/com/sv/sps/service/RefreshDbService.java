@@ -1,4 +1,4 @@
-package sps.service;
+package com.sv.sps.service;
 
 import com.neovisionaries.i18n.CountryCode;
 import com.sps.model.RefinedPlaylist;
@@ -10,6 +10,7 @@ import com.sps.repository.TrackRepository;
 import com.sps.repository.UserRepository;
 import com.sps.service.SpotifyAuthenticationService;
 import com.sps.utilities.DownstreamMapper;
+import com.sv.sps.utilities.DownstreamMapper;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
 import com.wrapper.spotify.model_objects.specification.*;
@@ -21,12 +22,11 @@ import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
 import com.wrapper.spotify.requests.data.tracks.GetSeveralTracksRequest;
 import com.wrapper.spotify.requests.data.tracks.GetTrackRequest;
 import com.wrapper.spotify.requests.data.users_profile.GetUsersProfileRequest;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import refinedDataModels.RefinedPlaylist;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +34,6 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-
 @Slf4j
 public class RefreshDbService {
 
@@ -68,7 +67,7 @@ public class RefreshDbService {
         List<RefinedPlaylist> playlistsToPull = playlistRepository.findByName(null);
         pullLocationPlaylists(api);
         pullFeaturedPlaylists(api);
-        //TODO pull playlists from user.
+
         if (!playlistsToPull.isEmpty()) {
             for (RefinedPlaylist aRefinedPlaylistToPull : playlistsToPull) {
                 pullPlaylist(api, aRefinedPlaylistToPull);
@@ -159,7 +158,7 @@ public class RefreshDbService {
                 }
 
                 for (Track track : trackArrayList) {
-                    trackRepository.saveAndFlush(DownstreamMapper.mapSong(track));
+                    trackRepository.saveAndFlush(DownstreamMapper.mapTrack(track));
                     log.info("Saved Song: {} to the database", track.getName());
                 }
             }

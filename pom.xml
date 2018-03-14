@@ -57,6 +57,18 @@
         </dependency>
 
         <dependency>
+            <groupId>com.sv</groupId>
+            <artifactId>mongoDatamodel</artifactId>
+            <version>1.0.0-RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sv</groupId>
+            <artifactId>mongoDao</artifactId>
+            <version>1.0.0-RELEASE</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.18</version>
