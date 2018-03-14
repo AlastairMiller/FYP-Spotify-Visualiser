@@ -1,4 +1,4 @@
-package com.sps.service;
+package sps.service;
 
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.credentials.ClientCredentials;
@@ -15,13 +15,12 @@ import java.util.concurrent.Future;
 
 @Slf4j
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AuthenticationService {
+public class SpotifyAuthenticationService {
     private final String clientId;
     private final String clientSecret;
 
     @Autowired
-    public AuthenticationService(@Value("${clientId}") String clientId, @Value("${clientSecret}") String clientSecret) {
+    public SpotifyAuthenticationService(@Value("${clientId}") String clientId, @Value("${clientSecret}") String clientSecret) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
     }

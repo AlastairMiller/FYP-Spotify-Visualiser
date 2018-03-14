@@ -1,9 +1,5 @@
-package com.sps.utilities;
+package sps.utilities;
 
-import com.sps.model.RefinedArtist;
-import com.sps.model.RefinedPlaylist;
-import com.sps.model.RefinedTrack;
-import com.sps.model.RefinedUser;
 import com.wrapper.spotify.model_objects.specification.*;
 
 import java.net.MalformedURLException;

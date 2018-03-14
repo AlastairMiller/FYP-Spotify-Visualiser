@@ -1,4 +1,4 @@
-package com.sps.service;
+package sps.service;
 
 import com.neovisionaries.i18n.CountryCode;
 import com.sps.model.RefinedPlaylist;
@@ -8,6 +8,7 @@ import com.sps.repository.ArtistRepository;
 import com.sps.repository.PlaylistRepository;
 import com.sps.repository.TrackRepository;
 import com.sps.repository.UserRepository;
+import com.sps.service.SpotifyAuthenticationService;
 import com.sps.utilities.DownstreamMapper;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
@@ -33,9 +34,9 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
+
 @Slf4j
-public class RefreshLocalDbService {
+public class RefreshDbService {
 
     //TODO 1. Catch when access token expires
     //TODO 3. Write UI
@@ -44,13 +45,13 @@ public class RefreshLocalDbService {
     //TODO 6. Find someplace to host
 
     PlaylistRepository playlistRepository;
-    AuthenticationService authenticationService;
+    private SpotifyAuthenticationService authenticationService;
     UserRepository userRepository;
     TrackRepository trackRepository;
     ArtistRepository artistRepository;
 
     @Autowired
-    public RefreshLocalDbService(AuthenticationService authenticationService, PlaylistRepository playlistRepository, UserRepository userRepository, TrackRepository trackRepository, ArtistRepository artistRepository) {
+    public RefreshDbService(SpotifyAuthenticationService authenticationService, PlaylistRepository playlistRepository, UserRepository userRepository, TrackRepository trackRepository, ArtistRepository artistRepository) {
         this.authenticationService = authenticationService;
         this.playlistRepository = playlistRepository;
         this.userRepository = userRepository;
@@ -59,6 +60,7 @@ public class RefreshLocalDbService {
     }
 
 
+    //TODO Add endpoint when scheduler is implemented to initiate this
     @Scheduled(fixedDelay = 43200)
     public void main() {
         SpotifyApi api = authenticationService.clientCredentialFlow();
