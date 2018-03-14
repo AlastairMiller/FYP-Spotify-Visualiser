@@ -2,27 +2,73 @@ package com.sv.sps.utilities;
 
 import com.wrapper.spotify.model_objects.specification.*;
 import lombok.extern.slf4j.Slf4j;
-import refinedDataModels.RefinedArtist;
-import refinedDataModels.RefinedPlaylist;
-import refinedDataModels.RefinedTrack;
-import refinedDataModels.RefinedUser;
+import refinedDataModels.*;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
 public class DownstreamMapper {
 
+
+    private static <T> List<String> returnNestedIds(Class<?> clazz, List<T> objects) {
+        List<String> nestedIds = new ArrayList<>();
+        for (T object : objects) {
+            try {
+                Field field = clazz.getDeclaredField("id");
+                Method getter = clazz.getDeclaredMethod("get" + field.getName().substring(0, 1).toUpperCase() +
+                        field.getName().substring(1));
+                nestedIds.add(String.valueOf(getter.invoke(object)));
+            } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        return nestedIds;
+    }
+
+
+    public static RefinedAlbum mapAlbum(Album fullAlbum) {
+        List<String> refinedArtists = returnNestedIds(ArtistSimplified.class, Arrays.asList(fullAlbum.getArtists()));
+        List<String> tracksIds = returnNestedIds(TrackSimplified.class, Arrays.asList(fullAlbum.getTracks().getItems()));
+        try {
+            return RefinedAlbum.builder()
+                    .id(fullAlbum.getId())
+                    .name(fullAlbum.getName())
+                    .artistsIds(refinedArtists)
+                    .trackIds(tracksIds)
+                    .imageURL(new URL(fullAlbum.getImages()[0].getUrl()))
+                    .releaseDate(new Date(fullAlbum.getReleaseDate()))
+                    .popularity(fullAlbum.getPopularity())
+                    .externalURL(new URL(fullAlbum.getExternalUrls().get("spotify")))
+                    .href(new URL(fullAlbum.getHref()))
+                    .uri(URI.create(fullAlbum.getUri()))
+                    .build();
+        } catch (MalformedURLException e) {
+            log.error("Either the album's externalUrl: {} or imageUrl: {} is invalid",
+                    fullAlbum.getExternalUrls().get("spotify"), fullAlbum.getImages()[0].getUrl());
+            return RefinedAlbum.builder()
+                    .id(fullAlbum.getId())
+                    .name(fullAlbum.getName())
+                    .artistsIds(refinedArtists)
+                    .trackIds(tracksIds)
+                    .releaseDate(new Date(fullAlbum.getReleaseDate()))
+                    .popularity(fullAlbum.getPopularity())
+                    .uri(URI.create(fullAlbum.getUri()))
+                    .build();
+        }
+    }
+
     public static RefinedTrack mapTrack(Track fullTrack) {
-        List<String> artistIds = new ArrayList<>();
-        List<String> albumIds  = new ArrayList<>();
-//        for (int i = 0; i < fullTrack.getArtists().length; i++) {
-//            minimisedRefinedArtists.add(mapSimpleArtist(fullTrack.getArtists()[i]));
-//        }
+        List<String> artistIds = returnNestedIds(ArtistSimplified.class, Arrays.asList(fullTrack.getArtists()));
+        List<String> albumIds = returnNestedIds(AlbumSimplified.class, Arrays.asList(fullTrack.getAlbum()));
         try {
             return RefinedTrack.builder()
                     .id(fullTrack.getId())
@@ -57,13 +103,11 @@ public class DownstreamMapper {
     }
 
     public static RefinedArtist mapArtist(Artist fullArtist) {
-        List<String> albumIds  = new ArrayList<>();
         try {
             return RefinedArtist.builder()
                     .id(fullArtist.getId())
                     .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
                     .genres(Arrays.asList(fullArtist.getGenres()))
-                    .refinedAlbumIds(albumIds)
                     .href(new URL(fullArtist.getHref()))
                     .name(fullArtist.getName())
                     .followers(fullArtist.getFollowers().getTotal())
@@ -76,7 +120,6 @@ public class DownstreamMapper {
             return RefinedArtist.builder()
                     .id(fullArtist.getId())
                     .genres(Arrays.asList(fullArtist.getGenres()))
-                    .refinedAlbumIds(albumIds)
                     .name(fullArtist.getName())
                     .followers(fullArtist.getFollowers().getTotal())
                     .popularity(fullArtist.getPopularity())
@@ -110,8 +153,8 @@ public class DownstreamMapper {
         }
     }
 
-    public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist){
-        List<String> trackIds = new ArrayList<>();
+    public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist) {
+        List<String> trackIds = returnNestedIds(PlaylistTrack.class, Arrays.asList(fullPlaylist.getTracks().getItems()));
         try {
             return RefinedPlaylist.builder()
                     .id(fullPlaylist.getId())
@@ -138,6 +181,5 @@ public class DownstreamMapper {
         }
 
     }
-
 
 }
