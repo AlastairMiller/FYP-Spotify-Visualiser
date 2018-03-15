@@ -1,4 +1,4 @@
-package com.sv.sps.utilities;
+package com.sv.svi.utils;
 
 import com.wrapper.spotify.model_objects.specification.*;
 import lombok.extern.slf4j.Slf4j;

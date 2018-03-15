@@ -1,4 +1,4 @@
-package com.sv.sps.service;
+package com.sv.svi.service;
 
 import com.neovisionaries.i18n.CountryCode;
 import com.sps.model.RefinedPlaylist;
@@ -10,7 +10,8 @@ import com.sps.repository.TrackRepository;
 import com.sps.repository.UserRepository;
 import com.sps.service.SpotifyAuthenticationService;
 import com.sps.utilities.DownstreamMapper;
-import com.sv.sps.utilities.DownstreamMapper;
+import com.sv.svi.SpotifyAuthenticationHelper;
+import com.sv.svi.utils.DownstreamMapper;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
 import com.wrapper.spotify.model_objects.specification.*;
@@ -44,13 +45,13 @@ public class RefreshDbService {
     //TODO 6. Find someplace to host
 
     PlaylistRepository playlistRepository;
-    private SpotifyAuthenticationService authenticationService;
+    private SpotifyAuthenticationHelper authenticationService;
     UserRepository userRepository;
     TrackRepository trackRepository;
     ArtistRepository artistRepository;
 
     @Autowired
-    public RefreshDbService(SpotifyAuthenticationService authenticationService, PlaylistRepository playlistRepository, UserRepository userRepository, TrackRepository trackRepository, ArtistRepository artistRepository) {
+    public RefreshDbService(SpotifyAuthenticationHelper authenticationService, PlaylistRepository playlistRepository, UserRepository userRepository, TrackRepository trackRepository, ArtistRepository artistRepository) {
         this.authenticationService = authenticationService;
         this.playlistRepository = playlistRepository;
         this.userRepository = userRepository;
