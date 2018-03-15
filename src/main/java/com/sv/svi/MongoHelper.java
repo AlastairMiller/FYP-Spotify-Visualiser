@@ -14,8 +14,8 @@ public class MongoHelper {
     @Getter
     private final BaseDao mongoDao;
 
-    public MongoHelper(@Value("$mongo.hostname:localhost") String hostname, @Value("${mongo.port:27017") int port,
-                       @Value("$mongo.username:mongo") String username, @Value("$mongo.dbname:spotify") String dbname, @Value("$mongo.password:mongo") String password) {
+    public MongoHelper(@Value("${mongo.hostname:localhost}") String hostname, @Value("${mongo.port:27017}") int port,
+                       @Value("{$mongo.username:mongo}") String username, @Value("${mongo.dbname:spotify}") String dbname, @Value("${mongo.password:mongo}") String password) {
 
         mongoDao = new BaseDao(new ClientHandler(hostname, port, username, dbname, password.toCharArray()));
     }

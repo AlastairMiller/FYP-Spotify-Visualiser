@@ -6,13 +6,19 @@ import com.wrapper.spotify.requests.authorization.client_credentials.ClientCrede
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Slf4j
+@Configuration
 @Component
+@PropertySource("classpath:application.properties")
 public class SpotifyAuthenticationHelper {
     private final String clientId;
     private final String clientSecret;
@@ -40,5 +46,10 @@ public class SpotifyAuthenticationHelper {
          log.error(e.getCause().getMessage());
         }
         return api;
+    }
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+        return new PropertySourcesPlaceholderConfigurer();
     }
 }
