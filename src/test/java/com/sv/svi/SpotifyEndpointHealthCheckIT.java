@@ -8,10 +8,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @Slf4j
@@ -20,9 +18,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @PropertySource("classpath:application.properties")
 public class SpotifyEndpointHealthCheckIT {
 
-    @Value("$clientId")
+    @Value("${clientId}")
     String clientId;
-    @Value("$clientSecret")
+    @Value("${clientSecret}")
     String clientSecret;
 
     SpotifyApi api;

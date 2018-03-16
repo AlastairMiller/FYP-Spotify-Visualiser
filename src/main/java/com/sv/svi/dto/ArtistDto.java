@@ -17,7 +17,7 @@ import java.util.List;
 public class ArtistDto {
 
     private Artist pullArtist(SpotifyApi api, String id) {
-        GetArtistRequest request = api.getArtist(id).build();
+        final GetArtistRequest request = api.getArtist(id).build();
         try {
             return request.execute();
         } catch (Exception e) {
