@@ -1,0 +1,8 @@
+mongo:
+        image: mongo:latest
+        environment:
+          - MONGODB_USER=mongo
+          - MONGODB_PASS=mongo
+          - MONGODB_DATABASE=spotify
+        ports:
+         - "27017:27017"
