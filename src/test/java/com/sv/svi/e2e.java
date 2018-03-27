@@ -8,7 +8,7 @@ import com.sv.svi.dto.TrackDto;
 import com.sv.svi.dto.UserDto;
 import com.sv.svi.utils.DownstreamMapper;
 import com.svd.ClientHandler;
-import com.svd.dao.BaseDao;
+import com.svd.dao.MongoDao;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.specification.Track;
 import de.flapdoodle.embed.mongo.MongodExecutable;
@@ -55,7 +55,7 @@ public class e2e {
 
     private MongodExecutable mongodExe;
     private MongodProcess mongod;
-    private BaseDao mongoDao;
+    private MongoDao mongoDao;
     private String hostname = "127.0.0.1";
     private int port = 12345;
 
@@ -79,7 +79,7 @@ public class e2e {
         mongodExe = starter.prepare(mongodConfig);
         mongod = mongodExe.start();
         MongoClient mongoClient = new MongoClient(hostname, port);
-        mongoDao = new BaseDao<>(new ClientHandler(hostname, port, "embedded"));
+        mongoDao = new MongoDao<>(new ClientHandler(hostname, port, "embedded"));
     }
 
     @After

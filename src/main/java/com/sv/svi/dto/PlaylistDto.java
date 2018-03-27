@@ -2,7 +2,7 @@ package com.sv.svi.dto;
 
 import com.mongodb.client.MongoCollection;
 import com.sv.svi.utils.DownstreamMapper;
-import com.svd.dao.BaseDao;
+import com.svd.dao.MongoDao;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.specification.Playlist;
 import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
@@ -73,7 +73,7 @@ public class PlaylistDto {
 //        }
     }
 
-    public void pullAndSavePlaylist(SpotifyApi api, String ownerId, List<String> playlistIds, BaseDao<RefinedPlaylist> playlistDao) {
+    public void pullAndSavePlaylist(SpotifyApi api, String ownerId, List<String> playlistIds, MongoDao<RefinedPlaylist> playlistDao) {
         List<RefinedPlaylist> playlists = new ArrayList<>();
         MongoCollection<Document> mongoCollection = playlistDao.getCollection("RefinedPlaylist");
         for (String playlist : playlistIds) {

@@ -60,13 +60,13 @@
         <dependency>
             <groupId>com.sv</groupId>
             <artifactId>mongoDatamodel</artifactId>
-            <version>1.0.0-RELEASE</version>
+            <version>1.0.2-RELEASE</version>
         </dependency>
 
         <dependency>
             <groupId>com.sv</groupId>
             <artifactId>mongoDao</artifactId>
-            <version>1.0.0-RELEASE</version>
+            <version>1.0.2-RELEASE</version>
         </dependency>
 
         <dependency>
