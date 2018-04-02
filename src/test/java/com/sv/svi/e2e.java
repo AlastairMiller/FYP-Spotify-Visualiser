@@ -10,6 +10,7 @@ import com.sv.svi.utils.DownstreamMapper;
 import com.svd.ClientHandler;
 import com.svd.dao.MongoDao;
 import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.model_objects.specification.Album;
 import com.wrapper.spotify.model_objects.specification.Track;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
@@ -31,10 +32,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import refinedDataModels.RefinedAlbum;
 import refinedDataModels.RefinedTrack;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 
+import static com.svd.mapper.JsontoRefinedMapper.toAlbum;
 import static com.svd.mapper.JsontoRefinedMapper.toTrack;
 
 @Slf4j
@@ -91,16 +95,28 @@ public class e2e {
     }
 
     @Test
-    public void shouldPullAndSaveTrack(){
+    public void shouldPullAndSaveTrack() throws MalformedURLException {
         Track track = TrackDto.pullTrack(api, "2g9txG7vtGj8lNuNLDxQhu");
         assert(track != null);
-        RefinedTrack refinedTrack = DownstreamMapper.mapTrack(track);
+        RefinedTrack expectedTrack = DownstreamMapper.mapTrack(track);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedTracks");
-        mongoDao.saveEntryToDatabase(RefinedTrack.class, refinedTrack, mongoCollection);
-        Object object = mongoDao.retrieveEntryById("2g9txG7vtGj8lNuNLDxQhu", "RefinedTracks");
+        mongoDao.saveEntryToDatabase(RefinedTrack.class, expectedTrack, mongoCollection);
+        Object object = mongoDao.retrieveEntryById("0gtU58GVllHFpZzIgLd5lV", "RefinedTracks");
         RefinedTrack actualSong = toTrack((Document) object);
-        Assert.assertEquals(refinedTrack, actualSong);
+        Assert.assertEquals(expectedTrack, actualSong);
 
+    }
+
+    @Test
+    public void shouldPullAndSaveAlbum() throws MalformedURLException {
+        Album album = AlbumDto.pullAlbum(api,"0gtU58GVllHFpZzIgLd5lV");
+        assert (album != null);
+        RefinedAlbum expectedAlbum = DownstreamMapper.mapAlbum(album);
+        MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedAlbums");
+        mongoDao.saveEntryToDatabase(RefinedAlbum.class, expectedAlbum,mongoCollection);
+        Object albumObject = mongoDao.retrieveEntryById("0gtU58GVllHFpZzIgLd5lV", "RefinedAlbums");
+        RefinedAlbum actualAlbum = toAlbum((Document) albumObject);
+        Assert.assertEquals(expectedAlbum,actualAlbum);
     }
 
 }

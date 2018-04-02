@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import refinedDataModels.RefinedPlaylist;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -77,13 +78,17 @@ public class PlaylistDto {
         List<RefinedPlaylist> playlists = new ArrayList<>();
         MongoCollection<Document> mongoCollection = playlistDao.getCollection("RefinedPlaylist");
         for (String playlist : playlistIds) {
-            playlistDao.saveEntryToDatabase(RefinedPlaylist.class, DownstreamMapper.mapPlaylist(pullPlaylist(api, ownerId, playlist)), mongoCollection);
+            try {
+                playlistDao.saveEntryToDatabase(RefinedPlaylist.class, DownstreamMapper.mapPlaylist(pullPlaylist(api, ownerId, playlist)), mongoCollection);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
 
     private Playlist pullPlaylist(SpotifyApi api, RefinedPlaylist refinedPlaylistToPull) {
-        return pullPlaylist(api, refinedPlaylistToPull.getRefinedUserId(), refinedPlaylistToPull.getId());
+        return pullPlaylist(api, refinedPlaylistToPull.getUserId(), refinedPlaylistToPull.getId());
     }
 
     private Playlist pullPlaylist(SpotifyApi api, String ownerId, String playlistId) {

@@ -1,7 +1,7 @@
 package com.sv.svi.utils;
 
-import com.google.gson.internal.LinkedTreeMap;
-import com.svd.mapper.Builder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.svd.mapper.RefinedObjectBuilder;
 import com.wrapper.spotify.model_objects.specification.*;
 import lombok.extern.slf4j.Slf4j;
 import refinedDataModels.*;
@@ -11,13 +11,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 import static com.svd.mapper.RefinedtoJsonMapper.invokeSimpleGetter;
 
 @Slf4j
 public class DownstreamMapper {
-
+    private static List<String> listOfIds = new ArrayList<>();
 
     private static <T> List<String> returnNestedIds(Class<?> clazz, List<T> objects) {
         List<String> nestedIds = new ArrayList<>();
@@ -35,43 +39,38 @@ public class DownstreamMapper {
     }
 
 
-    public static RefinedAlbum mapAlbum(Album fullAlbum) {
+    public static RefinedAlbum mapAlbum(Album fullAlbum) throws MalformedURLException {
         List<String> refinedArtists = returnNestedIds(ArtistSimplified.class, Arrays.asList(fullAlbum.getArtists()));
         List<String> tracksIds = returnNestedIds(TrackSimplified.class, Arrays.asList(fullAlbum.getTracks().getItems()));
-        try {
-            return RefinedAlbum.builder()
-                    .id(fullAlbum.getId())
-                    .name(fullAlbum.getName())
-                    .artistsIds(refinedArtists)
-                    .trackIds(tracksIds)
-                    .imageURL(new URL(fullAlbum.getImages()[0].getUrl()))
-                    .releaseDate(new Date(fullAlbum.getReleaseDate()))
-                    .popularity(fullAlbum.getPopularity())
-                    .externalURL(new URL(fullAlbum.getExternalUrls().get("spotify")))
-                    .href(new URL(fullAlbum.getHref()))
-                    .spotifyURI(fullAlbum.getUri())
-                    .build();
-        } catch (MalformedURLException e) {
-            log.error("Either the album's externalUrl: {} or imageUrl: {} is invalid",
-                    fullAlbum.getExternalUrls().get("spotify"), fullAlbum.getImages()[0].getUrl());
-            return RefinedAlbum.builder()
-                    .id(fullAlbum.getId())
-                    .name(fullAlbum.getName())
-                    .artistsIds(refinedArtists)
-                    .trackIds(tracksIds)
-                    .releaseDate(new Date(fullAlbum.getReleaseDate()))
-                    .popularity(fullAlbum.getPopularity())
-                    .spotifyURI(fullAlbum.getUri())
-                    .build();
-        }
+        Map<String, Object> map = mapGeneric(fullAlbum, Album.class);
+        map.put("artistsIds", refinedArtists);
+        map.remove("artists");
+        map.put("trackIds", tracksIds);
+        map.remove("tracks");
+        map.remove("albumType");
+        map.remove("availableMarkets");
+        map.remove("copyrights");
+        map.remove("genres");
+        map.remove("images");
+        map.remove("label");
+        map.remove("releaseDatePrecision");
+        String[] dateAsString = map.get("releaseDate").toString().split("-");
+        LocalDate localDate = LocalDate.of(Integer.parseInt(dateAsString[0]), Integer.parseInt(dateAsString[1]), Integer.parseInt(dateAsString[2]));
+        map.put("releaseDate", new Date(localDate.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()));
+        return (RefinedAlbum) RefinedObjectBuilder.start(RefinedAlbum.class).with(map).build();
     }
 
-    public static RefinedTrack mapTrack(Track fullTrack) {
+    public static RefinedTrack mapTrack(Track fullTrack) throws MalformedURLException {
         Map<String, Object> map = mapGeneric(fullTrack, Track.class);
-        map.put("artists",((ArtistSimplified) map.get("artists")).getId());
-        map.put("album",((ArtistSimplified) map.get("artists")).getId())));
-map.put("album", map.forEach((k,v) -> if(k == "album"){ );)
-        return (RefinedTrack) Builder.start(RefinedTrack.class).with(map).build();
+        map.remove("availableMarkets");
+        map.forEach(DownstreamMapper::getArtistIds);
+        map.put("artistIds", listOfIds);
+        listOfIds = new ArrayList<>();
+        map.remove("artists");
+        map.forEach(DownstreamMapper::getAlbumIds);
+        map.put("albumId", listOfIds.get(0));
+        map.remove("album");
+        return (RefinedTrack) RefinedObjectBuilder.start(RefinedTrack.class).with(map).build();
     }
 
     public static RefinedArtist mapArtist(Artist fullArtist) {
@@ -100,25 +99,25 @@ map.put("album", map.forEach((k,v) -> if(k == "album"){ );)
         }
     }
 
-    public static RefinedUser mapUser(User fullUser) {
-        return (RefinedUser) Builder.start(RefinedUser.class).with(mapGeneric(fullUser, User.class)).build();
+    public static RefinedUser mapUser(User fullUser) throws MalformedURLException {
+        return (RefinedUser) RefinedObjectBuilder.start(RefinedUser.class).with(mapGeneric(fullUser, User.class)).build();
 
     }
 
 
-    public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist) {
-        return (RefinedPlaylist) Builder.start(RefinedPlaylist.class).with(mapGeneric(fullPlaylist, Playlist.class)).build();
+    public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist) throws MalformedURLException {
+        return (RefinedPlaylist) RefinedObjectBuilder.start(RefinedPlaylist.class).with(mapGeneric(fullPlaylist, Playlist.class)).build();
     }
 
-    public static <T> Map<String, Object> mapGeneric(T instance, Class<T> clazz) {
+    public static <T> Map<String, Object> mapGeneric(T instance, Class<T> clazz) throws MalformedURLException {
         Map<String, Object> instanceMap = new HashMap<>();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
             try {
                 Method getter;
-                if (field.getType().getName().equals("boolean")) {
-                    getter = clazz.getDeclaredMethod("is" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
+                if (field.getName().equals("explicit")) {
+                    getter = clazz.getDeclaredMethod("getIs" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
                 } else {
                     getter = clazz.getDeclaredMethod("get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
                 }
@@ -128,10 +127,29 @@ map.put("album", map.forEach((k,v) -> if(k == "album"){ );)
                 e.printStackTrace();
             }
         }
-        ExternalUrl externalUrl = (ExternalUrl) instanceMap.get("externalUrls");
+        instanceMap.remove("type");
+        instanceMap.put("externalURL", new URL(((ExternalUrl) instanceMap.get("externalUrls")).getExternalUrls().get("spotify")));
+        instanceMap.remove("externalUrls");
+        instanceMap.put("spotifyURI", instanceMap.get("uri"));
+        instanceMap.remove("uri");
         instanceMap.remove("externalIds");
-        instanceMap.put("externalUrls", Arrays.asList(((ExternalUrl) instanceMap.get("externalUrls")).getExternalUrls()).get(0));
         return instanceMap;
     }
 
+    private static void getArtistIds(String key, Object value) {
+        if (key.equals("artists")) {
+            for (ArtistSimplified artistSimplified : (ArtistSimplified[]) value) {
+                listOfIds.add(artistSimplified.getId());
+            }
+        }
+    }
+
+    private static void getAlbumIds(String key, Object value) {
+        if (key.equals("album")) {
+            if (value != null) {
+                AlbumSimplified albumSimplified = (AlbumSimplified) value;
+                listOfIds.add(albumSimplified.getId());
+            }
+        }
+    }
 }

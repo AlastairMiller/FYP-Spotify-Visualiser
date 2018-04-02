@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import refinedDataModels.RefinedAlbum;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class AlbumDto {
 
-    private Album pullAlbum(SpotifyApi api, String id) {
+    public static Album pullAlbum(SpotifyApi api, String id) {
         final GetAlbumRequest request = api.getAlbum(id).build();
         try {
             return request.execute();
@@ -28,7 +29,7 @@ public class AlbumDto {
         }
     }
 
-    private List<Album> pullAlbums(SpotifyApi api, List<String> ids) {
+    public static List<Album> pullAlbums(SpotifyApi api, List<String> ids) {
         List<Album> pulledAlbums = new ArrayList<>();
         if (ids.size() > 50) {
             final GetSeveralAlbumsRequest request = api.getSeveralAlbums(ids.subList(0, 49).toString()).build();
@@ -52,7 +53,7 @@ public class AlbumDto {
         }
     }
 
-    public List<RefinedAlbum> pullAndMapAlbums(SpotifyApi api, List<String> ids) {
+    public List<RefinedAlbum> pullAndMapAlbums(SpotifyApi api, List<String> ids) throws MalformedURLException {
         if (ids.size() > 1) {
             List<Album> pulledAlbums = pullAlbums(api, ids);
             List<RefinedAlbum> mappedAlbums = new ArrayList<>();

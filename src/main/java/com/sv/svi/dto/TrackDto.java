@@ -8,6 +8,7 @@ import com.wrapper.spotify.requests.data.tracks.GetTrackRequest;
 import lombok.extern.slf4j.Slf4j;
 import refinedDataModels.RefinedTrack;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,7 +52,7 @@ public class TrackDto {
         }
     }
 
-    public List<RefinedTrack> pullAndMapTracks(SpotifyApi api, List<String> ids) {
+    public List<RefinedTrack> pullAndMapTracks(SpotifyApi api, List<String> ids) throws MalformedURLException {
         if (ids.size() > 1) {
             List<Track> pulledTracks = pullTracks(api, ids);
             List<RefinedTrack> mappedArtists = new ArrayList<>();
