@@ -1,6 +1,5 @@
 package com.sv.svi.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.svd.mapper.RefinedObjectBuilder;
 import com.wrapper.spotify.model_objects.specification.*;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
 

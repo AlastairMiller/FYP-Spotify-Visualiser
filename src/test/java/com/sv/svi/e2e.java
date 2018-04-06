@@ -97,11 +97,11 @@ public class e2e {
     @Test
     public void shouldPullAndSaveTrack() throws MalformedURLException {
         Track track = TrackDto.pullTrack(api, "2g9txG7vtGj8lNuNLDxQhu");
-        assert(track != null);
+        assert (track != null);
         RefinedTrack expectedTrack = DownstreamMapper.mapTrack(track);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedTracks");
         mongoDao.saveEntryToDatabase(RefinedTrack.class, expectedTrack, mongoCollection);
-        Object object = mongoDao.retrieveEntryById("0gtU58GVllHFpZzIgLd5lV", "RefinedTracks");
+        Object object = mongoDao.retrieveEntryById("2g9txG7vtGj8lNuNLDxQhu", "RefinedTracks");
         RefinedTrack actualSong = toTrack((Document) object);
         Assert.assertEquals(expectedTrack, actualSong);
 
@@ -109,14 +109,14 @@ public class e2e {
 
     @Test
     public void shouldPullAndSaveAlbum() throws MalformedURLException {
-        Album album = AlbumDto.pullAlbum(api,"0gtU58GVllHFpZzIgLd5lV");
+        Album album = AlbumDto.pullAlbum(api, "0gtU58GVllHFpZzIgLd5lV");
         assert (album != null);
         RefinedAlbum expectedAlbum = DownstreamMapper.mapAlbum(album);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedAlbums");
-        mongoDao.saveEntryToDatabase(RefinedAlbum.class, expectedAlbum,mongoCollection);
+        mongoDao.saveEntryToDatabase(RefinedAlbum.class, expectedAlbum, mongoCollection);
         Object albumObject = mongoDao.retrieveEntryById("0gtU58GVllHFpZzIgLd5lV", "RefinedAlbums");
         RefinedAlbum actualAlbum = toAlbum((Document) albumObject);
-        Assert.assertEquals(expectedAlbum,actualAlbum);
+        Assert.assertEquals(expectedAlbum, actualAlbum);
     }
 
 }
