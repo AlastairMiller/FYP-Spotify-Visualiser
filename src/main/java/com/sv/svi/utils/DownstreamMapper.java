@@ -94,6 +94,12 @@ public class DownstreamMapper {
 
 
     public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist) throws MalformedURLException {
+        Map<String,Object> map = mapGeneric(fullPlaylist, Playlist.class);
+        map.put("externalUrls", new URL(((ExternalUrl) map.get("images")).get("spotify"));
+        map.remove("collaborative");
+        map.remove("description");
+        map.remove("publicAccess");
+
         return (RefinedPlaylist) RefinedObjectBuilder.start(RefinedPlaylist.class).with(mapGeneric(fullPlaylist, Playlist.class)).build();
     }
 

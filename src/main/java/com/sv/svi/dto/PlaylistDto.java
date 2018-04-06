@@ -74,7 +74,7 @@ public class PlaylistDto {
 //        }
     }
 
-    public void pullAndSavePlaylist(SpotifyApi api, String ownerId, List<String> playlistIds, MongoDao<RefinedPlaylist> playlistDao) {
+    public void pullAndSavePlaylists(SpotifyApi api, String ownerId, List<String> playlistIds, MongoDao<RefinedPlaylist> playlistDao) {
         List<RefinedPlaylist> playlists = new ArrayList<>();
         MongoCollection<Document> mongoCollection = playlistDao.getCollection("RefinedPlaylist");
         for (String playlist : playlistIds) {
@@ -91,7 +91,7 @@ public class PlaylistDto {
         return pullPlaylist(api, refinedPlaylistToPull.getUserId(), refinedPlaylistToPull.getId());
     }
 
-    private Playlist pullPlaylist(SpotifyApi api, String ownerId, String playlistId) {
+    public static Playlist pullPlaylist(SpotifyApi api, String ownerId, String playlistId) {
         //Todo make Async
         final GetPlaylistRequest request = api.getPlaylist(ownerId, playlistId).build();
         try {
