@@ -1,17 +1,17 @@
 package com.sv.svi;
 
+import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.sv.svi.dto.AlbumDto;
-import com.sv.svi.dto.PlaylistDto;
-import com.sv.svi.dto.TrackDto;
-import com.sv.svi.dto.UserDto;
+import com.sv.svi.dto.*;
 import com.sv.svi.utils.DownstreamMapper;
 import com.svd.ClientHandler;
 import com.svd.dao.MongoDao;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.specification.Album;
+import com.wrapper.spotify.model_objects.specification.Artist;
 import com.wrapper.spotify.model_objects.specification.Track;
+import com.wrapper.spotify.model_objects.specification.User;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
 import de.flapdoodle.embed.mongo.MongodStarter;
@@ -33,13 +33,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import refinedDataModels.RefinedAlbum;
+import refinedDataModels.RefinedArtist;
 import refinedDataModels.RefinedTrack;
+import refinedDataModels.RefinedUser;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import static com.svd.mapper.JsontoRefinedMapper.toAlbum;
-import static com.svd.mapper.JsontoRefinedMapper.toTrack;
+import static com.svd.mapper.JsontoRefinedMapper.*;
 
 @Slf4j
 @SpringBootTest
@@ -97,7 +98,7 @@ public class e2e {
     @Test
     public void shouldPullAndSaveTrack() throws MalformedURLException {
         Track track = TrackDto.pullTrack(api, "2g9txG7vtGj8lNuNLDxQhu");
-        assert (track != null);
+        assert track != null;
         RefinedTrack expectedTrack = DownstreamMapper.mapTrack(track);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedTracks");
         mongoDao.saveEntryToDatabase(RefinedTrack.class, expectedTrack, mongoCollection);
@@ -110,13 +111,38 @@ public class e2e {
     @Test
     public void shouldPullAndSaveAlbum() throws MalformedURLException {
         Album album = AlbumDto.pullAlbum(api, "0gtU58GVllHFpZzIgLd5lV");
-        assert (album != null);
+        assert album != null;
         RefinedAlbum expectedAlbum = DownstreamMapper.mapAlbum(album);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedAlbums");
         mongoDao.saveEntryToDatabase(RefinedAlbum.class, expectedAlbum, mongoCollection);
         Object albumObject = mongoDao.retrieveEntryById("0gtU58GVllHFpZzIgLd5lV", "RefinedAlbums");
         RefinedAlbum actualAlbum = toAlbum((Document) albumObject);
         Assert.assertEquals(expectedAlbum, actualAlbum);
+    }
+
+    @Test
+    public void shouldPullAndSaveArtist() throws MalformedURLException {
+        Artist artist = ArtistDto.pullArtist(api, "5WId4o5jdGVhptNU0uqKxu");
+        assert artist != null;
+        RefinedArtist expectedArtist = DownstreamMapper.mapArtist(artist);
+        MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedArtists");
+        mongoDao.saveEntryToDatabase(RefinedArtist.class, expectedArtist, mongoCollection);
+        Object artistObject = mongoDao.retrieveEntryById("5WId4o5jdGVhptNU0uqKxu", "RefinedArtists");
+        RefinedArtist actualArtist = toArtist((Document) artistObject);
+        Assert.assertEquals(expectedArtist, actualArtist);
+    }
+
+    @Test
+    public void shouldPullAndSaveUser() throws MalformedURLException {
+        User user = UserDto.pullUser(api, "spotify");
+        assert user != null;
+        RefinedUser expectedUser = DownstreamMapper.mapUser(user);
+        MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedUsers");
+        mongoDao.saveEntryToDatabase(RefinedUser.class, expectedUser, mongoCollection);
+        Object userObject = mongoDao.retrieveEntryById("spotify", "RefinedUsers");
+        RefinedUser actualUser = toUser((Document) userObject);
+        Assert.assertEquals(expectedUser, actualUser);
+
     }
 
 }

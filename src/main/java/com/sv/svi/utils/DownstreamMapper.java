@@ -70,34 +70,25 @@ public class DownstreamMapper {
         return (RefinedTrack) RefinedObjectBuilder.start(RefinedTrack.class).with(map).build();
     }
 
-    public static RefinedArtist mapArtist(Artist fullArtist) {
-        try {
-            return RefinedArtist.builder()
-                    .id(fullArtist.getId())
-                    .externalURL((new URL(fullArtist.getExternalUrls().get("spotify"))))
-                    .genres(Arrays.asList(fullArtist.getGenres()))
-                    .href(new URL(fullArtist.getHref()))
-                    .name(fullArtist.getName())
-                    .followers(fullArtist.getFollowers().getTotal())
-                    .popularity(fullArtist.getPopularity())
-                    .spotifyURI(fullArtist.getUri())
-                    .build();
-        } catch (MalformedURLException e) {
-            log.error("Either the track's externalUrl: {} or href: {} is invalid",
-                    fullArtist.getExternalUrls().get("spotify"), fullArtist.getHref());
-            return RefinedArtist.builder()
-                    .id(fullArtist.getId())
-                    .genres(Arrays.asList(fullArtist.getGenres()))
-                    .name(fullArtist.getName())
-                    .followers(fullArtist.getFollowers().getTotal())
-                    .popularity(fullArtist.getPopularity())
-                    .spotifyURI(fullArtist.getUri())
-                    .build();
-        }
+    public static RefinedArtist mapArtist(Artist fullArtist) throws MalformedURLException {
+        Map<String, Object> map = mapGeneric(fullArtist, Artist.class);
+        map.remove("images");
+        map.replace("followers", ((Followers) map.get("followers")).getTotal());
+        map.replace("genres", (Arrays.asList((String[]) map.get("genres"))));
+        return (RefinedArtist) RefinedObjectBuilder.start(RefinedArtist.class).with(map).build();
     }
 
     public static RefinedUser mapUser(User fullUser) throws MalformedURLException {
-        return (RefinedUser) RefinedObjectBuilder.start(RefinedUser.class).with(mapGeneric(fullUser, User.class)).build();
+        Map<String, Object> map = mapGeneric(fullUser, User.class);
+        map.put("numOfFollowers", ((Followers) map.get("followers")).getTotal());
+        map.put("imageURL", new URL(((Image[]) map.get("images"))[0].getUrl()));
+        map.remove("followers");
+        map.remove("images");
+        map.remove("birthdate");
+        map.remove("country");
+        map.remove("email");
+        map.remove("product");
+        return (RefinedUser) RefinedObjectBuilder.start(RefinedUser.class).with(map).build();
 
     }
 

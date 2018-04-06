@@ -8,6 +8,7 @@ import com.wrapper.spotify.requests.data.artists.GetSeveralArtistsRequest;
 import lombok.extern.slf4j.Slf4j;
 import refinedDataModels.RefinedArtist;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,7 +17,7 @@ import java.util.List;
 @Slf4j
 public class ArtistDto {
 
-    private Artist pullArtist(SpotifyApi api, String id) {
+     public static Artist pullArtist(SpotifyApi api, String id) {
         final GetArtistRequest request = api.getArtist(id).build();
         try {
             return request.execute();
@@ -51,7 +52,7 @@ public class ArtistDto {
         }
     }
 
-    public List<RefinedArtist> pullAndMapArtists(SpotifyApi api, List<String> ids) {
+    public List<RefinedArtist> pullAndMapArtists(SpotifyApi api, List<String> ids) throws MalformedURLException {
         if (ids.size() > 1) {
             List<Artist> pulledArtists = pullArtists(api, ids);
             List<RefinedArtist> mappedArtists = new ArrayList<>();

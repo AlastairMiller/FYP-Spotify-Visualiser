@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserDto {
 
-    private User pullUser(SpotifyApi api, String id) {
+    public static User pullUser(SpotifyApi api, String id) {
         //Todo MakeAsync
         final GetUsersProfileRequest request = api.getUsersProfile(id).build();
         try {
