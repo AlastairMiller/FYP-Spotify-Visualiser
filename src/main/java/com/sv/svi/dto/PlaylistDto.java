@@ -62,16 +62,17 @@ public class PlaylistDto {
     }
 
     public void saveSimplePlaylistsToDatastore(SpotifyApi api, List<PlaylistSimplified> playlistsToSave) {
-//        for (PlaylistSimplified simplePlaylist : playlistsToSave) {
-//            Playlist fullPlaylist = convertSimplePlaylistToPlaylist(api, simplePlaylist);
-//            if (fullPlaylist != null) {
-//                if (playlistRepository.findById(fullPlaylist.getId()) == null) {
-//                    saveSpotifyPlaylist(api, fullPlaylist);
-//                } else {
-//                    //Attempt to clean up the playlist.
-//                }
-//            }
-//        }
+        //TODO reduce api calls here
+        for (PlaylistSimplified simplePlaylist : playlistsToSave) {
+            Playlist fullPlaylist = convertSimplePlaylistToPlaylist(api, simplePlaylist);
+            if (fullPlaylist != null) {
+                if (playlistRepository.findById(fullPlaylist.getId()) == null) {
+                    saveSpotifyPlaylist(api, fullPlaylist);
+                } else {
+                    //Attempt to clean up the playlist.
+                }
+            }
+        }
     }
 
     public void pullAndSavePlaylists(SpotifyApi api, String ownerId, List<String> playlistIds, MongoDao<RefinedPlaylist> playlistDao) {

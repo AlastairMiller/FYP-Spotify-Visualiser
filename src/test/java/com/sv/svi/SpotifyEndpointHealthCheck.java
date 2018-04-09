@@ -19,7 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @PropertySource("classpath:application.properties")
-public class SpotifyEndpointHealthCheckIT {
+public class SpotifyEndpointHealthCheck {
 
     @Value("${clientId}")
     String clientId;
