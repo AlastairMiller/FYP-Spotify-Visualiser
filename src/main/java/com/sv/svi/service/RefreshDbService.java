@@ -11,8 +11,8 @@ import com.wrapper.spotify.requests.data.browse.GetListOfFeaturedPlaylistsReques
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import sun.nio.ch.SelectorImpl;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -51,21 +51,18 @@ public class RefreshDbService {
     }
 
     private void pullLocationPlaylists(SpotifyApi api) {
-        log.info("-----------------------Pulling Location Playlists-----------------------");
+        log.info("-----------------------Pulling location playlist's-----------------------");
         int playlistRetrieval = 0;
         List<PlaylistSimplified> playlists = playlistDto.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval);
         playlists.removeIf(SimplePlaylist -> !SimplePlaylist.getName().contains("The Sound of "));
-        playlists.removeIf(SimplePlaylist -> SimplePlaylist.getName().matches("\\w*[A-Z][A-Z]\\b"));
-        for (int i = 0; i < playlists.size(); i++) {
-            if (playlists.get(i).getName().matches(".*[A-Z][A-Z]\\b")) {
-                playlists.remove(i);
-            }
-        }
-        playlistDto.saveSimplePlaylistsToDatastore(api, playlists);
+        playlists.removeIf(SimplePlaylist -> SimplePlaylist.getName().matches(".* [A-Z][A-Z]\\b"));
+        playlists.subList(100,playlists.size()).clear();
+        playlistDto.saveSimplePlaylistsToMongo(api, playlists, mongoHelper.getMongoDao());
+        log.info("{} playlists in the database", mongoHelper.getMongoDao().getCollection("RefinedPlaylists").count());
     }
 
     private void pullFeaturedPlaylists(SpotifyApi api) {
-        log.info("-----------------------Pulling featured Playlists-----------------------");
+        log.info("-----------------------Pulling featured playlist's-----------------------");
         Date timestamp = new Date();
         FeaturedPlaylists featuredPlaylists;
 
@@ -80,7 +77,7 @@ public class RefreshDbService {
             //Todo async
             featuredPlaylists = request.execute();
             List<PlaylistSimplified> featuredPlaylistList = Arrays.asList(featuredPlaylists.getPlaylists().getItems());
-            playlistDto.saveSimplePlaylistsToDatastore(api, featuredPlaylistList);
+            playlistDto.saveSimplePlaylistsToMongo(api, featuredPlaylistList, mongoHelper.getMongoDao());
         } catch (Exception e) {
             log.error("Failed to pull featured Playlists from Spotify Api, HTTP Status code: {}", e.getMessage());
         }

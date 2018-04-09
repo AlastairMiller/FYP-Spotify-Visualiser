@@ -21,6 +21,7 @@ import java.util.List;
 @Slf4j
 @NoArgsConstructor
 public class PlaylistDto {
+    private static final String collectionName = "RefinedPlaylists";
 
     public List<PlaylistSimplified> pullPlaylistsForAUser(SpotifyApi api, String userId, int offset) {
         final GetListOfUsersPlaylistsRequest request = api.getListOfUsersPlaylists(userId).limit(50).offset(offset).build();
@@ -38,9 +39,49 @@ public class PlaylistDto {
         }
     }
 
+
+    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao) {
+        List<Playlist> completedPlaylists = new ArrayList<>();
+        for (PlaylistSimplified simplePlaylist : playlistsToSave) {
+            completedPlaylists.add(convertSimplePlaylistToPlaylist(api, simplePlaylist));
+            log.info("Pulled Playlist: {}", simplePlaylist.getName());
+        }
+        savePlaylists(api, completedPlaylists, playlistDao);
+    }
+
+    public static Playlist pullPlaylist(SpotifyApi api, String ownerId, String playlistId) {
+        //Todo make Async
+        final GetPlaylistRequest request = api.getPlaylist(ownerId, playlistId).build();
+        try {
+            return request.execute();
+        } catch (Exception e) {
+            log.error("Failed to download metadata for playlist {}, HTTP error code: {}", playlistId, e.getMessage());
+            return null;
+        }
+
+    }
+
     private Playlist convertSimplePlaylistToPlaylist(SpotifyApi api, PlaylistSimplified simplePlaylist) {
         return pullPlaylist(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
     }
+
+
+    public void savePlaylists(SpotifyApi api, List<Playlist> playlists, MongoDao playlistDao) {
+        MongoCollection mongoCollection = playlistDao.getCollection(collectionName);
+        for (Playlist playlist : playlists) {
+            if (playlistDao.retrieveEntryById(playlist.getId(), collectionName) == null) {
+                try {
+                    playlistDao.saveEntryToDatabase(RefinedPlaylist.class, DownstreamMapper.mapPlaylist(playlist), mongoCollection);
+                    log.info("Saved a playlist called {}", playlist.getName());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }else {
+                //Playlist Cleanup
+            }
+        }
+    }
+
 
     private void playlistCleanup(SpotifyApi api, RefinedPlaylist newRefinedPlaylist) {
 //        List<RefinedTrack> storedTracks = playlistRepository.findOne(newRefinedPlaylist.getId()).getRefinedTracks();
@@ -60,106 +101,5 @@ public class PlaylistDto {
 //        playlistRepository.delete(newRefinedPlaylist.getId());
 //        savePlaylist(api, newRefinedPlaylist);
     }
-
-    public void saveSimplePlaylistsToDatastore(SpotifyApi api, List<PlaylistSimplified> playlistsToSave) {
-        //TODO reduce api calls here
-        for (PlaylistSimplified simplePlaylist : playlistsToSave) {
-            Playlist fullPlaylist = convertSimplePlaylistToPlaylist(api, simplePlaylist);
-            if (fullPlaylist != null) {
-                if (playlistRepository.findById(fullPlaylist.getId()) == null) {
-                    saveSpotifyPlaylist(api, fullPlaylist);
-                } else {
-                    //Attempt to clean up the playlist.
-                }
-            }
-        }
-    }
-
-    public void pullAndSavePlaylists(SpotifyApi api, String ownerId, List<String> playlistIds, MongoDao<RefinedPlaylist> playlistDao) {
-        List<RefinedPlaylist> playlists = new ArrayList<>();
-        MongoCollection<Document> mongoCollection = playlistDao.getCollection("RefinedPlaylist");
-        for (String playlist : playlistIds) {
-            try {
-                playlistDao.saveEntryToDatabase(RefinedPlaylist.class, DownstreamMapper.mapPlaylist(pullPlaylist(api, ownerId, playlist)), mongoCollection);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-    private Playlist pullPlaylist(SpotifyApi api, RefinedPlaylist refinedPlaylistToPull) {
-        return pullPlaylist(api, refinedPlaylistToPull.getUserId(), refinedPlaylistToPull.getId());
-    }
-
-    public static Playlist pullPlaylist(SpotifyApi api, String ownerId, String playlistId) {
-        //Todo make Async
-        final GetPlaylistRequest request = api.getPlaylist(ownerId, playlistId).build();
-        try {
-            return request.execute();
-        } catch (Exception e) {
-            log.error("Failed to download metadata for playlist {}, HTTP error code: {}", playlistId, e.getMessage());
-            return null;
-        }
-
-    }
-
-
-    private void savePlaylist(SpotifyApi api, RefinedPlaylist fullRefinedPlaylist) {
-
-//        if (playlistRepository.findById(fullRefinedPlaylist.getId()) != null) {
-//            //Attempt to cleanup the playlist
-//        }
-
-//        if (userRepository.findById(fullRefinedPlaylist.getRefinedUser().getId()) == null) {
-//
-//            RefinedUser newRefinedUser = DownstreamMapper.mapUser(pullUser(api, fullRefinedPlaylist.getRefinedUser().getId()));
-//            userRepository.saveAndFlush(newRefinedUser);
-//
-//        }
-//        ArrayList<String> songIdArrayList = new ArrayList<>();
-//        for (int i = 0; i < fullRefinedPlaylist.getRefinedTracks().size(); i++) {
-//            if (trackRepository.findById(fullRefinedPlaylist.getRefinedTracks().get(i).getId()) == null) {
-//                songIdArrayList.add(fullRefinedPlaylist.getRefinedTracks().get(i).getId());
-//            }
-//        }
-//        if (songIdArrayList.size() > 0) {
-//            List<Track> trackArrayList = pullTracks(api, songIdArrayList);
-//            if (trackArrayList != null) {
-//                ArrayList<String> artistIdArrayList = new ArrayList<String>();
-//                for (Track track : trackArrayList) {
-//                    if (track != null) {
-//                        for (int p = 0; p < track.getArtists().length; p++) {
-//                            if (artistRepository.findById(track.getArtists()[p].getId()) == null) {
-//                                artistIdArrayList.add(track.getArtists()[p].getId());
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                List<Artist> artistList = pullArtists(api, artistIdArrayList);
-//                if (artistList != null) {
-//                    for (Artist artist : artistList) {
-//                        artistRepository.saveAndFlush(DownstreamMapper.mapArtist(artist));
-//                        log.info("Saved Artist: {} to the database", artist.getName());
-//                    }
-//                }
-//
-//                for (Track track : trackArrayList) {
-//                    trackRepository.saveAndFlush(DownstreamMapper.mapTrack(track));
-//                    log.info("Saved Song: {} to the database", track.getName());
-//                }
-//            }
-//        }
-//        log.error(fullRefinedPlaylist.toString());
-//        playlistRepository.saveAndFlush(fullRefinedPlaylist);
-        log.info("Saved a playlist called {}", fullRefinedPlaylist.getName());
-    }
-
-//    private void saveSpotifyPlaylist(SpotifyApi api, Playlist fullPlaylist) {
-//        RefinedPlaylist newRefinedPlaylist = DownstreamMapper.mapPlaylist(fullPlaylist);
-//        savePlaylist(api, newRefinedPlaylist);
-//    }
-
 
 }
