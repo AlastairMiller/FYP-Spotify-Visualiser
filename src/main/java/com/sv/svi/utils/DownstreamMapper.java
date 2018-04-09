@@ -23,13 +23,17 @@ public class DownstreamMapper {
     private static <T> List<String> returnNestedIds(Class<?> clazz, List<T> objects) {
         List<String> nestedIds = new ArrayList<>();
         for (T object : objects) {
-            try {
-                Field field = clazz.getDeclaredField("id");
-                Method getter = clazz.getDeclaredMethod("get" + field.getName().substring(0, 1).toUpperCase() +
-                        field.getName().substring(1));
-                nestedIds.add(String.valueOf(getter.invoke(object)));
-            } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+            if(clazz.getName().equals("com.wrapper.spotify.model_objects.specification.PlaylistTrack")){
+                nestedIds.add(((PlaylistTrack) object).getTrack().getId());
+            }else {
+                try {
+                    Field field = clazz.getDeclaredField("id");
+                    Method getter = clazz.getDeclaredMethod("get" + field.getName().substring(0, 1).toUpperCase() +
+                            field.getName().substring(1));
+                    nestedIds.add(String.valueOf(getter.invoke(object)));
+                } catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return nestedIds;
@@ -94,13 +98,21 @@ public class DownstreamMapper {
 
 
     public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist) throws MalformedURLException {
-        Map<String,Object> map = mapGeneric(fullPlaylist, Playlist.class);
-        map.put("externalUrls", new URL(((ExternalUrl) map.get("images")).get("spotify"));
+        List<String> tracksIds = returnNestedIds(PlaylistTrack.class, Arrays.asList(fullPlaylist.getTracks().getItems()));
+        Map<String, Object> map = mapGeneric(fullPlaylist, Playlist.class);
+        map.remove("tracks");
         map.remove("collaborative");
         map.remove("description");
         map.remove("publicAccess");
-
-        return (RefinedPlaylist) RefinedObjectBuilder.start(RefinedPlaylist.class).with(mapGeneric(fullPlaylist, Playlist.class)).build();
+        map.remove("snapshotId");
+        map.put("userId", ((User) map.get("owner")).getId());
+        map.remove("owner");
+        map.put("imageURL", ((Image[]) map.get("images"))[0].getUrl());
+        map.remove("images");
+        map.put("numOfFollowers", ((Followers) map.get("followers")).getTotal());
+        map.remove("followers");
+        map.put("trackIds", tracksIds);
+        return (RefinedPlaylist) RefinedObjectBuilder.start(RefinedPlaylist.class).with(map).build();
     }
 
     public static <T> Map<String, Object> mapGeneric(T instance, Class<T> clazz) throws MalformedURLException {
@@ -110,7 +122,8 @@ public class DownstreamMapper {
             field.setAccessible(true);
             try {
                 Method getter;
-                if (field.getName().equals("explicit")) {
+                //Dodgy Variable naming in Spotify api, some boolean getters called getIs`` while some boolean getters are named get`` :(
+                if ((field.getType().equals(Boolean.class) || field.getType().equals(boolean.class)) && !field.getName().equals("isPlayable")) {
                     getter = clazz.getDeclaredMethod("getIs" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
                 } else {
                     getter = clazz.getDeclaredMethod("get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));

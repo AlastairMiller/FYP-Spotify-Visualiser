@@ -63,6 +63,5 @@ public class ArtistDto {
         } else {
             return new ArrayList<>(Collections.singletonList(DownstreamMapper.mapArtist(pullArtist(api, ids.get(0)))));
         }
-
     }
 }

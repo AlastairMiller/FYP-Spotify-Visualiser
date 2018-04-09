@@ -120,7 +120,7 @@ public class e2e {
         assert playlist != null;
         RefinedPlaylist expectedPlaylist = DownstreamMapper.mapPlaylist(playlist);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedPlaylists");
-        mongoDao.saveEntryToDatabase(RefinedArtist.class, expectedPlaylist, mongoCollection);
+        mongoDao.saveEntryToDatabase(RefinedPlaylist.class, expectedPlaylist, mongoCollection);
         Object playlistObject = mongoDao.retrieveEntryById("2CTdEa3JWbncC1h8WjnuxZ", "RefinedPlaylists");
         RefinedPlaylist actualPlaylist = toPlaylist((Document) playlistObject);
         Assert.assertEquals(expectedPlaylist, actualPlaylist);
