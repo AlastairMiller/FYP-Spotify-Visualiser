@@ -74,7 +74,6 @@ public class RefreshDbService {
                 .timestamp(timestamp)
                 .build();
         try {
-            //Todo async
             featuredPlaylists = request.execute();
             List<PlaylistSimplified> featuredPlaylistList = Arrays.asList(featuredPlaylists.getPlaylists().getItems());
             playlistDto.saveSimplePlaylistsToMongo(api, featuredPlaylistList, mongoHelper.getMongoDao());

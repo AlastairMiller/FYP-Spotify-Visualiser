@@ -1,6 +1,7 @@
 package com.sv.svi.dto;
 
 import com.mongodb.client.MongoCollection;
+import com.sun.xml.internal.ws.util.CompletedFuture;
 import com.sv.svi.utils.DownstreamMapper;
 import com.svd.dao.MongoDao;
 import com.wrapper.spotify.SpotifyApi;
@@ -10,13 +11,14 @@ import com.wrapper.spotify.requests.data.playlists.GetListOfUsersPlaylistsReques
 import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.Document;
 import refinedDataModels.RefinedPlaylist;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @NoArgsConstructor
@@ -40,10 +42,11 @@ public class PlaylistDto {
     }
 
 
-    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao) {
+    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao) throws ExecutionException, InterruptedException {
         List<Playlist> completedPlaylists = new ArrayList<>();
         for (PlaylistSimplified simplePlaylist : playlistsToSave) {
-            completedPlaylists.add(convertSimplePlaylistToPlaylist(api, simplePlaylist));
+            CompletableFuture<Playlist> completableFuture = CompletableFuture.supplyAsync(() -> convertSimplePlaylistToPlaylist(api, simplePlaylist));
+            completedPlaylists.add(completableFuture.get());
             log.info("Pulled Playlist: {}", simplePlaylist.getName());
         }
         savePlaylists(api, completedPlaylists, playlistDao);
@@ -85,6 +88,7 @@ public class PlaylistDto {
 
     private void playlistCleanup(SpotifyApi api, RefinedPlaylist newRefinedPlaylist) {
 //        List<RefinedTrack> storedTracks = playlistRepository.findOne(newRefinedPlaylist.getId()).getRefinedTracks();
+//        for (int i = 0; i < storedTracks.size(); i++) {
 //        for (int i = 0; i < storedTracks.size(); i++) {
 //            Boolean remove = true;
 //            for (int p = 0; p < newRefinedPlaylist.getRefinedTracks().size(); p++) {
