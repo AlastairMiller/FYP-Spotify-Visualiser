@@ -17,6 +17,10 @@ import sun.nio.ch.SelectorImpl;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
@@ -32,6 +36,7 @@ public class RefreshDbService {
 
     private MongoHelper mongoHelper;
     private PlaylistDto playlistDto;
+    private ExecutorService executor = Executors.newFixedThreadPool(16);
 
     @Autowired
     public RefreshDbService(MongoHelper mongoHelper, SpotifyAuthenticationHelper authenticationHelper) {
@@ -57,7 +62,11 @@ public class RefreshDbService {
         playlists.removeIf(SimplePlaylist -> !SimplePlaylist.getName().contains("The Sound of "));
         playlists.removeIf(SimplePlaylist -> SimplePlaylist.getName().matches(".* [A-Z][A-Z]\\b"));
         playlists.subList(100,playlists.size()).clear();
-        playlistDto.saveSimplePlaylistsToMongo(api, playlists, mongoHelper.getMongoDao());
+        try {
+            playlistDto.saveSimplePlaylistsToMongo(api, playlists, mongoHelper.getMongoDao(), executor);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
         log.info("{} playlists in the database", mongoHelper.getMongoDao().getCollection("RefinedPlaylists").count());
     }
 
@@ -76,7 +85,7 @@ public class RefreshDbService {
         try {
             featuredPlaylists = request.execute();
             List<PlaylistSimplified> featuredPlaylistList = Arrays.asList(featuredPlaylists.getPlaylists().getItems());
-            playlistDto.saveSimplePlaylistsToMongo(api, featuredPlaylistList, mongoHelper.getMongoDao());
+            playlistDto.saveSimplePlaylistsToMongo(api, featuredPlaylistList, mongoHelper.getMongoDao(),executor);
         } catch (Exception e) {
             log.error("Failed to pull featured Playlists from Spotify Api, HTTP Status code: {}", e.getMessage());
         }

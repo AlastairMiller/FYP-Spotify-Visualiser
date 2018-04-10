@@ -1,7 +1,6 @@
 package com.sv.svi.dto;
 
 import com.mongodb.client.MongoCollection;
-import com.sun.xml.internal.ws.util.CompletedFuture;
 import com.sv.svi.utils.DownstreamMapper;
 import com.svd.dao.MongoDao;
 import com.wrapper.spotify.SpotifyApi;
@@ -19,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 @Slf4j
 @NoArgsConstructor
@@ -28,9 +29,8 @@ public class PlaylistDto {
     public List<PlaylistSimplified> pullPlaylistsForAUser(SpotifyApi api, String userId, int offset) {
         final GetListOfUsersPlaylistsRequest request = api.getListOfUsersPlaylists(userId).limit(50).offset(offset).build();
         try {
-            //Todo MakeAsync
             List<PlaylistSimplified> usersPlaylist = new ArrayList<>(Arrays.asList(request.execute().getItems()));
-            log.info("Pulled {} playlists for user {}", offset, userId);
+            log.info("Pulled {} simple playlists for user {}", offset, userId);
             if (usersPlaylist.size() == 50) {
                 usersPlaylist.addAll(pullPlaylistsForAUser(api, userId, offset + 50));
             }
@@ -42,18 +42,27 @@ public class PlaylistDto {
     }
 
 
-    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao) throws ExecutionException, InterruptedException {
-        List<Playlist> completedPlaylists = new ArrayList<>();
+    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao, ExecutorService executor) throws ExecutionException, InterruptedException {
+        List<Future> futureList = new ArrayList<>();
         for (PlaylistSimplified simplePlaylist : playlistsToSave) {
-            CompletableFuture<Playlist> completableFuture = CompletableFuture.supplyAsync(() -> convertSimplePlaylistToPlaylist(api, simplePlaylist));
-            completedPlaylists.add(completableFuture.get());
-            log.info("Pulled Playlist: {}", simplePlaylist.getName());
+            Future<Object> completableFuture = convertSimplePlaylistToPlaylist(api, simplePlaylist);
+            futureList.add(completableFuture);
+        }
+        log.error("Pulled {} playlists", futureList.size());
+        List<Playlist> completedPlaylists = new ArrayList<>();
+        while(futureList.size() > 0) {
+            for (Future completableFuture : futureList) {
+                if(completableFuture.isDone()) {
+                    Object object = completableFuture.get();
+                    completedPlaylists.add((Playlist) object );
+                    futureList.remove(completableFuture);
+                }
+            }
         }
         savePlaylists(api, completedPlaylists, playlistDao);
     }
 
     public static Playlist pullPlaylist(SpotifyApi api, String ownerId, String playlistId) {
-        //Todo make Async
         final GetPlaylistRequest request = api.getPlaylist(ownerId, playlistId).build();
         try {
             return request.execute();
@@ -64,8 +73,19 @@ public class PlaylistDto {
 
     }
 
-    private Playlist convertSimplePlaylistToPlaylist(SpotifyApi api, PlaylistSimplified simplePlaylist) {
-        return pullPlaylist(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
+    private static Future<Object> pullPlaylistAsync(SpotifyApi api, String ownerId, String playlistId) {
+        final GetPlaylistRequest request = api.getPlaylist(ownerId, playlistId).build();
+        try {
+            return request.executeAsync();
+        } catch (Exception e) {
+            log.error("Failed to download metadata for playlist {}, HTTP error code: {}", playlistId, e.getMessage());
+            return null;
+        }
+    }
+
+
+    private Future<Object> convertSimplePlaylistToPlaylist(SpotifyApi api, PlaylistSimplified simplePlaylist) {
+        return pullPlaylistAsync(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
     }
 
 
@@ -79,7 +99,7 @@ public class PlaylistDto {
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
-            }else {
+            } else {
                 //Playlist Cleanup
             }
         }
