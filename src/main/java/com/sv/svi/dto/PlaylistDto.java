@@ -15,6 +15,7 @@ import refinedDataModels.RefinedPlaylist;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -51,11 +52,12 @@ public class PlaylistDto {
         log.error("Pulled {} playlists", futureList.size());
         List<Playlist> completedPlaylists = new ArrayList<>();
         while(futureList.size() > 0) {
-            for (Future completableFuture : futureList) {
+            for (Iterator<Future> it = futureList.iterator(); it.hasNext();) {
+                Future completableFuture = it.next();
                 if(completableFuture.isDone()) {
                     Object object = completableFuture.get();
                     completedPlaylists.add((Playlist) object );
-                    futureList.remove(completableFuture);
+                    it.remove();
                 }
             }
         }
