@@ -62,11 +62,7 @@ public class RefreshDbService {
         playlists.removeIf(SimplePlaylist -> !SimplePlaylist.getName().contains("The Sound of "));
         playlists.removeIf(SimplePlaylist -> SimplePlaylist.getName().matches(".* [A-Z][A-Z]\\b"));
         playlists.subList(100,playlists.size()).clear();
-        try {
-            playlistDto.saveSimplePlaylistsToMongo(api, playlists, mongoHelper.getMongoDao(), executor);
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        playlistDto.saveSimplePlaylistsToMongo(api, playlists, mongoHelper.getMongoDao(), executor);
         log.info("{} playlists in the database", mongoHelper.getMongoDao().getCollection("RefinedPlaylists").count());
     }
 

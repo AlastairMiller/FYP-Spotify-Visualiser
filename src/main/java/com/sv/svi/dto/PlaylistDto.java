@@ -11,6 +11,7 @@ import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import refinedDataModels.RefinedPlaylist;
+import refinedDataModels.RefinedTrack;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -43,24 +44,33 @@ public class PlaylistDto {
     }
 
 
-    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao, ExecutorService executor) throws ExecutionException, InterruptedException {
+    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao, ExecutorService executor) {
         List<Future> futureList = new ArrayList<>();
         for (PlaylistSimplified simplePlaylist : playlistsToSave) {
             Future<Object> completableFuture = convertSimplePlaylistToPlaylist(api, simplePlaylist);
             futureList.add(completableFuture);
         }
-        log.error("Pulled {} playlists", futureList.size());
+        log.info("Pulling {} playlists", futureList.size());
         List<Playlist> completedPlaylists = new ArrayList<>();
-        while(futureList.size() > 0) {
-            for (Iterator<Future> it = futureList.iterator(); it.hasNext();) {
+        while (futureList.size() > 0) {
+            for (Iterator<Future> it = futureList.iterator(); it.hasNext(); ) {
                 Future completableFuture = it.next();
-                if(completableFuture.isDone()) {
-                    Object object = completableFuture.get();
-                    completedPlaylists.add((Playlist) object );
+                if (completableFuture.isDone()) {
+                    Object object = null;
+                    try {
+                        object = completableFuture.get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    completedPlaylists.add((Playlist) object);
                     it.remove();
                 }
             }
         }
+        log.info("Pulled {} playlists", completedPlaylists.size());
         savePlaylists(api, completedPlaylists, playlistDao);
     }
 
@@ -91,7 +101,7 @@ public class PlaylistDto {
     }
 
 
-    public void savePlaylists(SpotifyApi api, List<Playlist> playlists, MongoDao playlistDao) {
+    public void savePlaylists(SpotifyApi api, List<Playlist> playlists, MongoDao playlistDao) throws MalformedURLException {
         MongoCollection mongoCollection = playlistDao.getCollection(collectionName);
         for (Playlist playlist : playlists) {
             if (playlistDao.retrieveEntryById(playlist.getId(), collectionName) == null) {
@@ -102,30 +112,28 @@ public class PlaylistDto {
                     e.printStackTrace();
                 }
             } else {
-                //Playlist Cleanup
+               playlistCleanup(api, DownstreamMapper.mapPlaylist(playlist), playlistDao);
             }
         }
     }
 
 
-    private void playlistCleanup(SpotifyApi api, RefinedPlaylist newRefinedPlaylist) {
-//        List<RefinedTrack> storedTracks = playlistRepository.findOne(newRefinedPlaylist.getId()).getRefinedTracks();
-//        for (int i = 0; i < storedTracks.size(); i++) {
-//        for (int i = 0; i < storedTracks.size(); i++) {
-//            Boolean remove = true;
-//            for (int p = 0; p < newRefinedPlaylist.getRefinedTracks().size(); p++) {
-//                if (storedTracks.get(i).getId().equals(newRefinedPlaylist.getRefinedTracks().get(p).getId())) {
-//                    remove = false;
-//                    p = newRefinedPlaylist.getRefinedTracks().size() - 1;
-//                }
-//            }
-//            if (remove) {
-//                log.info("Removing song: {} from playlist: {}", storedTracks.get(i).getName(), newRefinedPlaylist.getName());
-//                storedTracks.remove(i);
-//            }
-//        }
-//        playlistRepository.delete(newRefinedPlaylist.getId());
-//        savePlaylist(api, newRefinedPlaylist);
+    private void playlistCleanup(SpotifyApi api, RefinedPlaylist newRefinedPlaylist, MongoDao playlistDao) {
+        List<String> storedTracks = (List<String>) playlistDao.retrieveEntryById(newRefinedPlaylist.getId(), collectionName).get("");
+        for (int i = 0; i < storedTracks.size(); i++) {
+            Boolean remove = true;
+            for (int p = 0; p < newRefinedPlaylist.getTrackIds().size(); p++) {
+                if (storedTracks.get(i).equals(newRefinedPlaylist.getTrackIds().get(p))) {
+                    remove = false;
+                    p = newRefinedPlaylist.getTrackIds().size() - 1;
+                }
+            }
+            if (remove) {
+                log.info("Removing song: {} from playlist: {}", storedTracks.get(i), newRefinedPlaylist.getName());
+                storedTracks.remove(i);
+            }
+        }
+        playlistDao.deleteEntryinDb();
+        playlistDao.saveEntryToDatabase(RefinedPlaylist.class, newRefinedPlaylist, playlistDao.getCollection(collectionName));
     }
-
 }
