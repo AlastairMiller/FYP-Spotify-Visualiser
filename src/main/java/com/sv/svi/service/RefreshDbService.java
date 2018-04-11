@@ -60,9 +60,7 @@ public class RefreshDbService {
         log.info("-----------------------Pulling location playlist's-----------------------");
         int playlistRetrieval = 0;
         List<PlaylistSimplified> playlists = playlistDto.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval);
-        playlists.removeIf(SimplePlaylist -> !SimplePlaylist.getName().contains("The Sound of "));
-        playlists.removeIf(SimplePlaylist -> SimplePlaylist.getName().matches(".* [A-Z][A-Z]\\b"));
-        playlists.subList(100,playlists.size()).clear();
+        playlists.removeIf(SimplePlaylist -> !SimplePlaylist.getName().matches(".* [A-Z][A-Z]\\b"));
         try {
             playlistDto.saveSimplePlaylistsToMongo(api, playlists, mongoHelper.getMongoDao(), executor);
         } catch (MalformedURLException e) {

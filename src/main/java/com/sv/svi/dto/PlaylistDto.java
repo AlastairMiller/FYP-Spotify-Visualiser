@@ -10,16 +10,13 @@ import com.wrapper.spotify.requests.data.playlists.GetListOfUsersPlaylistsReques
 import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.Document;
 import refinedDataModels.RefinedPlaylist;
-import refinedDataModels.RefinedTrack;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
