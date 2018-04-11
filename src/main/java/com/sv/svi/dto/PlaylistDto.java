@@ -42,7 +42,7 @@ public class PlaylistDto {
     }
 
 
-    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao, ExecutorService executor) throws MalformedURLException {
+    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao) throws MalformedURLException {
         List<Future> futureList = new ArrayList<>();
         for (PlaylistSimplified simplePlaylist : playlistsToSave) {
             Future<Object> completableFuture = convertSimplePlaylistToPlaylist(api, simplePlaylist);

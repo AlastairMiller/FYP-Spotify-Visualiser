@@ -41,7 +41,7 @@ public class SpotifyAuthenticationHelper {
             final Future<ClientCredentials> responseFuture = request.executeAsync();
             final ClientCredentials clientCredentials = responseFuture.get();
             api.setAccessToken(clientCredentials.getAccessToken());
-            log.info("Expires in: {}", clientCredentials.getExpiresIn());
+            log.info("Token expires in: {}", clientCredentials.getExpiresIn());
         } catch (InterruptedException | ExecutionException e) {
          log.error(e.getCause().getMessage());
         }
