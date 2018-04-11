@@ -32,6 +32,7 @@ public class RefreshDbService {
     private PlaylistDto playlistDto;
     private ExecutorService executor = Executors.newFixedThreadPool(16);
     private SpotifyApi api;
+    private Boolean refreshInProgress = false;
 
     @Autowired
     public RefreshDbService(MongoHelper mongoHelper, SpotifyAuthenticationHelper authenticationHelper) {
@@ -48,25 +49,32 @@ public class RefreshDbService {
 
     }
 
+    private void refreshDB() {
+        refreshInProgress = true;
+        if (!(api == null)) {
+            playlistDto = new PlaylistDto();
+            log.info("-----------------------Database refresh started-----------------------");
+            pullLocationPlaylists(api);
+            pullFeaturedPlaylists(api);
+            refreshInProgress = false;
+        } else {
+            try {
+                refreshInProgress = false;
+                Thread.sleep(300);
+                refreshDB();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     //TODO Add endpoint when scheduler is implemented to initiate this
     @Scheduled(fixedDelay = 43200)
     public void main() {
-        executor.submit(() -> {
-            if (!(api == null)) {
-                playlistDto = new PlaylistDto();
-                log.info("-----------------------Database refresh started-----------------------");
-                pullLocationPlaylists(api);
-                pullFeaturedPlaylists(api);
-            } else {
-                try {
-                    Thread.sleep(300);
-                    main();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        if (!refreshInProgress) {
+            executor.submit(this::refreshDB);
+        }
     }
 
     private void pullLocationPlaylists(SpotifyApi api) {
