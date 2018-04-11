@@ -32,7 +32,6 @@ public class RefreshDbService {
     private PlaylistDto playlistDto;
     private ExecutorService executor = Executors.newFixedThreadPool(16);
     private SpotifyApi api;
-    private Boolean apiSet = false;
 
     @Autowired
     public RefreshDbService(MongoHelper mongoHelper, SpotifyAuthenticationHelper authenticationHelper) {
@@ -45,7 +44,6 @@ public class RefreshDbService {
         executor.submit(() -> {
             log.info("-----------------------Refreshing Api Token-----------------------");
             api =  authenticationHelper.clientCredentialFlow();
-            apiSet = true;
         });
 
     }
@@ -54,7 +52,7 @@ public class RefreshDbService {
     //TODO Add endpoint when scheduler is implemented to initiate this
     @Scheduled(fixedDelay = 43200)
     public void main() {
-        if(apiSet) {
+        if(!(api == null)) {
             playlistDto = new PlaylistDto();
             log.info("-----------------------Database refresh started-----------------------");
             pullLocationPlaylists(api);
