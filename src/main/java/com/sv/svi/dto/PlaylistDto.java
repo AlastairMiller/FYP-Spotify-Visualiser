@@ -10,6 +10,7 @@ import com.wrapper.spotify.requests.data.playlists.GetListOfUsersPlaylistsReques
 import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import refinedDataModels.RefinedPlaylist;
 import refinedDataModels.RefinedTrack;
 
@@ -44,7 +45,7 @@ public class PlaylistDto {
     }
 
 
-    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao, ExecutorService executor) {
+    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao, ExecutorService executor) throws MalformedURLException {
         List<Future> futureList = new ArrayList<>();
         for (PlaylistSimplified simplePlaylist : playlistsToSave) {
             Future<Object> completableFuture = convertSimplePlaylistToPlaylist(api, simplePlaylist);
@@ -66,11 +67,11 @@ public class PlaylistDto {
                         return;
                     }
                     completedPlaylists.add((Playlist) object);
+                    log.info("Pulled playlist: {}", ((Playlist) object).getName());
                     it.remove();
                 }
             }
         }
-        log.info("Pulled {} playlists", completedPlaylists.size());
         savePlaylists(api, completedPlaylists, playlistDao);
     }
 
@@ -119,7 +120,7 @@ public class PlaylistDto {
 
 
     private void playlistCleanup(SpotifyApi api, RefinedPlaylist newRefinedPlaylist, MongoDao playlistDao) {
-        List<String> storedTracks = (List<String>) playlistDao.retrieveEntryById(newRefinedPlaylist.getId(), collectionName).get("");
+        List<String> storedTracks = (List<String>) playlistDao.retrieveEntryById(newRefinedPlaylist.getId(), collectionName).get("trackIds");
         for (int i = 0; i < storedTracks.size(); i++) {
             Boolean remove = true;
             for (int p = 0; p < newRefinedPlaylist.getTrackIds().size(); p++) {
@@ -133,7 +134,7 @@ public class PlaylistDto {
                 storedTracks.remove(i);
             }
         }
-        playlistDao.deleteEntryinDb();
+        playlistDao.deleteEntryinDb(newRefinedPlaylist.getId(), playlistDao.getCollection(collectionName));
         playlistDao.saveEntryToDatabase(RefinedPlaylist.class, newRefinedPlaylist, playlistDao.getCollection(collectionName));
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import sun.nio.ch.SelectorImpl;
 
+import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -62,7 +63,11 @@ public class RefreshDbService {
         playlists.removeIf(SimplePlaylist -> !SimplePlaylist.getName().contains("The Sound of "));
         playlists.removeIf(SimplePlaylist -> SimplePlaylist.getName().matches(".* [A-Z][A-Z]\\b"));
         playlists.subList(100,playlists.size()).clear();
-        playlistDto.saveSimplePlaylistsToMongo(api, playlists, mongoHelper.getMongoDao(), executor);
+        try {
+            playlistDto.saveSimplePlaylistsToMongo(api, playlists, mongoHelper.getMongoDao(), executor);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
         log.info("{} playlists in the database", mongoHelper.getMongoDao().getCollection("RefinedPlaylists").count());
     }
 
