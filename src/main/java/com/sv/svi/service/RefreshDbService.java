@@ -39,11 +39,11 @@ public class RefreshDbService {
         this.authenticationHelper = authenticationHelper;
     }
 
-    @Scheduled(fixedDelay = 3600000)
+    @Scheduled(fixedDelay = 360000)
     public void refreshToken() {
         executor.submit(() -> {
             log.info("-----------------------Refreshing Api Token-----------------------");
-            api =  authenticationHelper.clientCredentialFlow();
+            api = authenticationHelper.clientCredentialFlow();
         });
 
     }
@@ -52,19 +52,21 @@ public class RefreshDbService {
     //TODO Add endpoint when scheduler is implemented to initiate this
     @Scheduled(fixedDelay = 43200)
     public void main() {
-        if(!(api == null)) {
-            playlistDto = new PlaylistDto();
-            log.info("-----------------------Database refresh started-----------------------");
-            pullLocationPlaylists(api);
-            pullFeaturedPlaylists(api);
-        }else {
-            try {
-                Thread.sleep(300);
-                main();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        executor.submit(() -> {
+            if (!(api == null)) {
+                playlistDto = new PlaylistDto();
+                log.info("-----------------------Database refresh started-----------------------");
+                pullLocationPlaylists(api);
+                pullFeaturedPlaylists(api);
+            } else {
+                try {
+                    Thread.sleep(300);
+                    main();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        });
     }
 
     private void pullLocationPlaylists(SpotifyApi api) {
