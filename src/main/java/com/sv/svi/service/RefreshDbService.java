@@ -68,10 +68,7 @@ public class RefreshDbService {
         }
     }
 
-
-    //TODO Add endpoint when scheduler is implemented to initiate this
-    @Scheduled(fixedDelay = 43200)
-    public void main() {
+    public void refresh() {
         if (!refreshInProgress) {
             executor.submit(this::refreshDB);
         }
