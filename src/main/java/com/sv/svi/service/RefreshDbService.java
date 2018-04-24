@@ -34,6 +34,7 @@ public class RefreshDbService {
     private PlaylistDto playlistDto;
     private ExecutorService executor = Executors.newFixedThreadPool(16);
     private SpotifyApi api;
+    private int refreshRetries = 0;
     private Boolean refreshInProgress = false;
 
     @Autowired
@@ -51,22 +52,30 @@ public class RefreshDbService {
 
     }
 
+    @Scheduled(fixedDelay = 300000)
     private void refreshDB() {
         refreshInProgress = true;
-        if (!(api == null)) {
-            playlistDto = new PlaylistDto();
-            log.info("-----------------------Database refresh started-----------------------");
-            pullLocationPlaylists(api);
-            pullFeaturedPlaylists(api);
-            refreshInProgress = false;
-        } else {
-            try {
+        if(refreshRetries <= 100) {
+            if (!(api == null)) {
+                playlistDto = new PlaylistDto();
+                refreshRetries = 0;
+                log.info("-----------------------Database refresh started-----------------------");
+                pullLocationPlaylists(api);
+                pullFeaturedPlaylists(api);
                 refreshInProgress = false;
-                Thread.sleep(300);
-                refreshDB();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } else {
+                try {
+                    refreshRetries++;
+                    refreshInProgress = false;
+                    log.info("Refresh thread busy, will retry in 2.5 seconds. Retry number {}", refreshRetries);
+                    Thread.sleep(2500);
+                    refreshDB();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+        }else {
+            log.error("Request timed out after {} retries", refreshRetries);
         }
     }
 
