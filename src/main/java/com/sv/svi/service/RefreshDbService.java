@@ -26,10 +26,7 @@ import java.util.concurrent.Executors;
 @Data
 public class RefreshDbService {
 
-    //TODO 1. Catch when access token expires
-
     private SpotifyAuthenticationHelper authenticationHelper;
-
     private MongoHelper mongoHelper;
     private PlaylistDto playlistDto;
     private ExecutorService executor = Executors.newFixedThreadPool(16);
