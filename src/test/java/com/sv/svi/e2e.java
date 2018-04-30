@@ -2,7 +2,7 @@ package com.sv.svi;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.sv.svi.dto.*;
+import com.sv.svi.dao.*;
 import com.sv.svi.utils.DownstreamMapper;
 import com.svd.ClientHandler;
 import com.svd.dao.MongoDao;
@@ -45,10 +45,10 @@ public class e2e {
     private SpotifyAuthenticationHelper authenticationHelper;
     @Autowired
     private MongoHelper mongoHelper;
-    private AlbumDto albumDto;
-    private PlaylistDao playlistDto;
-    private TrackDto trackDto;
-    private UserDto userDto;
+    private SpotifyAlbumDao spotifyAlbumDao;
+    private SpotifyPlaylistDao playlistDto;
+    private SpotifyTrackDao spotifyTrackDao;
+    private SpotifyUserDto spotifyUserDto;
     private SpotifyApi api;
 
     private MongodExecutable mongodExe;
@@ -91,7 +91,7 @@ public class e2e {
 
     @Test
     public void shouldPullAndSaveAlbum() throws MalformedURLException {
-        Album album = AlbumDto.pullAlbum(api, "0gtU58GVllHFpZzIgLd5lV");
+        Album album = SpotifyAlbumDao.pullAlbum(api, "0gtU58GVllHFpZzIgLd5lV");
         assert album != null;
         RefinedAlbum expectedAlbum = DownstreamMapper.mapAlbum(album);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedAlbums");
@@ -103,7 +103,7 @@ public class e2e {
 
     @Test
     public void shouldPullAndSaveArtist() throws MalformedURLException {
-        Artist artist = ArtistDto.pullArtist(api, "5WId4o5jdGVhptNU0uqKxu");
+        Artist artist = SpotifyArtistDao.pullArtist(api, "5WId4o5jdGVhptNU0uqKxu");
         assert artist != null;
         RefinedArtist expectedArtist = DownstreamMapper.mapArtist(artist);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedArtists");
@@ -115,7 +115,7 @@ public class e2e {
 
     @Test
     public void shouldPullAndSavePlaylist() throws MalformedURLException {
-        Playlist playlist = PlaylistDao.pullPlaylist(api, "millersinc", "2CTdEa3JWbncC1h8WjnuxZ");
+        Playlist playlist = SpotifyPlaylistDao.pullPlaylist(api, "millersinc", "2CTdEa3JWbncC1h8WjnuxZ");
         assert playlist != null;
         RefinedPlaylist expectedPlaylist = DownstreamMapper.mapPlaylist(playlist);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedPlaylists");
@@ -127,7 +127,7 @@ public class e2e {
 
     @Test
     public void shouldPullAndSaveTrack() throws MalformedURLException {
-        Track track = TrackDto.pullTrack(api, "2g9txG7vtGj8lNuNLDxQhu");
+        Track track = SpotifyTrackDao.pullTrack(api, "2g9txG7vtGj8lNuNLDxQhu");
         assert track != null;
         RefinedTrack expectedTrack = DownstreamMapper.mapTrack(track);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedTracks");
@@ -140,7 +140,7 @@ public class e2e {
 
     @Test
     public void shouldPullAndSaveUser() throws MalformedURLException {
-        User user = UserDto.pullUser(api, "spotify");
+        User user = SpotifyUserDto.pullUser(api, "spotify");
         assert user != null;
         RefinedUser expectedUser = DownstreamMapper.mapUser(user);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedUsers");

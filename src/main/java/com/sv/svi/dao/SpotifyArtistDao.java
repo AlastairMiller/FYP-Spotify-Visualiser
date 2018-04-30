@@ -1,4 +1,4 @@
-package com.sv.svi.dto;
+package com.sv.svi.dao;
 
 import com.sv.svi.utils.DownstreamMapper;
 import com.wrapper.spotify.SpotifyApi;
@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
-public class ArtistDto {
+public class SpotifyArtistDao {
 
      public static Artist pullArtist(SpotifyApi api, String id) {
         final GetArtistRequest request = api.getArtist(id).build();

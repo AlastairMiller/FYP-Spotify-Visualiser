@@ -4,7 +4,7 @@ import com.mongodb.client.MongoCollection;
 import com.neovisionaries.i18n.CountryCode;
 import com.sv.svi.MongoHelper;
 import com.sv.svi.SpotifyAuthenticationHelper;
-import com.sv.svi.dto.PlaylistDao;
+import com.sv.svi.dao.SpotifyPlaylistDao;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
 import com.wrapper.spotify.model_objects.specification.Playlist;
@@ -34,7 +34,7 @@ public class RefreshDbService {
 
     private final SpotifyAuthenticationHelper authenticationHelper;
     private final MongoHelper mongoHelper;
-    private final PlaylistDao playlistDao;
+    private final SpotifyPlaylistDao spotifyPlaylistDao;
     private SpotifyApi api;
     private ExecutorService executor = Executors.newFixedThreadPool(16);
     private int refreshRetries = 0;
@@ -73,11 +73,11 @@ public class RefreshDbService {
     private void pullLocationPlaylists(SpotifyApi api) {
         log.info("-----------------------Pulling location playlist's-----------------------");
         int playlistRetrieval = 0;
-        List<PlaylistSimplified> playlistSimplifieds = playlistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
+        List<PlaylistSimplified> playlistSimplifieds = spotifyPlaylistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
                 .filter(playlist -> !playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
         try {
-            List<Playlist> playlists = playlistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
+            List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
             mongoHelper.getMongoDao().getCollection("playlist").find().save(playlists);
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -100,7 +100,7 @@ public class RefreshDbService {
         try {
             featuredPlaylists = request.execute();
             List<PlaylistSimplified> featuredPlaylistList = Arrays.asList(featuredPlaylists.getPlaylists().getItems());
-            playlistDao.getPlaylistsFromSimplePlaylists(api, featuredPlaylistList, mongoHelper.getMongoDao());
+            spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, featuredPlaylistList, mongoHelper.getMongoDao());
         } catch (Exception e) {
             log.error("Failed to pull featured Playlists from Spotify Api, HTTP Status code: {}", e.getMessage());
         }

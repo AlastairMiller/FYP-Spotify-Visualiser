@@ -1,4 +1,4 @@
-package com.sv.svi.dto;
+package com.sv.svi.dao;
 
 public class ArtistDtoTest {
 

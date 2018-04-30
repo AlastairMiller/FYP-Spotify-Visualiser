@@ -1,4 +1,4 @@
-package com.sv.svi.dto;
+package com.sv.svi.dao;
 
 import com.mongodb.client.MongoCollection;
 import com.sv.svi.utils.DownstreamMapper;
@@ -22,7 +22,7 @@ import java.util.concurrent.Future;
 @Slf4j
 @NoArgsConstructor
 @Repository
-public class PlaylistDao {
+public class SpotifyPlaylistDao {
     private static final String collectionName = "RefinedPlaylists";
 
     public List<PlaylistSimplified> pullPlaylistsForAUser(SpotifyApi api, String userId, int offset) {
