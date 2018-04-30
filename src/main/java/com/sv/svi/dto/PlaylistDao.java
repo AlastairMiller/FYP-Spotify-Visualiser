@@ -4,26 +4,25 @@ import com.mongodb.client.MongoCollection;
 import com.sv.svi.utils.DownstreamMapper;
 import com.svd.dao.MongoDao;
 import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.exceptions.detailed.TooManyRequestsException;
 import com.wrapper.spotify.model_objects.specification.Playlist;
 import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
 import com.wrapper.spotify.requests.data.playlists.GetListOfUsersPlaylistsRequest;
 import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 import refinedDataModels.RefinedPlaylist;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 @Slf4j
 @NoArgsConstructor
-public class PlaylistDto {
+@Repository
+public class PlaylistDao {
     private static final String collectionName = "RefinedPlaylists";
 
     public List<PlaylistSimplified> pullPlaylistsForAUser(SpotifyApi api, String userId, int offset) {
@@ -42,34 +41,39 @@ public class PlaylistDto {
     }
 
 
-    public void saveSimplePlaylistsToMongo(SpotifyApi api, List<PlaylistSimplified> playlistsToSave, MongoDao playlistDao) throws MalformedURLException {
-        List<Future> futureList = new ArrayList<>();
+    public List<Playlist> getPlaylistsFromSimplePlaylists(SpotifyApi api, List<PlaylistSimplified> playlistsToSave) throws MalformedURLException {
+        List<Map<String, Future<Playlist>>> futureList = new ArrayList<>();
         for (PlaylistSimplified simplePlaylist : playlistsToSave) {
-            Future<Object> completableFuture = convertSimplePlaylistToPlaylist(api, simplePlaylist);
+            Map<String, Future<Playlist>> completableFuture = convertSimplePlaylistToPlaylist(api, simplePlaylist);
             futureList.add(completableFuture);
         }
         log.info("Pulling {} playlists", futureList.size());
+
+        return getPlaylists(api, futureList);
+    }
+
+    private List<Playlist> getPlaylists(SpotifyApi api, List<Map<String, Future<Playlist>>> futureList) {
         List<Playlist> completedPlaylists = new ArrayList<>();
-        while (futureList.size() > 0) {
-            for (Iterator<Future> it = futureList.iterator(); it.hasNext(); ) {
-                Future completableFuture = it.next();
-                if (completableFuture.isDone()) {
-                    Object object = null;
-                    try {
-                        object = completableFuture.get();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                        return;
-                    }
-                    completedPlaylists.add((Playlist) object);
-                    log.info("Pulled playlist: {}", ((Playlist) object).getName());
-                    it.remove();
+        List<Map<String, Future<Playlist>>> retriedPlaylists = new ArrayList<>();
+        for (Map<String, Future<Playlist>> stringFutureMap: futureList) {
+            try {
+                Playlist playlist = stringFutureMap.values().iterator().next().get();
+                completedPlaylists.add(playlist);
+            } catch (InterruptedException e) {
+                log.error(e.getMessage(), e);
+            } catch (ExecutionException e) {
+                log.error(e.getMessage(), e);
+
+                if (e.getCause() instanceof TooManyRequestsException) {
+                    String[] key = stringFutureMap.keySet().iterator().next().split("_");
+                    retriedPlaylists.add(pullPlaylistAsync(api, key[0], key[1]));
                 }
             }
         }
-        savePlaylists(api, completedPlaylists, playlistDao);
+        if (!retriedPlaylists.isEmpty()) {
+            completedPlaylists.addAll(getPlaylists(api, retriedPlaylists));
+        }
+        return completedPlaylists;
     }
 
     public static Playlist pullPlaylist(SpotifyApi api, String ownerId, String playlistId) {
@@ -83,10 +87,12 @@ public class PlaylistDto {
 
     }
 
-    private static Future<Object> pullPlaylistAsync(SpotifyApi api, String ownerId, String playlistId) {
+    private static Map<String, Future<Playlist>> pullPlaylistAsync(SpotifyApi api, String ownerId, String playlistId) {
         final GetPlaylistRequest request = api.getPlaylist(ownerId, playlistId).build();
         try {
-            return request.executeAsync();
+            Map<String, Future<Playlist>> map = new HashMap<>();
+            map.put(ownerId + "_" + playlistId, request.executeAsync());
+            return map;
         } catch (Exception e) {
             log.error("Failed to download metadata for playlist {}, HTTP error code: {}", playlistId, e.getMessage());
             return null;
@@ -94,7 +100,7 @@ public class PlaylistDto {
     }
 
 
-    private Future<Object> convertSimplePlaylistToPlaylist(SpotifyApi api, PlaylistSimplified simplePlaylist) {
+    private Map<String, Future<Playlist>> convertSimplePlaylistToPlaylist(SpotifyApi api, PlaylistSimplified simplePlaylist) {
         return pullPlaylistAsync(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
     }
 
@@ -110,7 +116,7 @@ public class PlaylistDto {
                     e.printStackTrace();
                 }
             } else {
-               playlistCleanup(api, DownstreamMapper.mapPlaylist(playlist), playlistDao);
+                playlistCleanup(api, DownstreamMapper.mapPlaylist(playlist), playlistDao);
             }
         }
     }

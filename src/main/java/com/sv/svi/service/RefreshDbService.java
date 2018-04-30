@@ -1,94 +1,84 @@
 package com.sv.svi.service;
 
+import com.mongodb.client.MongoCollection;
 import com.neovisionaries.i18n.CountryCode;
 import com.sv.svi.MongoHelper;
 import com.sv.svi.SpotifyAuthenticationHelper;
-import com.sv.svi.dto.PlaylistDto;
+import com.sv.svi.dto.PlaylistDao;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
+import com.wrapper.spotify.model_objects.specification.Playlist;
 import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
 import com.wrapper.spotify.requests.data.browse.GetListOfFeaturedPlaylistsRequest;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @Data
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class RefreshDbService {
 
-    private SpotifyAuthenticationHelper authenticationHelper;
-    private MongoHelper mongoHelper;
-    private PlaylistDto playlistDto;
-    private ExecutorService executor = Executors.newFixedThreadPool(16);
+    private final SpotifyAuthenticationHelper authenticationHelper;
+    private final MongoHelper mongoHelper;
+    private final PlaylistDao playlistDao;
     private SpotifyApi api;
+    private ExecutorService executor = Executors.newFixedThreadPool(16);
     private int refreshRetries = 0;
     private Boolean refreshInProgress = false;
 
-    @Autowired
-    public RefreshDbService(MongoHelper mongoHelper, SpotifyAuthenticationHelper authenticationHelper) {
-        this.mongoHelper = mongoHelper;
-        this.authenticationHelper = authenticationHelper;
-    }
-
     @Scheduled(fixedDelay = 360000)
+    @PostConstruct
     public void refreshToken() {
-        executor.submit(() -> {
-            log.info("-----------------------Refreshing Api Token-----------------------");
-            api = authenticationHelper.clientCredentialFlow();
-        });
-
+        log.info("-----------------------Refreshing Api Token-----------------------");
+        api = authenticationHelper.clientCredentialFlow();
+        if (api == null) {
+            throw new RuntimeException("API is borked");
+        }
     }
 
     @Scheduled(fixedDelay = 300000)
     private void refreshDB() {
         refreshInProgress = true;
-        if(refreshRetries <= 100) {
-            if (!(api == null)) {
-                playlistDto = new PlaylistDto();
-                refreshRetries = 0;
-                log.info("-----------------------Database refresh started-----------------------");
-                pullLocationPlaylists(api);
-                pullFeaturedPlaylists(api);
-                refreshInProgress = false;
-            } else {
-                try {
-                    refreshRetries++;
-                    refreshInProgress = false;
-                    log.info("Refresh thread busy, will retry in 2.5 seconds. Retry number {}", refreshRetries);
-                    Thread.sleep(2500);
-                    refreshDB();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }else {
+        if (refreshRetries <= 100) {
+            refreshRetries = 0;
+            log.info("-----------------------Database refresh started-----------------------");
+            pullLocationPlaylists(api);
+            pullFeaturedPlaylists(api);
+            refreshInProgress = false;
+        } else {
             log.error("Request timed out after {} retries", refreshRetries);
         }
     }
 
-    public void refresh() {
-        if (!refreshInProgress) {
-            executor.submit(this::refreshDB);
-        }
+    private void createIndexes() {
+        log.info("----------------------------Creating Indexes----------------------------");
+        MongoCollection trackCollection = mongoHelper.getMongoDao().getCollection("");
+
     }
 
     private void pullLocationPlaylists(SpotifyApi api) {
         log.info("-----------------------Pulling location playlist's-----------------------");
         int playlistRetrieval = 0;
-        List<PlaylistSimplified> playlists = playlistDto.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval);
-        playlists.removeIf(SimplePlaylist -> !SimplePlaylist.getName().matches(".* [A-Z][A-Z]\\b"));
+        List<PlaylistSimplified> playlistSimplifieds = playlistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
+                .filter(playlist -> !playlist.getName().matches(".* [A-Z][A-Z]\\b"))
+                .collect(Collectors.toList());
         try {
-            playlistDto.saveSimplePlaylistsToMongo(api, playlists, mongoHelper.getMongoDao());
+            List<Playlist> playlists = playlistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
+            mongoHelper.getMongoDao().getCollection("playlist").find().save(playlists);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -110,7 +100,7 @@ public class RefreshDbService {
         try {
             featuredPlaylists = request.execute();
             List<PlaylistSimplified> featuredPlaylistList = Arrays.asList(featuredPlaylists.getPlaylists().getItems());
-            playlistDto.saveSimplePlaylistsToMongo(api, featuredPlaylistList, mongoHelper.getMongoDao());
+            playlistDao.getPlaylistsFromSimplePlaylists(api, featuredPlaylistList, mongoHelper.getMongoDao());
         } catch (Exception e) {
             log.error("Failed to pull featured Playlists from Spotify Api, HTTP Status code: {}", e.getMessage());
         }

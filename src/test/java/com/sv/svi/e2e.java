@@ -1,6 +1,5 @@
 package com.sv.svi;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.sv.svi.dto.*;
@@ -47,7 +46,7 @@ public class e2e {
     @Autowired
     private MongoHelper mongoHelper;
     private AlbumDto albumDto;
-    private PlaylistDto playlistDto;
+    private PlaylistDao playlistDto;
     private TrackDto trackDto;
     private UserDto userDto;
     private SpotifyApi api;
@@ -116,7 +115,7 @@ public class e2e {
 
     @Test
     public void shouldPullAndSavePlaylist() throws MalformedURLException {
-        Playlist playlist = PlaylistDto.pullPlaylist(api, "millersinc", "2CTdEa3JWbncC1h8WjnuxZ");
+        Playlist playlist = PlaylistDao.pullPlaylist(api, "millersinc", "2CTdEa3JWbncC1h8WjnuxZ");
         assert playlist != null;
         RefinedPlaylist expectedPlaylist = DownstreamMapper.mapPlaylist(playlist);
         MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedPlaylists");
