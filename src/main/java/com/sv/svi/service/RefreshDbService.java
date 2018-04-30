@@ -74,14 +74,10 @@ public class RefreshDbService {
         log.info("-----------------------Pulling location playlist's-----------------------");
         int playlistRetrieval = 0;
         List<PlaylistSimplified> playlistSimplifieds = spotifyPlaylistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
-                .filter(playlist -> !playlist.getName().matches(".* [A-Z][A-Z]\\b"))
+                .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
-        try {
-            List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
-            mongoHelper.getMongoDao().getCollection("playlist").find().save(playlists);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
+        mongoHelper.getMongoDao().getCollection("playlist").insertMany(playlists);
         log.info("{} playlists in the database", mongoHelper.getMongoDao().getCollection("RefinedPlaylists").count());
     }
 
@@ -100,7 +96,7 @@ public class RefreshDbService {
         try {
             featuredPlaylists = request.execute();
             List<PlaylistSimplified> featuredPlaylistList = Arrays.asList(featuredPlaylists.getPlaylists().getItems());
-            spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, featuredPlaylistList, mongoHelper.getMongoDao());
+            spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, featuredPlaylistList);
         } catch (Exception e) {
             log.error("Failed to pull featured Playlists from Spotify Api, HTTP Status code: {}", e.getMessage());
         }

@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 @Repository
 public class SpotifyPlaylistDao {
     private static final String collectionName = "RefinedPlaylists";
+    private Integer retries = 0;
 
     public List<PlaylistSimplified> pullPlaylistsForAUser(SpotifyApi api, String userId, int offset) {
         final GetListOfUsersPlaylistsRequest request = api.getListOfUsersPlaylists(userId).limit(50).offset(offset).build();
@@ -41,7 +42,7 @@ public class SpotifyPlaylistDao {
     }
 
 
-    public List<Playlist> getPlaylistsFromSimplePlaylists(SpotifyApi api, List<PlaylistSimplified> playlistsToSave) throws MalformedURLException {
+    public List<Playlist> getPlaylistsFromSimplePlaylists(SpotifyApi api, List<PlaylistSimplified> playlistsToSave) {
         List<Map<String, Future<Playlist>>> futureList = new ArrayList<>();
         for (PlaylistSimplified simplePlaylist : playlistsToSave) {
             Map<String, Future<Playlist>> completableFuture = convertSimplePlaylistToPlaylist(api, simplePlaylist);
@@ -55,23 +56,36 @@ public class SpotifyPlaylistDao {
     private List<Playlist> getPlaylists(SpotifyApi api, List<Map<String, Future<Playlist>>> futureList) {
         List<Playlist> completedPlaylists = new ArrayList<>();
         List<Map<String, Future<Playlist>>> retriedPlaylists = new ArrayList<>();
-        for (Map<String, Future<Playlist>> stringFutureMap: futureList) {
-            try {
-                Playlist playlist = stringFutureMap.values().iterator().next().get();
-                completedPlaylists.add(playlist);
-            } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
-            } catch (ExecutionException e) {
-                log.error(e.getMessage(), e);
-
-                if (e.getCause() instanceof TooManyRequestsException) {
-                    String[] key = stringFutureMap.keySet().iterator().next().split("_");
-                    retriedPlaylists.add(pullPlaylistAsync(api, key[0], key[1]));
+        while (futureList.size()>0) {
+            //Iterator there as removing completed playlists (Even if rate limited) V messy tho :(((((
+            for (Iterator<Map<String, Future<Playlist>>> iterator = futureList.iterator(); iterator.hasNext();) {
+                Map<String, Future<Playlist>> stringFutureMap = iterator.next();
+                if(stringFutureMap.values().iterator().next().isDone()) {
+                    try {
+                        Playlist playlist = stringFutureMap.values().iterator().next().get();
+                        completedPlaylists.add(playlist);
+                        log.info("Successfully got playlist {}", playlist.getName());
+                    } catch (InterruptedException e) {
+                        log.error(e.getMessage(), e);
+                    } catch (ExecutionException e) {
+                        log.error(e.getMessage()+ ". Backing off will retry");
+                        if (e.getCause() instanceof TooManyRequestsException) {
+                            String[] key = stringFutureMap.keySet().iterator().next().split("_");
+                            retriedPlaylists.add(pullPlaylistAsync(api, key[0], key[1]));
+                        }
+                    }
+                    iterator.remove();
                 }
             }
         }
         if (!retriedPlaylists.isEmpty()) {
-            completedPlaylists.addAll(getPlaylists(api, retriedPlaylists));
+            retries++;
+            log.info("{} playlists failed to be pulled. Retry number {}", retriedPlaylists.size(), retries);
+            if (retries < 20) {
+                completedPlaylists.addAll(getPlaylists(api, retriedPlaylists));
+            } else {
+                log.error("Ditching {} playlists as retries exceeded {}", retriedPlaylists.size(), retries);
+            }
         }
         return completedPlaylists;
     }
