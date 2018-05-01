@@ -120,11 +120,11 @@ public class SpotifyPlaylistDao {
 
 
     public void savePlaylists(SpotifyApi api, List<Playlist> playlists, MongoDao playlistDao) throws MalformedURLException {
-        MongoCollection mongoCollection = playlistDao.getCollection(collectionName);
+        MongoCollection mongoCollection = playlistDao.getMongoCollection();
         for (Playlist playlist : playlists) {
-            if (playlistDao.retrieveEntryById(playlist.getId(), collectionName) == null) {
+            if (playlistDao.retrieveEntryById(playlist.getId()) == null) {
                 try {
-                    playlistDao.saveEntryToDatabase(RefinedPlaylist.class, DownstreamMapper.mapPlaylist(playlist), mongoCollection);
+                    playlistDao.saveEntryToDatabase(DownstreamMapper.mapPlaylist(playlist));
                     log.info("Saved a playlist called {}", playlist.getName());
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -137,7 +137,7 @@ public class SpotifyPlaylistDao {
 
 
     private void playlistCleanup(SpotifyApi api, RefinedPlaylist newRefinedPlaylist, MongoDao playlistDao) {
-        List<String> storedTracks = (List<String>) playlistDao.retrieveEntryById(newRefinedPlaylist.getId(), collectionName).get("trackIds");
+        List<String> storedTracks = (List<String>) playlistDao.retrieveEntryById(newRefinedPlaylist.getId()).get("trackIds");
         for (int i = 0; i < storedTracks.size(); i++) {
             Boolean remove = true;
             for (int p = 0; p < newRefinedPlaylist.getTrackIds().size(); p++) {
@@ -151,7 +151,7 @@ public class SpotifyPlaylistDao {
                 storedTracks.remove(i);
             }
         }
-        playlistDao.deleteEntryinDb(newRefinedPlaylist.getId(), playlistDao.getCollection(collectionName));
-        playlistDao.saveEntryToDatabase(RefinedPlaylist.class, newRefinedPlaylist, playlistDao.getCollection(collectionName));
+        playlistDao.deleteEntryinDb(newRefinedPlaylist.getId(), playlistDao.getMongoCollection());
+        playlistDao.saveEntryToDatabase(newRefinedPlaylist);
     }
 }

@@ -6,7 +6,7 @@ import com.wrapper.spotify.requests.data.users_profile.GetUsersProfileRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SpotifyUserDto {
+public class SpotifyUserDao {
 
     public static User pullUser(SpotifyApi api, String id) {
         //Todo MakeAsync

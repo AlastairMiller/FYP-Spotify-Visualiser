@@ -46,14 +46,19 @@ public class e2e {
     @Autowired
     private MongoHelper mongoHelper;
     private SpotifyAlbumDao spotifyAlbumDao;
-    private SpotifyPlaylistDao playlistDto;
+    private SpotifyArtistDao spotifyArtistDao;
+    private SpotifyPlaylistDao spotifyPlaylistDao;
     private SpotifyTrackDao spotifyTrackDao;
-    private SpotifyUserDto spotifyUserDto;
+    private SpotifyUserDao spotifyUserDao;
     private SpotifyApi api;
 
     private MongodExecutable mongodExe;
     private MongodProcess mongod;
-    private MongoDao mongoDao;
+    private MongoDao<RefinedAlbum> albumDao;
+    private MongoDao<RefinedArtist> artistDao;
+    private MongoDao<RefinedPlaylist> playlistDao;
+    private MongoDao<RefinedTrack> trackDao;
+    private MongoDao<RefinedUser> userDao;
     private String hostname = "127.0.0.1";
     private int port = 12345;
 
@@ -77,7 +82,11 @@ public class e2e {
         mongodExe = starter.prepare(mongodConfig);
         mongod = mongodExe.start();
         MongoClient mongoClient = new MongoClient(hostname, port);
-        mongoDao = new MongoDao<>(new ClientHandler(hostname, port, "embedded"));
+        albumDao = new MongoDao<>(new ClientHandler(hostname, port, "embedded"), "RefinedAlbums", RefinedAlbum.class);
+        artistDao = new MongoDao<>(new ClientHandler(hostname, port, "embedded"), "RefinedArtists", RefinedArtist.class);
+        playlistDao = new MongoDao<>(new ClientHandler(hostname, port, "embedded"), "RefinedPlaylists", RefinedPlaylist.class);
+        trackDao = new MongoDao<>(new ClientHandler(hostname, port, "embedded"), "RefinedTracks", RefinedTrack.class);
+        userDao = new MongoDao<>(new ClientHandler(hostname, port, "embedded"), "RefinedUsers", RefinedUser.class);
     }
 
     @After
@@ -94,9 +103,9 @@ public class e2e {
         Album album = SpotifyAlbumDao.pullAlbum(api, "0gtU58GVllHFpZzIgLd5lV");
         assert album != null;
         RefinedAlbum expectedAlbum = DownstreamMapper.mapAlbum(album);
-        MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedAlbums");
-        mongoDao.saveEntryToDatabase(RefinedAlbum.class, expectedAlbum, mongoCollection);
-        Object albumObject = mongoDao.retrieveEntryById("0gtU58GVllHFpZzIgLd5lV", "RefinedAlbums");
+        MongoCollection<Document> mongoCollection = albumDao.getMongoCollection();
+        albumDao.saveEntryToDatabase(expectedAlbum);
+        Object albumObject = albumDao.retrieveEntryById("0gtU58GVllHFpZzIgLd5lV");
         RefinedAlbum actualAlbum = toAlbum((Document) albumObject);
         Assert.assertEquals(expectedAlbum, actualAlbum);
     }
@@ -106,9 +115,8 @@ public class e2e {
         Artist artist = SpotifyArtistDao.pullArtist(api, "5WId4o5jdGVhptNU0uqKxu");
         assert artist != null;
         RefinedArtist expectedArtist = DownstreamMapper.mapArtist(artist);
-        MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedArtists");
-        mongoDao.saveEntryToDatabase(RefinedArtist.class, expectedArtist, mongoCollection);
-        Object artistObject = mongoDao.retrieveEntryById("5WId4o5jdGVhptNU0uqKxu", "RefinedArtists");
+        artistDao.saveEntryToDatabase(expectedArtist);
+        Object artistObject = artistDao.retrieveEntryById("5WId4o5jdGVhptNU0uqKxu");
         RefinedArtist actualArtist = toArtist((Document) artistObject);
         Assert.assertEquals(expectedArtist, actualArtist);
     }
@@ -118,9 +126,8 @@ public class e2e {
         Playlist playlist = SpotifyPlaylistDao.pullPlaylist(api, "millersinc", "2CTdEa3JWbncC1h8WjnuxZ");
         assert playlist != null;
         RefinedPlaylist expectedPlaylist = DownstreamMapper.mapPlaylist(playlist);
-        MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedPlaylists");
-        mongoDao.saveEntryToDatabase(RefinedPlaylist.class, expectedPlaylist, mongoCollection);
-        Object playlistObject = mongoDao.retrieveEntryById("2CTdEa3JWbncC1h8WjnuxZ", "RefinedPlaylists");
+        playlistDao.saveEntryToDatabase(expectedPlaylist);
+        Object playlistObject = playlistDao.retrieveEntryById("2CTdEa3JWbncC1h8WjnuxZ");
         RefinedPlaylist actualPlaylist = toPlaylist((Document) playlistObject);
         Assert.assertEquals(expectedPlaylist, actualPlaylist);
     }
@@ -130,22 +137,20 @@ public class e2e {
         Track track = SpotifyTrackDao.pullTrack(api, "2g9txG7vtGj8lNuNLDxQhu");
         assert track != null;
         RefinedTrack expectedTrack = DownstreamMapper.mapTrack(track);
-        MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedTracks");
-        mongoDao.saveEntryToDatabase(RefinedTrack.class, expectedTrack, mongoCollection);
-        Object object = mongoDao.retrieveEntryById("2g9txG7vtGj8lNuNLDxQhu", "RefinedTracks");
-        RefinedTrack actualSong = toTrack((Document) object);
+        trackDao.saveEntryToDatabase(expectedTrack);
+        Object trackObject = trackDao.retrieveEntryById("2g9txG7vtGj8lNuNLDxQhu");
+        RefinedTrack actualSong = toTrack((Document) trackObject);
         Assert.assertEquals(expectedTrack, actualSong);
 
     }
 
     @Test
     public void shouldPullAndSaveUser() throws MalformedURLException {
-        User user = SpotifyUserDto.pullUser(api, "spotify");
+        User user = SpotifyUserDao.pullUser(api, "spotify");
         assert user != null;
         RefinedUser expectedUser = DownstreamMapper.mapUser(user);
-        MongoCollection<Document> mongoCollection = mongoDao.getClientHandler().getMongoDB().getCollection("RefinedUsers");
-        mongoDao.saveEntryToDatabase(RefinedUser.class, expectedUser, mongoCollection);
-        Object userObject = mongoDao.retrieveEntryById("spotify", "RefinedUsers");
+        userDao.saveEntryToDatabase(expectedUser);
+        Object userObject = userDao.retrieveEntryById("spotify");
         RefinedUser actualUser = toUser((Document) userObject);
         Assert.assertEquals(expectedUser, actualUser);
 
