@@ -18,7 +18,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -66,7 +65,7 @@ public class RefreshDbService {
 
     private void createIndexes() {
         log.info("----------------------------Creating Indexes----------------------------");
-        MongoCollection trackCollection = mongoHelper.getMongoDao().getCollection("");
+        MongoCollection trackCollection = mongoHelper.getRefinedTrackDao().getMongoCollection();
 
     }
 
@@ -77,8 +76,8 @@ public class RefreshDbService {
                 .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
         List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
-        mongoHelper.getMongoDao().getCollection("playlist").insertMany(playlists);
-        log.info("{} playlists in the database", mongoHelper.getMongoDao().getCollection("RefinedPlaylists").count());
+        // mongoHelper.getRefinedPlaylistDao().getMongoCollection().insertMany(playlists);
+        log.info("{} playlists in the database", mongoHelper.getRefinedPlaylistDao().getMongoCollection().count());
     }
 
     private void pullFeaturedPlaylists(SpotifyApi api) {
