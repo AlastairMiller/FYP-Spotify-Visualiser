@@ -5,6 +5,7 @@ import com.neovisionaries.i18n.CountryCode;
 import com.sv.svi.MongoHelper;
 import com.sv.svi.SpotifyAuthenticationHelper;
 import com.sv.svi.dao.SpotifyPlaylistDao;
+import com.sv.svi.utils.DownstreamMapper;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
 import com.wrapper.spotify.model_objects.specification.Playlist;
@@ -16,8 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import refinedDataModels.RefinedPlaylist;
 
 import javax.annotation.PostConstruct;
+import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -65,7 +68,7 @@ public class RefreshDbService {
 
     private void createIndexes() {
         log.info("----------------------------Creating Indexes----------------------------");
-        MongoCollection trackCollection = mongoHelper.getRefinedTrackDao().getMongoCollection();
+        MongoCollection<org.bson.Document> trackCollection = mongoHelper.getRefinedTrackDao().getMongoCollection();
 
     }
 
@@ -76,7 +79,11 @@ public class RefreshDbService {
                 .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
         List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
-        // mongoHelper.getRefinedPlaylistDao().getMongoCollection().insertMany(playlists);
+        try {
+            savePlaylists(playlists);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
         log.info("{} playlists in the database", mongoHelper.getRefinedPlaylistDao().getMongoCollection().count());
     }
 
@@ -99,6 +106,41 @@ public class RefreshDbService {
         } catch (Exception e) {
             log.error("Failed to pull featured Playlists from Spotify Api, HTTP Status code: {}", e.getMessage());
         }
+    }
+
+
+    private void savePlaylists(List<Playlist> playlists) throws MalformedURLException {
+        for (Playlist playlist : playlists) {
+            if (mongoHelper.getRefinedPlaylistDao().retrieveEntryById(playlist.getId()) == null) {
+                try {
+                    mongoHelper.getRefinedPlaylistDao().saveEntryToDatabase(DownstreamMapper.mapPlaylist(playlist));
+                    log.info("Saved a playlist called {}", playlist.getName());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            } else {
+               playlistCleanup(DownstreamMapper.mapPlaylist(playlist));
+            }
+        }
+    }
+
+    private void playlistCleanup(RefinedPlaylist newRefinedPlaylist) {
+        List<String> storedTracks = (List<String>) mongoHelper.getRefinedPlaylistDao().retrieveEntryById(newRefinedPlaylist.getId()).get("trackIds");
+        for (int i = 0; i < storedTracks.size(); i++) {
+            Boolean remove = true;
+            for (int p = 0; p < newRefinedPlaylist.getTrackIds().size(); p++) {
+                if (storedTracks.get(i).equals(newRefinedPlaylist.getTrackIds().get(p))) {
+                    remove = false;
+                    p = newRefinedPlaylist.getTrackIds().size() - 1;
+                }
+            }
+            if (remove) {
+                log.info("Removing song: {} from playlist: {}", storedTracks.get(i), newRefinedPlaylist.getName());
+                storedTracks.remove(i);
+            }
+        }
+        mongoHelper.getRefinedPlaylistDao().deleteEntryinDb(newRefinedPlaylist.getId(), mongoHelper.getRefinedPlaylistDao().getMongoCollection());
+        mongoHelper.getRefinedPlaylistDao().saveEntryToDatabase(newRefinedPlaylist);
     }
 
 

@@ -24,7 +24,11 @@ public class DownstreamMapper {
         List<String> nestedIds = new ArrayList<>();
         for (T object : objects) {
             if(clazz.getName().equals("com.wrapper.spotify.model_objects.specification.PlaylistTrack")){
-                nestedIds.add(((PlaylistTrack) object).getTrack().getId());
+                try {
+                    nestedIds.add(((PlaylistTrack) object).getTrack().getId());
+                } catch (NullPointerException e){
+                    log.error("Invalid track object: {}", object.toString());
+                }
             }else {
                 try {
                     Field field = clazz.getDeclaredField("id");

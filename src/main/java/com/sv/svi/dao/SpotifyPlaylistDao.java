@@ -118,40 +118,4 @@ public class SpotifyPlaylistDao {
         return pullPlaylistAsync(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
     }
 
-
-    public void savePlaylists(SpotifyApi api, List<Playlist> playlists, MongoDao playlistDao) throws MalformedURLException {
-        MongoCollection mongoCollection = playlistDao.getMongoCollection();
-        for (Playlist playlist : playlists) {
-            if (playlistDao.retrieveEntryById(playlist.getId()) == null) {
-                try {
-                    playlistDao.saveEntryToDatabase(DownstreamMapper.mapPlaylist(playlist));
-                    log.info("Saved a playlist called {}", playlist.getName());
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                playlistCleanup(api, DownstreamMapper.mapPlaylist(playlist), playlistDao);
-            }
-        }
-    }
-
-
-    private void playlistCleanup(SpotifyApi api, RefinedPlaylist newRefinedPlaylist, MongoDao playlistDao) {
-        List<String> storedTracks = (List<String>) playlistDao.retrieveEntryById(newRefinedPlaylist.getId()).get("trackIds");
-        for (int i = 0; i < storedTracks.size(); i++) {
-            Boolean remove = true;
-            for (int p = 0; p < newRefinedPlaylist.getTrackIds().size(); p++) {
-                if (storedTracks.get(i).equals(newRefinedPlaylist.getTrackIds().get(p))) {
-                    remove = false;
-                    p = newRefinedPlaylist.getTrackIds().size() - 1;
-                }
-            }
-            if (remove) {
-                log.info("Removing song: {} from playlist: {}", storedTracks.get(i), newRefinedPlaylist.getName());
-                storedTracks.remove(i);
-            }
-        }
-        playlistDao.deleteEntryinDb(newRefinedPlaylist.getId(), playlistDao.getMongoCollection());
-        playlistDao.saveEntryToDatabase(newRefinedPlaylist);
-    }
 }
