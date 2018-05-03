@@ -13,14 +13,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 
 @Slf4j
 public class SpotifyArtistDao {
 
-     public static Artist pullArtist(SpotifyApi api, String id) {
+     public static Future<Object> pullArtist(SpotifyApi api, String id) {
         final GetArtistRequest request = api.getArtist(id).build();
         try {
-            return request.execute();
+            return request.executeAsync();
         } catch (Exception e) {
             log.error("Failed to download metadata for artist {}, HTTP error code: {} ", id, e.getMessage());
             return null;

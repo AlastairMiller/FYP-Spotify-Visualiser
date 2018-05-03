@@ -56,11 +56,11 @@ public class SpotifyPlaylistDao {
     private List<Playlist> getPlaylists(SpotifyApi api, List<Map<String, Future<Playlist>>> futureList) {
         List<Playlist> completedPlaylists = new ArrayList<>();
         List<Map<String, Future<Playlist>>> retriedPlaylists = new ArrayList<>();
-        while (futureList.size()>0) {
+        while (futureList.size() > 0) {
             //Iterator there as removing completed playlists (Even if rate limited) V messy tho :(((((
-            for (Iterator<Map<String, Future<Playlist>>> iterator = futureList.iterator(); iterator.hasNext();) {
+            for (Iterator<Map<String, Future<Playlist>>> iterator = futureList.iterator(); iterator.hasNext(); ) {
                 Map<String, Future<Playlist>> stringFutureMap = iterator.next();
-                if(stringFutureMap.values().iterator().next().isDone()) {
+                if (stringFutureMap.values().iterator().next().isDone()) {
                     try {
                         Playlist playlist = stringFutureMap.values().iterator().next().get();
                         completedPlaylists.add(playlist);
@@ -68,7 +68,7 @@ public class SpotifyPlaylistDao {
                     } catch (InterruptedException e) {
                         log.error(e.getMessage(), e);
                     } catch (ExecutionException e) {
-                        log.error(e.getMessage()+ ". Backing off will retry");
+                        log.error(e.getMessage() + ". Backing off will retry");
                         if (e.getCause() instanceof TooManyRequestsException) {
                             String[] key = stringFutureMap.keySet().iterator().next().split("_");
                             retriedPlaylists.add(pullPlaylistAsync(api, key[0], key[1]));
@@ -116,42 +116,5 @@ public class SpotifyPlaylistDao {
 
     private Map<String, Future<Playlist>> convertSimplePlaylistToPlaylist(SpotifyApi api, PlaylistSimplified simplePlaylist) {
         return pullPlaylistAsync(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
-    }
-
-
-    public void savePlaylists(SpotifyApi api, List<Playlist> playlists, MongoDao playlistDao) throws MalformedURLException {
-        MongoCollection mongoCollection = playlistDao.getMongoCollection();
-        for (Playlist playlist : playlists) {
-            if (playlistDao.retrieveEntryById(playlist.getId()) == null) {
-                try {
-                    playlistDao.saveEntryToDatabase(DownstreamMapper.mapPlaylist(playlist));
-                    log.info("Saved a playlist called {}", playlist.getName());
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                playlistCleanup(api, DownstreamMapper.mapPlaylist(playlist), playlistDao);
-            }
-        }
-    }
-
-
-    private void playlistCleanup(SpotifyApi api, RefinedPlaylist newRefinedPlaylist, MongoDao playlistDao) {
-        List<String> storedTracks = (List<String>) playlistDao.retrieveEntryById(newRefinedPlaylist.getId()).get("trackIds");
-        for (int i = 0; i < storedTracks.size(); i++) {
-            Boolean remove = true;
-            for (int p = 0; p < newRefinedPlaylist.getTrackIds().size(); p++) {
-                if (storedTracks.get(i).equals(newRefinedPlaylist.getTrackIds().get(p))) {
-                    remove = false;
-                    p = newRefinedPlaylist.getTrackIds().size() - 1;
-                }
-            }
-            if (remove) {
-                log.info("Removing song: {} from playlist: {}", storedTracks.get(i), newRefinedPlaylist.getName());
-                storedTracks.remove(i);
-            }
-        }
-        playlistDao.deleteEntryinDb(newRefinedPlaylist.getId(), playlistDao.getMongoCollection());
-        playlistDao.saveEntryToDatabase(newRefinedPlaylist);
     }
 }
