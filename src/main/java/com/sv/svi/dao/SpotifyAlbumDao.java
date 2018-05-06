@@ -7,6 +7,9 @@ import com.wrapper.spotify.model_objects.specification.Album;
 import com.wrapper.spotify.requests.data.albums.GetAlbumRequest;
 import com.wrapper.spotify.requests.data.albums.GetSeveralAlbumsRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import refinedDataModels.RefinedAlbum;
 
 import java.io.IOException;
@@ -17,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
+@Repository
 public class SpotifyAlbumDao {
 
     public static Album pullAlbum(SpotifyApi api, String id) {

@@ -6,6 +6,8 @@ import com.wrapper.spotify.model_objects.specification.Artist;
 import com.wrapper.spotify.requests.data.artists.GetArtistRequest;
 import com.wrapper.spotify.requests.data.artists.GetSeveralArtistsRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import refinedDataModels.RefinedArtist;
 
 import java.net.MalformedURLException;
@@ -16,9 +18,10 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 @Slf4j
+@Repository
 public class SpotifyArtistDao {
 
-     public static Future<Object> pullArtist(SpotifyApi api, String id) {
+     public Future<Artist> pullArtistAsync(SpotifyApi api, String id) {
         final GetArtistRequest request = api.getArtist(id).build();
         try {
             return request.executeAsync();
@@ -26,7 +29,16 @@ public class SpotifyArtistDao {
             log.error("Failed to download metadata for artist {}, HTTP error code: {} ", id, e.getMessage());
             return null;
         }
+    }
 
+    public static Artist pullArtist(SpotifyApi api, String id) {
+         final GetArtistRequest request = api.getArtist(id).build();
+         try {
+             return request.execute();
+         } catch (Exception e) {
+             log.error("Failed to download metadata for artist {}, HTTP error code: {} ", id, e.getMessage());
+             return null;
+         }
     }
 
     private List<Artist> pullArtists(SpotifyApi api, List<String> ids) {

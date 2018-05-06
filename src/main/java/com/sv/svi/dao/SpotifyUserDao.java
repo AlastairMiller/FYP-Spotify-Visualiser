@@ -4,8 +4,10 @@ import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.specification.User;
 import com.wrapper.spotify.requests.data.users_profile.GetUsersProfileRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 
 @Slf4j
+@Repository
 public class SpotifyUserDao {
 
     public static User pullUser(SpotifyApi api, String id) {
