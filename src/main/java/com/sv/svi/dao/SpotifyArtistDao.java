@@ -53,16 +53,4 @@ public class SpotifyArtistDao {
         }
     }
 
-    public List<RefinedArtist> pullAndMapArtists(SpotifyApi api, List<String> ids) throws MalformedURLException {
-        if (ids.size() > 1) {
-            List<Artist> pulledArtists = pullArtists(api, ids);
-            List<RefinedArtist> mappedArtists = new ArrayList<>();
-            for(Artist artist : pulledArtists){
-                mappedArtists.add(DownstreamMapper.mapArtist(artist));
-            }
-            return mappedArtists;
-        } else {
-            return new ArrayList<>(Collections.singletonList(DownstreamMapper.mapArtist(pullArtist(api, ids.get(0)))));
-        }
-    }
 }

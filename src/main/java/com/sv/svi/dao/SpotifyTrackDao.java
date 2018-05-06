@@ -2,7 +2,6 @@ package com.sv.svi.dao;
 
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.detailed.TooManyRequestsException;
-import com.wrapper.spotify.model_objects.specification.Playlist;
 import com.wrapper.spotify.model_objects.specification.Track;
 import com.wrapper.spotify.requests.data.tracks.GetSeveralTracksRequest;
 import com.wrapper.spotify.requests.data.tracks.GetTrackRequest;
@@ -16,7 +15,7 @@ import java.util.concurrent.Future;
 public class SpotifyTrackDao {
     private Integer retries = 0;
 
-    public Future<Track> pullTrackAsync(SpotifyApi api, String id) {
+    private Future<Track> pullTrackAsync(SpotifyApi api, String id) {
         final GetTrackRequest request = api.getTrack(id).build();
         try {
             return request.executeAsync();
@@ -66,7 +65,7 @@ public class SpotifyTrackDao {
         List<Track> completedTracks = new ArrayList<>();
         List<Map<String, Future<Track>>> retriedTracks = new ArrayList<>();
 
-        for (Iterator<Map<String, Future<Track>> iterator = pulledTrackFutures.iterator(); iterator.hasNext(); ) {
+        for (Iterator<Map<String, Future<Track>>> iterator = pulledTrackFutures.iterator(); iterator.hasNext(); ) {
             Map<String, Future<Track>> nextFutureMap = iterator.next();
             if (nextFutureMap.values().iterator().next().isDone()) {
                 try {
@@ -79,7 +78,7 @@ public class SpotifyTrackDao {
                     log.error(e.getMessage() + ". Backing off will retry");
                     if (e.getCause() instanceof TooManyRequestsException) {
                         String[] key = nextFutureMap.keySet().iterator().next().split("_");
-                        retriedTracks.add(pullTrackAsync(api, key[0], key[1]));
+                        retriedTracks.add(new HashMap<>( pullTrackAsync(api, key[0])));
                     }
                 }
                 iterator.remove();

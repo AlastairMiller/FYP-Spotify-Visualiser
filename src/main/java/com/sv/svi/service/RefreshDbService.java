@@ -14,6 +14,7 @@ import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
 import com.wrapper.spotify.model_objects.specification.Playlist;
 import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
+import com.wrapper.spotify.model_objects.specification.Track;
 import com.wrapper.spotify.requests.data.browse.GetListOfFeaturedPlaylistsRequest;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -128,7 +129,15 @@ public class RefreshDbService {
             } else {
                 playlistCleanup(DownstreamMapper.mapPlaylist(playlist));
             }
-            verifyTracksArePersisted(refinedPlaylist);
+            verifyTracksArePersisted(refinedPlaylist.getTrackIds());
+        }
+    }
+
+    private void saveTracks(List<Track> tracks) throws MalformedURLException {
+        for (Track track : tracks) {
+            RefinedTrack refinedTrack = DownstreamMapper.mapTrack(track);
+            mongoHelper.getRefinedTrackDao().saveEntryToDatabase(refinedTrack);
+            log.info("Saved a track called {}", track.getName());
         }
     }
 
@@ -161,9 +170,13 @@ public class RefreshDbService {
             } else {
                 log.info("Track {} already exists in Mongo.", refinedTrackId);
             }
-            spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
-
-            verifyAlbumsArePersisted();
+            List<Track> tracks = spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
+            try {
+                saveTracks(tracks);
+            } catch (MalformedURLException e) {
+                log.error(e.getMessage());
+            }
+//            verifyAlbumsArePersisted();
             verifyArtistsArePersisted(JsontoRefinedMapper.toTrack(mongoHelper.getRefinedTrackDao().retrieveEntryById(refinedTrackId)).getArtistIds());
         }
     }
@@ -182,20 +195,18 @@ public class RefreshDbService {
 
     }
 
-    private void verifyAlbumsArePersisted(String albumId) {
-        if (mongoHelper.getRefinedAlbumDao().retrieveEntryById(albumId) == null) {
-            log.info("Album {} missing, will get");
-            albumIdsToPull.add(albumId);
-        }else {
-            log.info("Album {} already exists", albumId );
-        }
-        if (albumIdsToPull.size() == 50){
-           albumFutures.addAll(spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull));
-           albumIdsToPull.clear();
-        }
-    }
-
-
+//    private void verifyAlbumsArePersisted(String albumId) {
+//        if (mongoHelper.getRefinedAlbumDao().retrieveEntryById(albumId) == null) {
+//            log.info("Album {} missing, will get");
+//            albumIdsToPull.add(albumId);
+//        } else {
+//            log.info("Album {} already exists", albumId);
+//        }
+//        if (albumIdsToPull.size() == 50) {
+//            albumFutures.addAll(spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull));
+//            albumIdsToPull.clear();
+//        }
+//    }
 
 
 }
