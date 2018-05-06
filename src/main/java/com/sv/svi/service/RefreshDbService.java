@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCollection;
 import com.neovisionaries.i18n.CountryCode;
 import com.sv.svi.MongoHelper;
 import com.sv.svi.SpotifyAuthenticationHelper;
+import com.sv.svi.dao.SpotifyAlbumDao;
 import com.sv.svi.dao.SpotifyArtistDao;
 import com.sv.svi.dao.SpotifyPlaylistDao;
 import com.sv.svi.dao.SpotifyTrackDao;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import refinedDataModels.RefinedAlbum;
 import refinedDataModels.RefinedPlaylist;
 import refinedDataModels.RefinedTrack;
 
@@ -39,13 +41,15 @@ public class RefreshDbService {
 
     private final SpotifyAuthenticationHelper authenticationHelper;
     private final MongoHelper mongoHelper;
+    private final SpotifyAlbumDao spotifyAlbumDao;
     private final SpotifyPlaylistDao spotifyPlaylistDao;
     private final SpotifyTrackDao spotifyTrackDao;
     private SpotifyApi api;
     private ExecutorService executor = Executors.newFixedThreadPool(16);
     private int refreshRetries = 0;
     private Boolean refreshInProgress = false;
-    private List<?> spam = Collections.synchronizedList(new ArrayList<>());
+    private List<String> albumIdsToPull = new ArrayList<>();
+    private List<Future<RefinedAlbum>> albumFutures = new ArrayList<>();
     private List<Future<?>> futureListOfNestedElements = new ArrayList<>();
 
     @Scheduled(fixedDelay = 360000)
@@ -157,7 +161,8 @@ public class RefreshDbService {
             } else {
                 log.info("Track {} already exists in Mongo.", refinedTrackId);
             }
-            //split into 50 and make request async
+            spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
+
             verifyAlbumsArePersisted();
             verifyArtistsArePersisted(JsontoRefinedMapper.toTrack(mongoHelper.getRefinedTrackDao().retrieveEntryById(refinedTrackId)).getArtistIds());
         }
@@ -177,13 +182,20 @@ public class RefreshDbService {
 
     }
 
-    private void verifyAlbumsArePersisted(RefinedTrack track) {
-        if (mongoHelper.getRefinedAlbumDao().retrieveEntryById(track.getAlbumId()) == null) {
+    private void verifyAlbumsArePersisted(String albumId) {
+        if (mongoHelper.getRefinedAlbumDao().retrieveEntryById(albumId) == null) {
             log.info("Album {} missing, will get");
-
+            albumIdsToPull.add(albumId);
+        }else {
+            log.info("Album {} already exists", albumId );
         }
-
+        if (albumIdsToPull.size() == 50){
+           albumFutures.addAll(spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull));
+           albumIdsToPull.clear();
+        }
     }
+
+
 
 
 }
