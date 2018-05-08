@@ -13,6 +13,8 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import static java.util.Arrays.asList;
+
 @Slf4j
 @Repository
 public class SpotifyTrackDao {
@@ -41,7 +43,7 @@ public class SpotifyTrackDao {
     }
 
     public List<Track> pullTracksAsync(SpotifyApi api, List<String> ids) {
-        List<Map<String, Future<List<Track>>>> pulledTracksFutures = new ArrayList<>();
+        List<Map<String, Future<Track[]>>> pulledTracksFutures = new ArrayList<>();
 
         if (ids.size() > 50) {
             Integer numBatches = (int) Math.ceil(ids.size() / 50.0);
@@ -60,13 +62,13 @@ public class SpotifyTrackDao {
         return getTrackBatchFutures(api, pulledTracksFutures, ids);
     }
 
-    private Map<String, Future<List<Track>>> pullTrackBatchFutures(SpotifyApi api, List<String> ids) {
+    private Map<String, Future<Track[]>> pullTrackBatchFutures(SpotifyApi api, List<String> ids) {
         String idsAsString = ids.toString();
         idsAsString = idsAsString.replace("[", "").replace("]", "").replace(" ", "");
         final GetSeveralTracksRequest request = api.getSeveralTracks(idsAsString).build();
         try {
-            Future<List<Track>> futureList = request.executeAsync();
-            Map<String, Future<List<Track>>> futureBatch = new HashMap<>();
+            Future<Track[]> futureList = request.executeAsync();
+            Map<String, Future<Track[]>> futureBatch = new HashMap<>();
             futureBatch.put(ids.get(0), futureList);
             return futureBatch;
         } catch (Exception e) {
@@ -75,19 +77,18 @@ public class SpotifyTrackDao {
         }
     }
 
-    public List<Track> getTrackBatchFutures(SpotifyApi api, List<Map<String, Future<List<Track>>>> pulledTrackFutures, List<String> ids) {
+    public List<Track> getTrackBatchFutures(SpotifyApi api, List<Map<String, Future<Track[]>>> pulledTrackFutures, List<String> ids) {
         List<Track> completedTracks = new ArrayList<>();
         List<String> retriedTrackIds = new ArrayList<>();
 
         while (pulledTrackFutures.size() > 0) {
-            Iterator<Map<String, Future<List<Track>>>> iterator = pulledTrackFutures.iterator();
+            Iterator<Map<String, Future<Track[]>>> iterator = pulledTrackFutures.iterator();
             while (iterator.hasNext()) {
 
-                Map<String, Future<List<Track>>> nextFutureBatch = iterator.next();
+                Map<String, Future<Track[]>> nextFutureBatch = iterator.next();
                 if (nextFutureBatch.values().iterator().next().isDone()) {
                     try {
-                        // Broken asf
-                        List<Track> trackList = new ArrayList<>(nextFutureBatch.values().iterator().next().get());
+                        List<Track> trackList = asList(nextFutureBatch.values().iterator().next().get());
                         return null;
                     } catch (InterruptedException e) {
                         log.error(e.getMessage(), e);
