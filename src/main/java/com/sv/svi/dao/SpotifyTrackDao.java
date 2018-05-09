@@ -88,8 +88,7 @@ public class SpotifyTrackDao {
                 Map<String, Future<Track[]>> nextFutureBatch = iterator.next();
                 if (nextFutureBatch.values().iterator().next().isDone()) {
                     try {
-                        List<Track> trackList = asList(nextFutureBatch.values().iterator().next().get());
-                        return null;
+                        return asList(nextFutureBatch.values().iterator().next().get());
                     } catch (InterruptedException e) {
                         log.error(e.getMessage(), e);
                     } catch (ExecutionException e) {

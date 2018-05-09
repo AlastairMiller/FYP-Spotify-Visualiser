@@ -68,6 +68,7 @@ public class DownstreamMapper {
     public static RefinedTrack mapTrack(Track fullTrack) throws MalformedURLException {
         Map<String, Object> map = mapGeneric(fullTrack, Track.class);
         map.remove("availableMarkets");
+        map.remove("previewUrl");
         map.forEach(DownstreamMapper::getArtistIds);
         map.put("artistIds", listOfIds);
         listOfIds = new ArrayList<>();

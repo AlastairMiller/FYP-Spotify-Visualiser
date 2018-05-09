@@ -89,7 +89,7 @@ public class RefreshDbService {
         List<PlaylistSimplified> playlistSimplifieds = spotifyPlaylistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
                 .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
-        playlistSimplifieds.subList(100,playlistSimplifieds.size()).clear();
+        playlistSimplifieds.subList(100, playlistSimplifieds.size()).clear();
         List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
         try {
             savePlaylists(playlists);
@@ -171,14 +171,15 @@ public class RefreshDbService {
             } else {
                 log.info("Track {} already exists in Mongo.", refinedTrackId);
             }
-        }      List<Track> tracks = spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
-            try {
-                saveTracks(tracks);
-            } catch (MalformedURLException e) {
-                log.error(e.getMessage());
-            }
+        }
+        List<Track> tracks = spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
+        try {
+            saveTracks(tracks);
+        } catch (MalformedURLException e) {
+            log.error(e.getMessage());
+        }
 //            verifyAlbumsArePersisted();
-  //          verifyArtistsArePersisted(JsontoRefinedMapper.toTrack(mongoHelper.getRefinedTrackDao().retrieveEntryById(refinedTrackId)).getArtistIds());
+        //          verifyArtistsArePersisted(JsontoRefinedMapper.toTrack(mongoHelper.getRefinedTrackDao().retrieveEntryById(refinedTrackId)).getArtistIds());
 
     }
 
