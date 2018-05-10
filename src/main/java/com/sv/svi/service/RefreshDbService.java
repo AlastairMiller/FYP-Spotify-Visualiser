@@ -172,11 +172,13 @@ public class RefreshDbService {
                 log.info("Track {} already exists in Mongo.", refinedTrackId);
             }
         }
-        List<Track> tracks = spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
-        try {
-            saveTracks(tracks);
-        } catch (MalformedURLException e) {
-            log.error(e.getMessage());
+        if(trackIdsToGet.size()>0) {
+            List<Track> tracks = spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
+            try {
+                saveTracks(tracks);
+            } catch (MalformedURLException e) {
+                log.error(e.getMessage());
+            }
         }
 //            verifyAlbumsArePersisted();
         //          verifyArtistsArePersisted(JsontoRefinedMapper.toTrack(mongoHelper.getRefinedTrackDao().retrieveEntryById(refinedTrackId)).getArtistIds());

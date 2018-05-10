@@ -46,10 +46,14 @@ public class SpotifyTrackDao {
         List<Map<String, Future<Track[]>>> pulledTracksFutures = new ArrayList<>();
 
         if (ids.size() > 50) {
-            Integer numBatches = (int) Math.ceil(ids.size() / 50.0);
+            Integer numBatches = (int) Math.floor(ids.size() / 50.0);
             for (int i = 0; i < numBatches; i++) {
                 try {
-                    pulledTracksFutures.add(pullTrackBatchFutures(api, ids.subList(i * 50, (i * 50) + 49)));
+                    if (i != numBatches - 1) {
+                        pulledTracksFutures.add(pullTrackBatchFutures(api, ids.subList(i * 50, (i * 50) + 49)));
+                    } else {
+                        pulledTracksFutures.add(pullTrackBatchFutures(api, ids.subList(i * 50, (i * 50) + (ids.size() - numBatches * 50))));
+                    }
                 } catch (Exception e) {
                     log.error("Cannot retrieve batch of songs from api, {}", e.getMessage());
                     return null;
