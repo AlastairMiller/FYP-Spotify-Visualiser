@@ -14,10 +14,8 @@ import refinedDataModels.RefinedAlbum;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Repository
@@ -57,11 +55,55 @@ public class SpotifyAlbumDao {
         }
     }
 
+    public List<Album> pullAlbumsAsync(SpotifyApi api, List<String> albumIds) {
+        List<Map<String, Future<Album[]>>> pulledAlbumFutures = new ArrayList<>();
+        if (albumIds.size() > 50) {
+            Integer numBatches = (int) Math.floor(albumIds.size() / 50.0);
+            Integer remainder = albumIds.size() % 50;
+            for (int i = 0; i < numBatches; i++) {
+                try {
+                    if (i != numBatches - 1) {
+                        pulledAlbumFutures.add(pullAlbumBatchFuture(api, albumIds.subList(i * 50, (i * 50) + 49)));
+                    } else {
+                        pulledAlbumFutures.add(pullAlbumBatchFuture(api, albumIds.subList(i * 50, (i * 50) + (50 - remainder))));
+                    }
+                } catch (Exception e) {
+                    log.error("Cannot retrieve batch of album from api, {}", e.getMessage());
+                    return null;
+                }
+            }
+        } else {
+            pulledAlbumFutures.add(pullAlbumBatchFuture(api, albumIds));
+        }
+        return getAlbumBatchFutures(api, pulledAlbumFutures, albumIds);
+
+    }
+
+
+    private Map<String, Future<Album[]>> pullAlbumBatchFuture(SpotifyApi api, List<String> albumIds) {
+        String idsAsString = albumIds.toString().replace("[", "").replace("]", "").replace(" ", "");
+        final GetSeveralAlbumsRequest request = api.getSeveralAlbums(idsAsString).build();
+        try {
+            Future<Album[]> futureAlbums = request.executeAsync();
+            Map<String, Future<Album[]>> futureAlbumBatch = new HashMap<>();
+            futureAlbumBatch.put(albumIds.get(0), futureAlbums);
+            return futureAlbumBatch;
+        }catch (Exception e) {
+            log.error("asdsad");
+            return null;
+        }
+
+    }
+
+    private List<Album> getAlbumBatchFutures(SpotifyApi api, List<Map<String,Future<Album[]>>> pulledAlbumFutures, List<String> albumIds) {
+        return null;
+    }
+
     public List<RefinedAlbum> pullAndMapAlbums(SpotifyApi api, List<String> ids) throws MalformedURLException {
         if (ids.size() > 1) {
             List<Album> pulledAlbums = pullAlbums(api, ids);
             List<RefinedAlbum> mappedAlbums = new ArrayList<>();
-            for(Album album : pulledAlbums){
+            for (Album album : pulledAlbums) {
                 mappedAlbums.add(DownstreamMapper.mapAlbum(album));
             }
             return mappedAlbums;

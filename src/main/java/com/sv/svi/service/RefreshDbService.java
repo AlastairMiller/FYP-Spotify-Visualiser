@@ -5,16 +5,13 @@ import com.neovisionaries.i18n.CountryCode;
 import com.sv.svi.MongoHelper;
 import com.sv.svi.SpotifyAuthenticationHelper;
 import com.sv.svi.dao.SpotifyAlbumDao;
-import com.sv.svi.dao.SpotifyArtistDao;
 import com.sv.svi.dao.SpotifyPlaylistDao;
 import com.sv.svi.dao.SpotifyTrackDao;
 import com.sv.svi.utils.DownstreamMapper;
 import com.svd.mapper.JsontoRefinedMapper;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
-import com.wrapper.spotify.model_objects.specification.Playlist;
-import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
-import com.wrapper.spotify.model_objects.specification.Track;
+import com.wrapper.spotify.model_objects.specification.*;
 import com.wrapper.spotify.requests.data.browse.GetListOfFeaturedPlaylistsRequest;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +50,7 @@ public class RefreshDbService {
     private List<Future<RefinedAlbum>> albumFutures = new ArrayList<>();
     private List<Future<?>> futureListOfNestedElements = new ArrayList<>();
 
-    @Scheduled(fixedDelay = 360000)
+    @Scheduled(fixedDelay = 36000)
     @PostConstruct
     public void refreshToken() {
         log.info("-----------------------Refreshing Api Token-----------------------");
@@ -142,6 +139,13 @@ public class RefreshDbService {
         }
     }
 
+    private void saveAlbums(List<Album> albums) throws MalformedURLException {
+        for (Album album : albums) {
+            RefinedAlbum refinedAlbum = DownstreamMapper.mapAlbum(album);
+
+        }
+    }
+
 
     private void playlistCleanup(RefinedPlaylist newRefinedPlaylist) {
         List<String> storedTracks = (List<String>) mongoHelper.getRefinedPlaylistDao().retrieveEntryById(newRefinedPlaylist.getId()).get("trackIds");
@@ -172,20 +176,35 @@ public class RefreshDbService {
                 log.info("Track {} already exists in Mongo.", refinedTrackId);
             }
         }
-        if(trackIdsToGet.size()>0) {
+        if (trackIdsToGet.size() > 0) {
             List<Track> tracks = spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
             try {
                 saveTracks(tracks);
             } catch (MalformedURLException e) {
                 log.error(e.getMessage());
             }
+            for (Track track : tracks) {
+                verifyAlbumIsPersisted(track.getAlbum().getId());
+                verifyArtistsArePersisted(track.getArtists());
+            }
         }
-//            verifyAlbumsArePersisted();
-        //          verifyArtistsArePersisted(JsontoRefinedMapper.toTrack(mongoHelper.getRefinedTrackDao().retrieveEntryById(refinedTrackId)).getArtistIds());
-
     }
 
-    private void verifyArtistsArePersisted(List<String> artistsIds) {
+    private void verifyAlbumIsPersisted(String albumId) {
+        if (mongoHelper.getRefinedAlbumDao().retrieveEntryById(albumId) == null) {
+            log.info("Album {} missing, will get.", albumId);
+            albumIdsToPull.add(albumId);
+        }
+        if (albumIdsToPull.size() = 50) {
+           List<Album> albums =  spotifyAlbumDao.pullAlbumsAsync(api ,albumIdsToPull);
+           try {
+               saveAlbums(albums)
+           }
+
+        }
+    }
+
+    private void verifyArtistsArePersisted(ArtistSimplified[] artists) {
         ArrayList<String> artistIdsToGet = new ArrayList<>();
         for (String artistId : artistsIds) {
             if (mongoHelper.getRefinedArtistDao().retrieveEntryById(artistId) == null) {
@@ -198,19 +217,6 @@ public class RefreshDbService {
         }
 
     }
-
-//    private void verifyAlbumsArePersisted(String albumId) {
-//        if (mongoHelper.getRefinedAlbumDao().retrieveEntryById(albumId) == null) {
-//            log.info("Album {} missing, will get");
-//            albumIdsToPull.add(albumId);
-//        } else {
-//            log.info("Album {} already exists", albumId);
-//        }
-//        if (albumIdsToPull.size() == 50) {
-//            albumFutures.addAll(spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull));
-//            albumIdsToPull.clear();
-//        }
-//    }
 
 
 }
