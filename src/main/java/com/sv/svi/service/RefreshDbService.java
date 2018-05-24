@@ -5,10 +5,10 @@ import com.neovisionaries.i18n.CountryCode;
 import com.sv.svi.MongoHelper;
 import com.sv.svi.SpotifyAuthenticationHelper;
 import com.sv.svi.dao.SpotifyAlbumDao;
+import com.sv.svi.dao.SpotifyArtistDao;
 import com.sv.svi.dao.SpotifyPlaylistDao;
 import com.sv.svi.dao.SpotifyTrackDao;
 import com.sv.svi.utils.DownstreamMapper;
-import com.svd.mapper.JsontoRefinedMapper;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
 import com.wrapper.spotify.model_objects.specification.*;
@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import refinedDataModels.RefinedAlbum;
+import refinedDataModels.RefinedArtist;
 import refinedDataModels.RefinedPlaylist;
 import refinedDataModels.RefinedTrack;
 
@@ -31,6 +32,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
+
 @Slf4j
 @Service
 @Data
@@ -40,6 +43,7 @@ public class RefreshDbService {
     private final SpotifyAuthenticationHelper authenticationHelper;
     private final MongoHelper mongoHelper;
     private final SpotifyAlbumDao spotifyAlbumDao;
+    private final SpotifyArtistDao spotifyArtistDao;
     private final SpotifyPlaylistDao spotifyPlaylistDao;
     private final SpotifyTrackDao spotifyTrackDao;
     private SpotifyApi api;
@@ -47,6 +51,7 @@ public class RefreshDbService {
     private int refreshRetries = 0;
     private Boolean refreshInProgress = false;
     private List<String> albumIdsToPull = new ArrayList<>();
+    ArrayList<String> artistIdsToPull = new ArrayList<>();
     private List<Future<RefinedAlbum>> albumFutures = new ArrayList<>();
     private List<Future<?>> futureListOfNestedElements = new ArrayList<>();
 
@@ -110,7 +115,7 @@ public class RefreshDbService {
                 .build();
         try {
             featuredPlaylists = request.execute();
-            List<PlaylistSimplified> featuredPlaylistList = Arrays.asList(featuredPlaylists.getPlaylists().getItems());
+            List<PlaylistSimplified> featuredPlaylistList = asList(featuredPlaylists.getPlaylists().getItems());
             List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, featuredPlaylistList);
             savePlaylists(playlists);
         } catch (Exception e) {
@@ -142,9 +147,19 @@ public class RefreshDbService {
     private void saveAlbums(List<Album> albums) throws MalformedURLException {
         for (Album album : albums) {
             RefinedAlbum refinedAlbum = DownstreamMapper.mapAlbum(album);
-
+            mongoHelper.getRefinedAlbumDao().saveEntryToDatabase(refinedAlbum);
+            log.info("Saved a album called {}", album.getName());
         }
     }
+
+    private void saveArtists(List<Artist> artists) throws MalformedURLException {
+        for (Artist artist : artists){
+            RefinedArtist refinedArtist = DownstreamMapper.mapArtist(artist);
+            mongoHelper.getRefinedArtistDao().saveEntryToDatabase(refinedArtist);
+            log.info("Saved a artist called {}", artist.getName());
+        }
+    }
+
 
 
     private void playlistCleanup(RefinedPlaylist newRefinedPlaylist) {
@@ -185,7 +200,10 @@ public class RefreshDbService {
             }
             for (Track track : tracks) {
                 verifyAlbumIsPersisted(track.getAlbum().getId());
-                verifyArtistsArePersisted(track.getArtists());
+                List<String> artistIds = Arrays.stream(track.getArtists())
+                        .map(ArtistSimplified::getId)
+                        .collect(Collectors.toList());
+                verifyArtistsArePersisted(artistIds);
             }
         }
     }
@@ -195,28 +213,43 @@ public class RefreshDbService {
             log.info("Album {} missing, will get.", albumId);
             albumIdsToPull.add(albumId);
         }
-        if (albumIdsToPull.size() = 50) {
-           List<Album> albums =  spotifyAlbumDao.pullAlbumsAsync(api ,albumIdsToPull);
-           try {
-               saveAlbums(albums)
-           }
-
+        if (albumIdsToPull.size() == 50) {
+            List<Album> albums = spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull);
+            try {
+                saveAlbums(albums);
+            } catch (MalformedURLException e) {
+                log.error(e.getMessage());
+            }
+            albumIdsToPull.clear();
+            List<String> trackIds = albums.stream()
+                    .flatMap(album -> Arrays.stream(album.getTracks().getItems()))
+                    .map(TrackSimplified::getId)
+                    .collect(Collectors.toList());
+            verifyTracksArePersisted(trackIds);
         }
     }
 
-    private void verifyArtistsArePersisted(ArtistSimplified[] artists) {
-        ArrayList<String> artistIdsToGet = new ArrayList<>();
+    private void verifyArtistsArePersisted(List<String> artistsIds) {
         for (String artistId : artistsIds) {
             if (mongoHelper.getRefinedArtistDao().retrieveEntryById(artistId) == null) {
                 log.info("Artist {} missing, will get.", artistId);
-                artistIdsToGet.add(artistId);
+                artistIdsToPull.add(artistId);
             } else {
                 log.info("Artist {} already exists", artistId);
             }
-            //split into 50 and make request async
+        }
+        if(artistIdsToPull.size() >=50){
+            List<Artist> artists = spotifyArtistDao.pullArtistsAsync(api, artistIdsToPull);
+            try {
+                saveArtists(artists);
+            }catch(MalformedURLException e) {
+                log.error(e.getMessage());
+            }
+            artistIdsToPull.subList(0,49).clear();
         }
 
     }
+
 
 
 }

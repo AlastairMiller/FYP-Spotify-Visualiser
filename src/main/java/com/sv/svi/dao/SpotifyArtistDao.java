@@ -65,4 +65,6 @@ public class SpotifyArtistDao {
         }
     }
 
+    public List<Artist> pullArtistsAsync(SpotifyApi api, ArrayList<String> artistIdsToPull) {
+    }
 }
