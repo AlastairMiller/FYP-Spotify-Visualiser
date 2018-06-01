@@ -8,7 +8,6 @@ import com.wrapper.spotify.requests.data.tracks.GetTrackRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -46,14 +45,14 @@ public class SpotifyTrackDao {
         List<Map<String, Future<Track[]>>> pulledTracksFutures = new ArrayList<>();
 
         if (ids.size() > 50) {
-            Integer numBatches = (int) Math.floor(ids.size() / 50.0);
+            Integer numBatches = (int) Math.ceil(ids.size() / 50.0);
             Integer remainder = ids.size() % 50;
             for (int i = 0; i < numBatches; i++) {
                 try {
                     if (i != numBatches - 1) {
                         pulledTracksFutures.add(pullTrackBatchFutures(api, ids.subList(i * 50, (i * 50) + 49)));
                     } else {
-                        pulledTracksFutures.add(pullTrackBatchFutures(api, ids.subList(i * 50, (i * 50) + (50 - remainder))));
+                        pulledTracksFutures.add(pullTrackBatchFutures(api, ids.subList(i * 50, (i * 50 + remainder))));
                     }
                 } catch (Exception e) {
                     log.error("Cannot retrieve batch of songs from api, {}", e.getMessage());
@@ -64,7 +63,7 @@ public class SpotifyTrackDao {
             pulledTracksFutures.add(pullTrackBatchFutures(api, ids));
 
         }
-        return getTrackBatchFutures(api, pulledTracksFutures, ids);
+        return getTrackBatchFutures(api, pulledTracksFutures);
     }
 
     private Map<String, Future<Track[]>> pullTrackBatchFutures(SpotifyApi api, List<String> ids) {
@@ -82,7 +81,7 @@ public class SpotifyTrackDao {
         }
     }
 
-    public List<Track> getTrackBatchFutures(SpotifyApi api, List<Map<String, Future<Track[]>>> pulledTrackFutures, List<String> ids) {
+    public List<Track> getTrackBatchFutures(SpotifyApi api, List<Map<String, Future<Track[]>>> pulledTrackFutures) {
         List<Track> completedTracks = new ArrayList<>();
         List<String> retriedTrackIds = new ArrayList<>();
 

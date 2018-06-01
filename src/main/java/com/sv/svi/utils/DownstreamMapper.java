@@ -1,6 +1,7 @@
 package com.sv.svi.utils;
 
 import com.svd.mapper.RefinedObjectBuilder;
+import com.wrapper.spotify.enums.ReleaseDatePrecision;
 import com.wrapper.spotify.model_objects.specification.*;
 import lombok.extern.slf4j.Slf4j;
 import refinedDataModels.*;
@@ -23,13 +24,13 @@ public class DownstreamMapper {
     private static <T> List<String> returnNestedIds(Class<?> clazz, List<T> objects) {
         List<String> nestedIds = new ArrayList<>();
         for (T object : objects) {
-            if(clazz.getName().equals("com.wrapper.spotify.model_objects.specification.PlaylistTrack")){
+            if (clazz.getName().equals("com.wrapper.spotify.model_objects.specification.PlaylistTrack")) {
                 try {
                     nestedIds.add(((PlaylistTrack) object).getTrack().getId());
-                }catch (Exception e){
+                } catch (Exception e) {
                     log.error("Invalid playlist track: {}");
                 }
-            }else {
+            } else {
                 try {
                     Field field = clazz.getDeclaredField("id");
                     Method getter = clazz.getDeclaredMethod("get" + field.getName().substring(0, 1).toUpperCase() +
@@ -58,11 +59,23 @@ public class DownstreamMapper {
         map.remove("genres");
         map.remove("images");
         map.remove("label");
-        map.remove("releaseDatePrecision");
-        String[] dateAsString = map.get("releaseDate").toString().split("-");
-        LocalDate localDate = LocalDate.of(Integer.parseInt(dateAsString[0]), Integer.parseInt(dateAsString[1]), Integer.parseInt(dateAsString[2]));
+        LocalDate localDate = translateDate(map.get("releaseDate").toString(), (ReleaseDatePrecision) map.get("releaseDatePrecision"));
         map.put("releaseDate", new Date(localDate.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()));
+        map.remove("releaseDatePrecision");
         return (RefinedAlbum) RefinedObjectBuilder.start(RefinedAlbum.class).with(map).build();
+    }
+
+    private static LocalDate translateDate(String dateAsString, ReleaseDatePrecision precision) {
+        String[] dateAsStringArray = dateAsString.split("-");
+        switch (precision) {
+            case DAY:
+                return LocalDate.of(Integer.parseInt(dateAsStringArray[0]), Integer.parseInt(dateAsStringArray[1]), Integer.parseInt(dateAsStringArray[2]));
+            case MONTH:
+                return LocalDate.of(Integer.parseInt(dateAsStringArray[0]), Integer.parseInt(dateAsStringArray[1]), 1);
+            case YEAR:
+                return LocalDate.of(Integer.parseInt(dateAsStringArray[0]), 1, 1);
+        }
+        throw new RuntimeException();
     }
 
     public static RefinedTrack mapTrack(Track fullTrack) throws MalformedURLException {

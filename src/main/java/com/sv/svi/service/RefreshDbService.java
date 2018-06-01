@@ -153,13 +153,12 @@ public class RefreshDbService {
     }
 
     private void saveArtists(List<Artist> artists) throws MalformedURLException {
-        for (Artist artist : artists){
+        for (Artist artist : artists) {
             RefinedArtist refinedArtist = DownstreamMapper.mapArtist(artist);
             mongoHelper.getRefinedArtistDao().saveEntryToDatabase(refinedArtist);
             log.info("Saved a artist called {}", artist.getName());
         }
     }
-
 
 
     private void playlistCleanup(RefinedPlaylist newRefinedPlaylist) {
@@ -208,13 +207,35 @@ public class RefreshDbService {
         }
     }
 
+    private void verifyArtistsArePersisted(List<String> artistsIds) {
+        for (String artistId : artistsIds) {
+            if (mongoHelper.getRefinedArtistDao().retrieveEntryById(artistId) == null) {
+                log.info("Artist {} missing, will get.", artistId);
+                artistIdsToPull.add(artistId);
+            } else {
+                log.info("Artist {} already exists", artistId);
+            }
+        }
+        if (artistIdsToPull.size() >= 50) {
+            List<Artist> artists = spotifyArtistDao.pullArtistsAsync(api, artistIdsToPull);
+            try {
+                saveArtists(artists);
+            } catch (MalformedURLException e) {
+                log.error(e.getMessage());
+            }
+            artistIdsToPull.subList(0, 49).clear();
+        }
+
+    }
+
+
     private void verifyAlbumIsPersisted(String albumId) {
         if (mongoHelper.getRefinedAlbumDao().retrieveEntryById(albumId) == null) {
             log.info("Album {} missing, will get.", albumId);
             albumIdsToPull.add(albumId);
         }
-        if (albumIdsToPull.size() == 50) {
-            List<Album> albums = spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull);
+        if (albumIdsToPull.size() == 20) {
+          List<Album> albums = spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull);
             try {
                 saveAlbums(albums);
             } catch (MalformedURLException e) {
@@ -228,28 +249,5 @@ public class RefreshDbService {
             verifyTracksArePersisted(trackIds);
         }
     }
-
-    private void verifyArtistsArePersisted(List<String> artistsIds) {
-        for (String artistId : artistsIds) {
-            if (mongoHelper.getRefinedArtistDao().retrieveEntryById(artistId) == null) {
-                log.info("Artist {} missing, will get.", artistId);
-                artistIdsToPull.add(artistId);
-            } else {
-                log.info("Artist {} already exists", artistId);
-            }
-        }
-        if(artistIdsToPull.size() >=50){
-            List<Artist> artists = spotifyArtistDao.pullArtistsAsync(api, artistIdsToPull);
-            try {
-                saveArtists(artists);
-            }catch(MalformedURLException e) {
-                log.error(e.getMessage());
-            }
-            artistIdsToPull.subList(0,49).clear();
-        }
-
-    }
-
-
 
 }
