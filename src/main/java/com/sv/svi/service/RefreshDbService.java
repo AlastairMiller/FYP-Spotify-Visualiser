@@ -61,7 +61,7 @@ public class RefreshDbService {
         log.info("-----------------------Refreshing Api Token-----------------------");
         api = authenticationHelper.clientCredentialFlow();
         if (api == null) {
-            throw new RuntimeException("API is borked");
+            throw new RuntimeException("Cannot refresh Auth Token. API down?");
         }
     }
 
@@ -79,6 +79,7 @@ public class RefreshDbService {
         }
     }
 
+    //Todo
     private void createIndexes() {
         log.info("----------------------------Creating Indexes----------------------------");
         MongoCollection trackCollection = mongoHelper.getRefinedTrackDao().getMongoCollection();
@@ -91,7 +92,7 @@ public class RefreshDbService {
         List<PlaylistSimplified> playlistSimplifieds = spotifyPlaylistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
                 .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
-        playlistSimplifieds.subList(100, playlistSimplifieds.size()).clear();
+    //   playlistSimplifieds.subList(1000, playlistSimplifieds.size()).clear();
         List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
         try {
             savePlaylists(playlists);
