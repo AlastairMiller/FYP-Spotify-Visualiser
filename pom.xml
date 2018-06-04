@@ -35,6 +35,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
+                            <classpathPrefix>dependency</classpathPrefix>
                             <mainClass>com.sv.svi.App</mainClass>
                         </manifest>
                     </archive>
@@ -42,9 +43,23 @@
             </plugin>
 
             <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>1.4.2</version>
+                <version>1.4.3</version>
                 <executions>
                     <execution>
                         <id>default</id>
@@ -55,8 +70,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <repository>alastairmiller-docker-spotify-visualiser-ingest.bintray.io</repository>
-                    <tag>${project.version}</tag>
+                    <repository>alastairmiller-docker-spotify-visualiser.bintray.io/${project.groupId}/spotify-visualiser-ingest</repository>
+                    <tag>1.0.1-snapshot</tag>
                     <buildArgs>
                         <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
