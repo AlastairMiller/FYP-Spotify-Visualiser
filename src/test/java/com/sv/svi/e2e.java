@@ -99,7 +99,7 @@ public class e2e {
 
 
     @Test
-    public void shouldPullAndSaveAlbum() throws MalformedURLException {
+    public void shouldPullAndSaveAlbum() throws Exception {
         Album album = SpotifyAlbumDao.pullAlbum(api, "0gtU58GVllHFpZzIgLd5lV");
         assert album != null;
         RefinedAlbum expectedAlbum = DownstreamMapper.mapAlbum(album);
@@ -111,7 +111,7 @@ public class e2e {
     }
 
     @Test
-    public void shouldPullAndSaveArtist() throws MalformedURLException {
+    public void shouldPullAndSaveArtist() throws Exception {
         Artist artist = SpotifyArtistDao.pullArtist(api, "5WId4o5jdGVhptNU0uqKxu");
         assert artist != null;
         RefinedArtist expectedArtist = DownstreamMapper.mapArtist(artist);
@@ -122,7 +122,7 @@ public class e2e {
     }
 
     @Test
-    public void shouldPullAndSavePlaylist() throws MalformedURLException {
+    public void shouldPullAndSavePlaylist() throws Exception {
         Playlist playlist = SpotifyPlaylistDao.pullPlaylist(api, "millersinc", "2CTdEa3JWbncC1h8WjnuxZ");
         assert playlist != null;
         RefinedPlaylist expectedPlaylist = DownstreamMapper.mapPlaylist(playlist);
@@ -133,7 +133,7 @@ public class e2e {
     }
 
     @Test
-    public void shouldPullAndSaveTrack() throws MalformedURLException {
+    public void shouldPullAndSaveTrack() throws Exception {
         Track track = SpotifyTrackDao.pullTrack(api, "2g9txG7vtGj8lNuNLDxQhu");
         assert track != null;
         RefinedTrack expectedTrack = DownstreamMapper.mapTrack(track);
@@ -145,7 +145,7 @@ public class e2e {
     }
 
     @Test
-    public void shouldPullAndSaveUser() throws MalformedURLException {
+    public void shouldPullAndSaveUser() throws Exception {
         User user = SpotifyUserDao.pullUser(api, "spotify");
         assert user != null;
         RefinedUser expectedUser = DownstreamMapper.mapUser(user);

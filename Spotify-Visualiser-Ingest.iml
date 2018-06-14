@@ -73,8 +73,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.vaadin.external.google:android-json:0.0.20131108.vaadin1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:4.3.10.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:3.6.3" level="project" />
-    <orderEntry type="library" name="Maven: com.sv:mongoDatamodel:1.0.3-RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: com.sv:mongoDao:1.0.3-RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.sv:mongoDatamodel:1.0.4-RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.sv:mongoDao:1.0.4-RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.projectlombok:lombok:1.16.20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.0.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: de.flapdoodle.embed:de.flapdoodle.embed.process:2.0.2" level="project" />
