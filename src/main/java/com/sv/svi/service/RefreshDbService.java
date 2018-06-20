@@ -55,7 +55,7 @@ public class RefreshDbService {
     private List<Future<RefinedAlbum>> albumFutures = new ArrayList<>();
     private List<Future<?>> futureListOfNestedElements = new ArrayList<>();
 
-    @Scheduled(fixedDelay = 36000)
+    @Scheduled(fixedDelay = 3600000)
     @PostConstruct
     public void refreshToken() {
         log.info("-----------------------Refreshing Api Token-----------------------");
@@ -74,6 +74,7 @@ public class RefreshDbService {
             pullLocationPlaylists(api);
             pullFeaturedPlaylists(api);
             refreshInProgress = false;
+            log.info("Finished DB refresh");
         } else {
             log.error("Request timed out after {} retries", refreshRetries);
         }
@@ -92,11 +93,11 @@ public class RefreshDbService {
         List<PlaylistSimplified> playlistSimplifieds = spotifyPlaylistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
                 .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
-    //   playlistSimplifieds.subList(1000, playlistSimplifieds.size()).clear();
+//       playlistSimplifieds.subList(1000, playlistSimplifieds.size()).clear();
         List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
         try {
             savePlaylists(playlists);
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
         log.info("{} playlists in the database", mongoHelper.getRefinedPlaylistDao().getMongoCollection().count());
@@ -124,11 +125,11 @@ public class RefreshDbService {
         }
     }
 
-    private void savePlaylists(List<Playlist> playlists) throws MalformedURLException {
+    private void savePlaylists(List<Playlist> playlists) throws MalformedURLException, IllegalAccessException, InstantiationException {
         for (Playlist playlist : playlists) {
             RefinedPlaylist refinedPlaylist = DownstreamMapper.mapPlaylist(playlist);
-            if (mongoHelper.getRefinedPlaylistDao().retrieveEntryById(playlist.getId()) == null) {
-                mongoHelper.getRefinedPlaylistDao().saveEntryToDatabase(refinedPlaylist);
+            if (mongoHelper.getRefinedPlaylistDao().getById(playlist.getId()) == null) {
+                mongoHelper.getRefinedPlaylistDao().save(refinedPlaylist);
                 log.info("Saved a playlist called {}", playlist.getName());
             } else {
                 playlistCleanup(DownstreamMapper.mapPlaylist(playlist));
@@ -137,33 +138,33 @@ public class RefreshDbService {
         }
     }
 
-    private void saveTracks(List<Track> tracks) throws MalformedURLException {
+    private void saveTracks(List<Track> tracks) throws MalformedURLException, IllegalAccessException, InstantiationException {
         for (Track track : tracks) {
             RefinedTrack refinedTrack = DownstreamMapper.mapTrack(track);
-            mongoHelper.getRefinedTrackDao().saveEntryToDatabase(refinedTrack);
+            mongoHelper.getRefinedTrackDao().save(refinedTrack);
             log.info("Saved a track called {}", track.getName());
         }
     }
 
-    private void saveAlbums(List<Album> albums) throws MalformedURLException {
+    private void saveAlbums(List<Album> albums) throws MalformedURLException, IllegalAccessException, InstantiationException {
         for (Album album : albums) {
             RefinedAlbum refinedAlbum = DownstreamMapper.mapAlbum(album);
-            mongoHelper.getRefinedAlbumDao().saveEntryToDatabase(refinedAlbum);
+            mongoHelper.getRefinedAlbumDao().save(refinedAlbum);
             log.info("Saved a album called {}", album.getName());
         }
     }
 
-    private void saveArtists(List<Artist> artists) throws MalformedURLException {
+    private void saveArtists(List<Artist> artists) throws MalformedURLException, IllegalAccessException, InstantiationException {
         for (Artist artist : artists) {
             RefinedArtist refinedArtist = DownstreamMapper.mapArtist(artist);
-            mongoHelper.getRefinedArtistDao().saveEntryToDatabase(refinedArtist);
+            mongoHelper.getRefinedArtistDao().save(refinedArtist);
             log.info("Saved a artist called {}", artist.getName());
         }
     }
 
 
     private void playlistCleanup(RefinedPlaylist newRefinedPlaylist) {
-        List<String> storedTracks = (List<String>) mongoHelper.getRefinedPlaylistDao().retrieveEntryById(newRefinedPlaylist.getId()).get("trackIds");
+        List<String> storedTracks = mongoHelper.getRefinedPlaylistDao().getById(newRefinedPlaylist.getId()).getTrackIds();
         for (int i = 0; i < storedTracks.size(); i++) {
             Boolean remove = true;
             for (int p = 0; p < newRefinedPlaylist.getTrackIds().size(); p++) {
@@ -177,14 +178,14 @@ public class RefreshDbService {
                 storedTracks.remove(i);
             }
         }
-        mongoHelper.getRefinedPlaylistDao().deleteEntryinDb(newRefinedPlaylist.getId(), mongoHelper.getRefinedPlaylistDao().getMongoCollection());
-        mongoHelper.getRefinedPlaylistDao().saveEntryToDatabase(newRefinedPlaylist);
+        mongoHelper.getRefinedPlaylistDao().delete(newRefinedPlaylist.getId());
+        mongoHelper.getRefinedPlaylistDao().save(newRefinedPlaylist);
     }
 
     private void verifyTracksArePersisted(List<String> trackIds) {
         ArrayList<String> trackIdsToGet = new ArrayList<>();
         for (String refinedTrackId : trackIds) {
-            if (mongoHelper.getRefinedTrackDao().retrieveEntryById(refinedTrackId) == null) {
+            if (mongoHelper.getRefinedTrackDao().getById(refinedTrackId) == null) {
                 log.info("Track {} missing, will get.", refinedTrackId);
                 trackIdsToGet.add(refinedTrackId);
             } else {
@@ -195,7 +196,7 @@ public class RefreshDbService {
             List<Track> tracks = spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
             try {
                 saveTracks(tracks);
-            } catch (MalformedURLException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage());
             }
             for (Track track : tracks) {
@@ -210,7 +211,7 @@ public class RefreshDbService {
 
     private void verifyArtistsArePersisted(List<String> artistsIds) {
         for (String artistId : artistsIds) {
-            if (mongoHelper.getRefinedArtistDao().retrieveEntryById(artistId) == null) {
+            if (mongoHelper.getRefinedArtistDao().getById(artistId) == null) {
                 log.info("Artist {} missing, will get.", artistId);
                 artistIdsToPull.add(artistId);
             } else {
@@ -221,7 +222,7 @@ public class RefreshDbService {
             List<Artist> artists = spotifyArtistDao.pullArtistsAsync(api, artistIdsToPull);
             try {
                 saveArtists(artists);
-            } catch (MalformedURLException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage());
             }
             artistIdsToPull.subList(0, 49).clear();
@@ -231,7 +232,7 @@ public class RefreshDbService {
 
 
     private void verifyAlbumIsPersisted(String albumId) {
-        if (mongoHelper.getRefinedAlbumDao().retrieveEntryById(albumId) == null) {
+        if (mongoHelper.getRefinedAlbumDao().getById(albumId) == null) {
             log.info("Album {} missing, will get.", albumId);
             albumIdsToPull.add(albumId);
         }
@@ -239,7 +240,7 @@ public class RefreshDbService {
           List<Album> albums = spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull);
             try {
                 saveAlbums(albums);
-            } catch (MalformedURLException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage());
             }
             albumIdsToPull.clear();

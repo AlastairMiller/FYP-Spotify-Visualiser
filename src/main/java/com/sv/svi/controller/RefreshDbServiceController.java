@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class RefreshDbServiceController {
 
-    //Todo Remove field injection, bit naughty >:(
-    @Autowired
     private RefreshDbService refreshDbService;
+
+    @Autowired
+    public RefreshDbServiceController(RefreshDbService refreshDbService) {
+        this.refreshDbService = refreshDbService;
+    }
 
     @RequestMapping(value = "refreshStatus", method = RequestMethod.GET)
     public Boolean getRefreshDbServiceStatus(){

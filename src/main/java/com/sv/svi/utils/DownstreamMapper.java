@@ -1,6 +1,6 @@
 package com.sv.svi.utils;
 
-import com.svd.mapper.RefinedObjectBuilder;
+import com.svd.util.RefinedObjectBuilder;
 import com.wrapper.spotify.enums.ReleaseDatePrecision;
 import com.wrapper.spotify.model_objects.specification.*;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ public class DownstreamMapper {
     }
 
 
-    public static RefinedAlbum mapAlbum(Album fullAlbum) throws MalformedURLException {
+    public static RefinedAlbum mapAlbum(Album fullAlbum) throws MalformedURLException, InstantiationException, IllegalAccessException {
         List<String> refinedArtists = returnNestedIds(ArtistSimplified.class, Arrays.asList(fullAlbum.getArtists()));
         List<String> tracksIds = returnNestedIds(TrackSimplified.class, Arrays.asList(fullAlbum.getTracks().getItems()));
         Map<String, Object> map = mapGeneric(fullAlbum, Album.class);
@@ -78,7 +78,7 @@ public class DownstreamMapper {
         throw new RuntimeException();
     }
 
-    public static RefinedTrack mapTrack(Track fullTrack) throws MalformedURLException {
+    public static RefinedTrack mapTrack(Track fullTrack) throws MalformedURLException, InstantiationException, IllegalAccessException {
         Map<String, Object> map = mapGeneric(fullTrack, Track.class);
         map.remove("availableMarkets");
         map.put("previewURL", map.get("previewUrl"));
@@ -93,7 +93,7 @@ public class DownstreamMapper {
         return (RefinedTrack) RefinedObjectBuilder.start(RefinedTrack.class).with(map).build();
     }
 
-    public static RefinedArtist mapArtist(Artist fullArtist) throws MalformedURLException {
+    public static RefinedArtist mapArtist(Artist fullArtist) throws MalformedURLException, InstantiationException, IllegalAccessException {
         Map<String, Object> map = mapGeneric(fullArtist, Artist.class);
         map.remove("images");
         map.replace("followers", ((Followers) map.get("followers")).getTotal());
@@ -101,7 +101,7 @@ public class DownstreamMapper {
         return (RefinedArtist) RefinedObjectBuilder.start(RefinedArtist.class).with(map).build();
     }
 
-    public static RefinedUser mapUser(User fullUser) throws MalformedURLException {
+    public static RefinedUser mapUser(User fullUser) throws MalformedURLException, InstantiationException, IllegalAccessException {
         Map<String, Object> map = mapGeneric(fullUser, User.class);
         map.put("numOfFollowers", ((Followers) map.get("followers")).getTotal());
         map.put("imageURL", new URL(((Image[]) map.get("images"))[0].getUrl()));
@@ -116,7 +116,7 @@ public class DownstreamMapper {
     }
 
 
-    public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist) throws MalformedURLException {
+    public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist) throws MalformedURLException, InstantiationException, IllegalAccessException {
         List<String> tracksIds = returnNestedIds(PlaylistTrack.class, Arrays.asList(fullPlaylist.getTracks().getItems()));
         Map<String, Object> map = mapGeneric(fullPlaylist, Playlist.class);
         map.remove("tracks");
