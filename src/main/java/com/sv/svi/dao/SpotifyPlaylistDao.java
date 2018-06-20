@@ -56,11 +56,11 @@ public class SpotifyPlaylistDao {
     private List<Playlist> getPlaylists(SpotifyApi api, List<Map<String, Future<Playlist>>> futureList) {
         List<Playlist> completedPlaylists = new ArrayList<>();
         List<Map<String, Future<Playlist>>> retriedPlaylists = new ArrayList<>();
-        while (futureList.size()>0) {
+        while (futureList.size() > 0) {
             //Iterator there as removing completed playlists (Even if rate limited) V messy tho :(((((
-            for (Iterator<Map<String, Future<Playlist>>> iterator = futureList.iterator(); iterator.hasNext();) {
+            for (Iterator<Map<String, Future<Playlist>>> iterator = futureList.iterator(); iterator.hasNext(); ) {
                 Map<String, Future<Playlist>> stringFutureMap = iterator.next();
-                if(stringFutureMap.values().iterator().next().isDone()) {
+                if (stringFutureMap.values().iterator().next().isDone()) {
                     try {
                         Playlist playlist = stringFutureMap.values().iterator().next().get();
                         completedPlaylists.add(playlist);
@@ -68,7 +68,7 @@ public class SpotifyPlaylistDao {
                     } catch (InterruptedException e) {
                         log.error(e.getMessage(), e);
                     } catch (ExecutionException e) {
-                        log.error(e.getMessage()+ ". Backing off will retry");
+                        log.error(e.getMessage() + ". Backing off will retry");
                         if (e.getCause() instanceof TooManyRequestsException) {
                             String[] key = stringFutureMap.keySet().iterator().next().split("_");
                             retriedPlaylists.add(pullPlaylistAsync(api, key[0], key[1]));
@@ -117,5 +117,4 @@ public class SpotifyPlaylistDao {
     private Map<String, Future<Playlist>> convertSimplePlaylistToPlaylist(SpotifyApi api, PlaylistSimplified simplePlaylist) {
         return pullPlaylistAsync(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
     }
-
 }

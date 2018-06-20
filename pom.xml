@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.spotify</groupId>
-    <artifactId>SpotifyPollingService</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <scm>
+        <developerConnection>scm:git:https://github.com/AlastairMiller/Spotify-Visualiser-Ingest.git
+        </developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <groupId>com.sv.svi</groupId>
+    <artifactId>Spotify-Visualiser-Ingest</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
     <build>
         <plugins>
             <plugin>
@@ -22,6 +27,57 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>dependency</classpathPrefix>
+                            <mainClass>com.sv.svi.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.3</version>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <repository>alastairmiller-docker-spotify-visualiser.bintray.io/${project.groupId}/spotify-visualiser-ingest</repository>
+                    <tag>1.0.1-snapshot</tag>
+                    <buildArgs>
+                        <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+                    </buildArgs>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
     <parent>
@@ -30,7 +86,7 @@
         <version>1.5.6.RELEASE</version>
     </parent>
 
-    <name>SpotifyPollingService</name>
+    <name>Spotify-Visualiser-Ingest</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -65,13 +121,13 @@
         <dependency>
             <groupId>com.sv</groupId>
             <artifactId>mongoDatamodel</artifactId>
-            <version>1.0.4-SNAPSHOT</version>
+            <version>1.0.4-RELEASE</version>
         </dependency>
 
         <dependency>
             <groupId>com.sv</groupId>
             <artifactId>mongoDao</artifactId>
-            <version>1.0.4-SNAPSHOT</version>
+            <version>1.0.4-RELEASE</version>
         </dependency>
 
         <dependency>
@@ -99,6 +155,8 @@
             <artifactId>guava-testlib</artifactId>
             <version>24.1-jre</version>
         </dependency>
+
+
 
     </dependencies>
 
