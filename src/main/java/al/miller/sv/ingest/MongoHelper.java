@@ -1,18 +1,18 @@
 package al.miller.sv.ingest;
 
-
-
 import com.svd.ClientHandler;
 import com.svd.dao.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 
 @Slf4j
 @Component
 @Getter
+@PropertySource("classpath:application.properties")
 public class MongoHelper {
 
     private final RefinedAlbumDao refinedAlbumDao;
