@@ -1,6 +1,7 @@
 package al.miller.sv.ingest;
 
 import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.requests.data.albums.GetAlbumRequest;
 import com.wrapper.spotify.requests.data.artists.GetArtistRequest;
 import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.IOException;
 
 @Slf4j
 @SpringBootTest
@@ -39,43 +42,28 @@ public class SpotifyEndpointHealthCheck {
     }
 
     @Test
-    public void shouldPullArtistFromSpotify() {
+    public void shouldPullArtistFromSpotify() throws IOException, SpotifyWebApiException {
         final GetArtistRequest request = api.getArtist("7dGJo4pcD2V6oG8kP0tJRR").build();
-        try {
-            assert (request.execute() != null);
-        } catch (Exception e) {
-            log.error("Failed to download metadata for artist : 7dGJo4pcD2V6oG8kP0tJRR, HTTP error code: {} ", e.getMessage());
-        }
+        assert (request.execute() != null);
+
     }
 
     @Test
-    public void shouldPullAlbumFromSpotify() {
+    public void shouldPullAlbumFromSpotify() throws IOException, SpotifyWebApiException {
         final GetAlbumRequest request = api.getAlbum("73nS1mA0WtUzBHzFhG3D5g").build();
-        try {
-            assert (request.execute() != null);
-        } catch (Exception e) {
-            log.error("Failed to download metadata for album : 73nS1mA0WtUzBHzFhG3D5g, HTTP error code: {}", e.getMessage());
-        }
-
+        assert (request.execute() != null);
     }
 
     @Test
-    public void shouldPullTrackFromSpotify() {
+    public void shouldPullTrackFromSpotify() throws IOException, SpotifyWebApiException {
         final GetTrackRequest request = api.getTrack("y1p3nME3c0YU0a8vHPi4Z").build();
-        try {
-            assert (request.execute() != null);
-        } catch (Exception e) {
-            log.error("Failed to download metadata for track : y1p3nME3c0YU0a8vHPi4Z, HTTP error code: {}", e.getMessage());
-        }
+        assert (request.execute() != null);
     }
 
     @Test
-    public void shouldPullPlaylistFromPlaylist(){
-        final GetPlaylistRequest request = api.getPlaylist("spotifycharts","37i9dQZEVXbLnolsZ8PSNw").build();
-        try {
-            assert (request.execute() != null);
-        } catch (Exception e) {
-            log.error("Failed to download metadata for playlist : 37i9dQZEVXbLnolsZ8PSNw, HTTP error code: {}", e.getMessage());
-        }
+    public void shouldPullPlaylistFromPlaylist() throws IOException, SpotifyWebApiException {
+        final GetPlaylistRequest request = api.getPlaylist("spotifycharts", "37i9dQZEVXbLnolsZ8PSNw").build();
+        assert (request.execute() != null);
+
     }
 }
