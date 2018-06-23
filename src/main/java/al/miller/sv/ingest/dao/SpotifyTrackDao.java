@@ -49,10 +49,12 @@ public class SpotifyTrackDao {
             Integer remainder = ids.size() % 50;
             for (int i = 0; i < numBatches; i++) {
                 try {
-                    if (i != numBatches - 1) {
+                    if (i != numBatches - 1 && remainder > 0) {
                         pulledTracksFutures.add(pullTrackBatchFutures(api, ids.subList(i * 50, (i * 50) + 49)));
-                    } else {
+                    } else if(remainder > 0){
                         pulledTracksFutures.add(pullTrackBatchFutures(api, ids.subList(i * 50, (i * 50 + remainder))));
+                    } else{
+                        pulledTracksFutures.add(pullTrackBatchFutures(api, ids.subList(i * 50, (i * 50 + 49))));
                     }
                 } catch (Exception e) {
                     log.error("Cannot retrieve batch of songs from api, {}", e.getMessage());

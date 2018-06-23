@@ -1,14 +1,13 @@
 package al.miller.sv.ingest.service;
 
-import com.mongodb.client.MongoCollection;
+import al.miller.sv.ingest.dao.*;
+import com.mongodb.client.model.Indexes;
 import com.neovisionaries.i18n.CountryCode;
 import al.miller.sv.ingest.MongoHelper;
 import al.miller.sv.ingest.SpotifyAuthenticationHelper;
-import al.miller.sv.ingest.dao.SpotifyAlbumDao;
-import al.miller.sv.ingest.dao.SpotifyArtistDao;
-import al.miller.sv.ingest.dao.SpotifyPlaylistDao;
-import al.miller.sv.ingest.dao.SpotifyTrackDao;
 import al.miller.sv.ingest.utils.DownstreamMapper;
+import com.svd.dao.AbstractDao;
+import com.svd.dao.RefinedUserDao;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
 import com.wrapper.spotify.model_objects.specification.*;
@@ -46,6 +45,7 @@ public class RefreshDbService {
     private final SpotifyArtistDao spotifyArtistDao;
     private final SpotifyPlaylistDao spotifyPlaylistDao;
     private final SpotifyTrackDao spotifyTrackDao;
+    private final SpotifyUserDao spotifyUserDao;
     private SpotifyApi api;
     private ExecutorService executor = Executors.newFixedThreadPool(16);
     private int refreshRetries = 0;
@@ -71,6 +71,7 @@ public class RefreshDbService {
         if (refreshRetries <= 100) {
             refreshRetries = 0;
             log.info("-----------------------Database refresh started-----------------------");
+            createIndexes();
             pullLocationPlaylists(api);
             pullFeaturedPlaylists(api);
             refreshInProgress = false;
@@ -80,10 +81,28 @@ public class RefreshDbService {
         }
     }
 
-    //Todo
     private void createIndexes() {
-        log.info("----------------------------Creating Indexes----------------------------");
-        MongoCollection trackCollection = mongoHelper.getRefinedTrackDao().getMongoCollection();
+        log.info("----------------------------Created Indexes----------------------------");
+        if (checkIfIndexExists(mongoHelper.getRefinedAlbumDao())) {
+            mongoHelper.getRefinedAlbumDao().getMongoCollection().createIndex(Indexes.ascending("id"));
+            log.info("Created index for Album Id");
+        }
+        if (checkIfIndexExists(mongoHelper.getRefinedArtistDao())) {
+            mongoHelper.getRefinedArtistDao().getMongoCollection().createIndex(Indexes.ascending(("id")));
+            log.info("Created index for Artist Id");
+        }
+        if (checkIfIndexExists(mongoHelper.getRefinedPlaylistDao())) {
+            mongoHelper.getRefinedPlaylistDao().getMongoCollection().createIndex(Indexes.ascending("id"));
+            log.info("Created index for Playlist Id");
+        }
+        if (checkIfIndexExists(mongoHelper.getRefinedTrackDao())) {
+            mongoHelper.getRefinedTrackDao().getMongoCollection().createIndex(Indexes.ascending("id"));
+            log.info("Created index for Track Id");
+        }
+        if (checkIfIndexExists(mongoHelper.getRefinedUserDao())) {
+            mongoHelper.getRefinedUserDao().getMongoCollection().createIndex(Indexes.ascending("id"));
+            log.info("Created index for User Id");
+        }
 
     }
 
@@ -93,7 +112,7 @@ public class RefreshDbService {
         List<PlaylistSimplified> playlistSimplifieds = spotifyPlaylistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
                 .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
-//       playlistSimplifieds.subList(1000, playlistSimplifieds.size()).clear();
+       playlistSimplifieds.subList(1000, playlistSimplifieds.size()).clear();
         List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
         try {
             savePlaylists(playlists);
@@ -237,7 +256,7 @@ public class RefreshDbService {
             albumIdsToPull.add(albumId);
         }
         if (albumIdsToPull.size() == 20) {
-          List<Album> albums = spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull);
+            List<Album> albums = spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull);
             try {
                 saveAlbums(albums);
             } catch (Exception e) {
@@ -250,6 +269,16 @@ public class RefreshDbService {
                     .collect(Collectors.toList());
             verifyTracksArePersisted(trackIds);
         }
+    }
+
+    private <T extends AbstractDao> boolean checkIfIndexExists(T dao) {
+        Collection daosIndexes = dao.getMongoCollection().listIndexes().into(new ArrayList());
+        return daosIndexes.size() == 0;
+    }
+
+    private boolean checkIfIndexExists(RefinedUserDao dao) {
+        Collection daosIndexes = dao.getMongoCollection().listIndexes().into(new ArrayList<>());
+        return daosIndexes.size() == 0;
     }
 
 }

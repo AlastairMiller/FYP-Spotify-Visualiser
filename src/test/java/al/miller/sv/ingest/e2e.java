@@ -2,7 +2,6 @@ package al.miller.sv.ingest;
 
 import al.miller.sv.ingest.dao.*;
 import al.miller.sv.ingest.utils.DownstreamMapper;
-import com.mongodb.MongoClient;
 import com.svd.ClientHandler;
 import com.svd.dao.*;
 import com.wrapper.spotify.SpotifyApi;
@@ -69,7 +68,6 @@ public class e2e {
 
         mongodExe = starter.prepare(mongodConfig);
         mongod = mongodExe.start();
-        MongoClient mongoClient = new MongoClient(hostname, port);
         refinedAlbumDao = new RefinedAlbumDao(new ClientHandler(hostname, port, "embedded"), "RefinedAlbums");
         refinedArtistDao = new RefinedArtistDao(new ClientHandler(hostname, port, "embedded"), "RefinedArtists");
         refinedPlaylistDao = new RefinedPlaylistDao(new ClientHandler(hostname, port, "embedded"), "RefinedPlaylists");
