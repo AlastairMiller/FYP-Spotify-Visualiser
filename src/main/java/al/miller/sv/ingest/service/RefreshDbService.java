@@ -50,8 +50,8 @@ public class RefreshDbService {
     private ExecutorService executor = Executors.newFixedThreadPool(16);
     private int refreshRetries = 0;
     private Boolean refreshInProgress = false;
-    private List<String> albumIdsToPull = new ArrayList<>();
-    ArrayList<String> artistIdsToPull = new ArrayList<>();
+
+    private List<String> trackIdsToGet = new ArrayList<>();
     private List<Future<RefinedAlbum>> albumFutures = new ArrayList<>();
     private List<Future<?>> futureListOfNestedElements = new ArrayList<>();
 
@@ -112,7 +112,7 @@ public class RefreshDbService {
         List<PlaylistSimplified> playlistSimplifieds = spotifyPlaylistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
                 .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
-       playlistSimplifieds.subList(1000, playlistSimplifieds.size()).clear();
+//       playlistSimplifieds.subList(1000, playlistSimplifieds.size()).clear();
         List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
         try {
             savePlaylists(playlists);
@@ -202,9 +202,8 @@ public class RefreshDbService {
     }
 
     private void verifyTracksArePersisted(List<String> trackIds) {
-        ArrayList<String> trackIdsToGet = new ArrayList<>();
         for (String refinedTrackId : trackIds) {
-            if (mongoHelper.getRefinedTrackDao().getById(refinedTrackId) == null) {
+            if (mongoHelper.getRefinedTrackDao().getById(refinedTrackId) == null && !trackIdsToGet.contains(refinedTrackId)) {
                 log.info("Track {} missing, will get.", refinedTrackId);
                 trackIdsToGet.add(refinedTrackId);
             } else {
@@ -229,8 +228,9 @@ public class RefreshDbService {
     }
 
     private void verifyArtistsArePersisted(List<String> artistsIds) {
+        List<String> artistIdsToPull = new ArrayList<>();
         for (String artistId : artistsIds) {
-            if (mongoHelper.getRefinedArtistDao().getById(artistId) == null) {
+            if (mongoHelper.getRefinedArtistDao().getById(artistId) == null && !artistsIds.contains(artistId)) {
                 log.info("Artist {} missing, will get.", artistId);
                 artistIdsToPull.add(artistId);
             } else {
@@ -246,12 +246,12 @@ public class RefreshDbService {
             }
             artistIdsToPull.subList(0, 49).clear();
         }
-
     }
 
 
     private void verifyAlbumIsPersisted(String albumId) {
-        if (mongoHelper.getRefinedAlbumDao().getById(albumId) == null) {
+        List<String> albumIdsToPull = new ArrayList<>();
+        if (mongoHelper.getRefinedAlbumDao().getById(albumId) == null && !albumIdsToPull.contains(albumId)) {
             log.info("Album {} missing, will get.", albumId);
             albumIdsToPull.add(albumId);
         }
