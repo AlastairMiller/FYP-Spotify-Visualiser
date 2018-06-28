@@ -39,7 +39,7 @@ public class SpotifyArtistDao {
         }
     }
 
-    public List<Artist> pullArtistsAsync(SpotifyApi api, List<String> ids) {
+    public List<Artist> pullArtistsAsync(SpotifyApi api, List<String> ids) throws InterruptedException {
         List<Map<String, Future<Artist[]>>> pulledArtistFutures = new ArrayList<>();
 
         if (ids.size() > 50) {
@@ -78,9 +78,10 @@ public class SpotifyArtistDao {
         }
     }
 
-    public List<Artist> getArtistBatchFutures(SpotifyApi api, List<Map<String, Future<Artist[]>>> pulledArtistFutures) {
+    public List<Artist> getArtistBatchFutures(SpotifyApi api, List<Map<String, Future<Artist[]>>> pulledArtistFutures) throws InterruptedException {
         List<Artist> completedArtists = new ArrayList<>();
         List<String> retriedArtistIds = new ArrayList<>();
+        Boolean apiLimitHit = false;
 
         while (pulledArtistFutures.size() > 0) {
             Iterator<Map<String, Future<Artist[]>>> iterator = pulledArtistFutures.iterator();
@@ -95,6 +96,13 @@ public class SpotifyArtistDao {
                     } catch (ExecutionException e) {
                         log.error(e.getMessage() + ". Backing off will retry");
                         if (e.getCause() instanceof TooManyRequestsException) {
+                            if (!apiLimitHit){
+                                apiLimitHit = true;
+                                log.error("Artist API rate limit exceeded. Will wait {} seconds and retry", ((TooManyRequestsException) e.getCause()).getRetryAfter());
+                                Thread.sleep(((TooManyRequestsException) e.getCause()).getRetryAfter() * 1000);
+                            }else {
+                                apiLimitHit= false;
+                            }
                             String key = nextFutureBatch.keySet().iterator().next();
                             retriedArtistIds.add(key);
                         }

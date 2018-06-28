@@ -1,6 +1,10 @@
 package al.miller.sv.ingest.service;
 
 import al.miller.sv.ingest.dao.*;
+import com.mongodb.Block;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Indexes;
 import com.neovisionaries.i18n.CountryCode;
 import al.miller.sv.ingest.MongoHelper;
@@ -15,6 +19,8 @@ import com.wrapper.spotify.requests.data.browse.GetListOfFeaturedPlaylistsReques
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.BsonDocument;
+import org.bson.BsonString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -50,8 +56,11 @@ public class RefreshDbService {
     private ExecutorService executor = Executors.newFixedThreadPool(16);
     private int refreshRetries = 0;
     private Boolean refreshInProgress = false;
+    private MongoCollection<PlaylistSimplified> batchCollection;
 
     private List<String> trackIdsToGet = new ArrayList<>();
+    private List<String> albumIdsToPull = new ArrayList<>();
+    private List<String> artistIdsToPull = new ArrayList<>();
     private List<Future<RefinedAlbum>> albumFutures = new ArrayList<>();
     private List<Future<?>> futureListOfNestedElements = new ArrayList<>();
 
@@ -65,7 +74,7 @@ public class RefreshDbService {
         }
     }
 
-    @Scheduled(fixedDelay = 300000)
+    @Scheduled(fixedDelay = 30000000)
     private void refreshDB() {
         refreshInProgress = true;
         if (refreshRetries <= 100) {
@@ -109,17 +118,38 @@ public class RefreshDbService {
     private void pullLocationPlaylists(SpotifyApi api) {
         log.info("-----------------------Pulling location playlist's-----------------------");
         int playlistRetrieval = 0;
+        int playlistBatchCounter = 0;
+        //Write batches to collection
         List<PlaylistSimplified> playlistSimplifieds = spotifyPlaylistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
                 .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
-//       playlistSimplifieds.subList(1000, playlistSimplifieds.size()).clear();
-        List<Playlist> playlists = spotifyPlaylistDao.getPlaylistsFromSimplePlaylists(api, playlistSimplifieds);
-        try {
-            savePlaylists(playlists);
-        } catch (Exception e) {
-            log.error(e.getMessage());
+        //playlistSimplifieds.subList(1000, playlistSimplifieds.size()).clear();
+        mongoHelper.getPlaylistSimplifiedDao().getMongoCollection().drop();
+        List<BsonDocument> playlistIds = playlistSimplifieds.stream()
+                .map(temp -> {
+                    BsonDocument document = new BsonDocument();
+                    document.append("id", new BsonString(temp.getId()));
+                    document.append("ownerId", new BsonString(temp.getOwner().getId()));
+                    return document;
+                })
+                .collect(Collectors.toList());
+
+        mongoHelper.getPlaylistSimplifiedDao().saveList(playlistIds);
+        playlistSimplifieds.clear();
+
+        ArrayList<BsonDocument> playlistSimplifiedIdList = mongoHelper.getPlaylistSimplifiedDao().getMongoCollection().find().into(new ArrayList<>());
+        for (BsonDocument playlistSimplifiedDocument : playlistSimplifiedIdList) {
+            try {
+                Playlist playlist = SpotifyPlaylistDao.pullPlaylistSync(api, playlistSimplifiedDocument.get("ownerId").asString().getValue(), playlistSimplifiedDocument.get("id").asString().getValue());
+                savePlaylist(playlist);
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+            log.info("{} playlists in the database", mongoHelper.getRefinedPlaylistDao().getMongoCollection().count());
+            log.info("{} albums in the database", mongoHelper.getRefinedAlbumDao().getMongoCollection().count());
+            log.info("{} tracks in the database", mongoHelper.getRefinedTrackDao().getMongoCollection().count());
+            log.info("{} artists in the database", mongoHelper.getRefinedArtistDao().getMongoCollection().count());
         }
-        log.info("{} playlists in the database", mongoHelper.getRefinedPlaylistDao().getMongoCollection().count());
     }
 
     private void pullFeaturedPlaylists(SpotifyApi api) {
@@ -155,6 +185,10 @@ public class RefreshDbService {
             }
             verifyTracksArePersisted(refinedPlaylist.getTrackIds());
         }
+    }
+
+    private void savePlaylist(Playlist playlist) throws IllegalAccessException, InstantiationException, MalformedURLException {
+        savePlaylists(Collections.singletonList(playlist));
     }
 
     private void saveTracks(List<Track> tracks) throws MalformedURLException, IllegalAccessException, InstantiationException {
@@ -204,42 +238,37 @@ public class RefreshDbService {
     private void verifyTracksArePersisted(List<String> trackIds) {
         for (String refinedTrackId : trackIds) {
             if (mongoHelper.getRefinedTrackDao().getById(refinedTrackId) == null && !trackIdsToGet.contains(refinedTrackId)) {
-                log.info("Track {} missing, will get.", refinedTrackId);
                 trackIdsToGet.add(refinedTrackId);
-            } else {
-                log.info("Track {} already exists in Mongo.", refinedTrackId);
             }
         }
         if (trackIdsToGet.size() > 0) {
-            List<Track> tracks = spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
             try {
+                List<Track> tracks = spotifyTrackDao.pullTracksAsync(api, trackIdsToGet);
                 saveTracks(tracks);
+                for (Track track : tracks) {
+                    verifyAlbumIsPersisted(track.getAlbum().getId());
+                    List<String> artistIds = Arrays.stream(track.getArtists())
+                            .map(ArtistSimplified::getId)
+                            .collect(Collectors.toList());
+                    verifyArtistsArePersisted(artistIds);
+                }
+                trackIdsToGet.clear();
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
-            for (Track track : tracks) {
-                verifyAlbumIsPersisted(track.getAlbum().getId());
-                List<String> artistIds = Arrays.stream(track.getArtists())
-                        .map(ArtistSimplified::getId)
-                        .collect(Collectors.toList());
-                verifyArtistsArePersisted(artistIds);
-            }
+
         }
     }
 
     private void verifyArtistsArePersisted(List<String> artistsIds) {
-        List<String> artistIdsToPull = new ArrayList<>();
         for (String artistId : artistsIds) {
-            if (mongoHelper.getRefinedArtistDao().getById(artistId) == null && !artistsIds.contains(artistId)) {
-                log.info("Artist {} missing, will get.", artistId);
+            if (mongoHelper.getRefinedArtistDao().getById(artistId) == null && !artistIdsToPull.contains(artistId)) {
                 artistIdsToPull.add(artistId);
-            } else {
-                log.info("Artist {} already exists", artistId);
             }
         }
         if (artistIdsToPull.size() >= 50) {
-            List<Artist> artists = spotifyArtistDao.pullArtistsAsync(api, artistIdsToPull);
             try {
+                List<Artist> artists = spotifyArtistDao.pullArtistsAsync(api, artistIdsToPull);
                 saveArtists(artists);
             } catch (Exception e) {
                 log.error(e.getMessage());
@@ -250,24 +279,23 @@ public class RefreshDbService {
 
 
     private void verifyAlbumIsPersisted(String albumId) {
-        List<String> albumIdsToPull = new ArrayList<>();
         if (mongoHelper.getRefinedAlbumDao().getById(albumId) == null && !albumIdsToPull.contains(albumId)) {
-            log.info("Album {} missing, will get.", albumId);
             albumIdsToPull.add(albumId);
         }
         if (albumIdsToPull.size() == 20) {
-            List<Album> albums = spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull);
             try {
+                List<Album> albums = spotifyAlbumDao.pullAlbumsAsync(api, albumIdsToPull);
                 saveAlbums(albums);
+                albumIdsToPull.clear();
+                List<String> trackIds = albums.stream()
+                        .flatMap(album -> Arrays.stream(album.getTracks().getItems()))
+                        .map(TrackSimplified::getId)
+                        .collect(Collectors.toList());
+                verifyTracksArePersisted(trackIds);
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
-            albumIdsToPull.clear();
-            List<String> trackIds = albums.stream()
-                    .flatMap(album -> Arrays.stream(album.getTracks().getItems()))
-                    .map(TrackSimplified::getId)
-                    .collect(Collectors.toList());
-            verifyTracksArePersisted(trackIds);
+
         }
     }
 

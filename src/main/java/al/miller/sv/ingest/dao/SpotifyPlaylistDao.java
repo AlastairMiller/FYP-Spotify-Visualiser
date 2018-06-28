@@ -9,6 +9,7 @@ import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import refinedDataModels.RefinedPlaylist;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -37,10 +38,10 @@ public class SpotifyPlaylistDao {
     }
 
 
-    public List<Playlist> getPlaylistsFromSimplePlaylists(SpotifyApi api, List<PlaylistSimplified> playlistsToSave) {
+    public List<Playlist> getPlaylistsFromSimplePlaylists(SpotifyApi api, List<PlaylistSimplified> playlistsToSave) throws InterruptedException {
         List<Map<String, Future<Playlist>>> futureList = new ArrayList<>();
-        for (PlaylistSimplified simplePlaylist : playlistsToSave) {
-            Map<String, Future<Playlist>> completableFuture = convertSimplePlaylistToPlaylist(api, simplePlaylist);
+        for (PlaylistSimplified simplePlaylistId : playlistsToSave) {
+            Map<String, Future<Playlist>> completableFuture = convertSimplePlaylistToPlaylist(api, simplePlaylistId.getId(), simplePlaylistId.getOwner().getId());
             futureList.add(completableFuture);
         }
         log.info("Pulling {} playlists", futureList.size());
@@ -48,9 +49,11 @@ public class SpotifyPlaylistDao {
         return getPlaylists(api, futureList);
     }
 
-    private List<Playlist> getPlaylists(SpotifyApi api, List<Map<String, Future<Playlist>>> futureList) {
+    private List<Playlist> getPlaylists(SpotifyApi api, List<Map<String, Future<Playlist>>> futureList) throws InterruptedException {
         List<Playlist> completedPlaylists = new ArrayList<>();
         List<Map<String, Future<Playlist>>> retriedPlaylists = new ArrayList<>();
+        Boolean apiLimitHit = false;
+
         while (futureList.size() > 0) {
             //Iterator there as removing completed playlists (Even if rate limited) V messy tho :(((((
             for (Iterator<Map<String, Future<Playlist>>> iterator = futureList.iterator(); iterator.hasNext(); ) {
@@ -63,8 +66,14 @@ public class SpotifyPlaylistDao {
                     } catch (InterruptedException e) {
                         log.error(e.getMessage(), e);
                     } catch (ExecutionException e) {
-                        log.error(e.getMessage() + ". Backing off will retry");
                         if (e.getCause() instanceof TooManyRequestsException) {
+                            if (!apiLimitHit){
+                                apiLimitHit = true;
+                                log.error("Playlist API rate limit exceeded. Will wait {} seconds and retry", ((TooManyRequestsException) e.getCause()).getRetryAfter());
+                                Thread.sleep(((TooManyRequestsException) e.getCause()).getRetryAfter() * 1000);
+                            }else {
+                                apiLimitHit= false;
+                            }
                             String[] key = stringFutureMap.keySet().iterator().next().split("_");
                             retriedPlaylists.add(pullPlaylistAsync(api, key[0], key[1]));
                         }
@@ -85,16 +94,22 @@ public class SpotifyPlaylistDao {
         return completedPlaylists;
     }
 
-    public static Playlist pullPlaylist(SpotifyApi api, String ownerId, String playlistId) {
+    public static Playlist pullPlaylistSync(SpotifyApi api, String ownerId, String playlistId) throws InterruptedException {
         final GetPlaylistRequest request = api.getPlaylist(ownerId, playlistId).build();
         try {
             return request.execute();
         } catch (Exception e) {
+            if(e instanceof TooManyRequestsException){
+                log.error("Playlist API rate limit exceeded. Will wait {} seconds and retry", ((TooManyRequestsException) e.getCause()).getRetryAfter());
+                Thread.sleep(((TooManyRequestsException) e).getRetryAfter() * 1000);
+               return pullPlaylistSync(api,ownerId,playlistId);
+            }
             log.error("Failed to download metadata for playlist {}, HTTP error code: {}", playlistId, e.getMessage());
             return null;
         }
-
     }
+
+
 
     private static Map<String, Future<Playlist>> pullPlaylistAsync(SpotifyApi api, String ownerId, String playlistId) {
         final GetPlaylistRequest request = api.getPlaylist(ownerId, playlistId).build();
@@ -109,7 +124,7 @@ public class SpotifyPlaylistDao {
     }
 
 
-    private Map<String, Future<Playlist>> convertSimplePlaylistToPlaylist(SpotifyApi api, PlaylistSimplified simplePlaylist) {
-        return pullPlaylistAsync(api, simplePlaylist.getOwner().getId(), simplePlaylist.getId());
+    private Map<String, Future<Playlist>> convertSimplePlaylistToPlaylist(SpotifyApi api, String simplePlaylistId, String ownerName) {
+        return pullPlaylistAsync(api, ownerName, simplePlaylistId);
     }
 }

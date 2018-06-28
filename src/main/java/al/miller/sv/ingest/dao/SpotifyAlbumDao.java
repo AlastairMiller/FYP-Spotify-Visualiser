@@ -55,7 +55,7 @@ public class SpotifyAlbumDao {
         }
     }
 
-    public List<Album> pullAlbumsAsync(SpotifyApi api, List<String> albumIds) {
+    public List<Album> pullAlbumsAsync(SpotifyApi api, List<String> albumIds) throws InterruptedException {
         List<Map<String, Future<Album[]>>> pulledAlbumFutures = new ArrayList<>();
         if (albumIds.size() > 20) {
             Integer numBatches = (int) Math.ceil(albumIds.size() / 20.0);
@@ -75,7 +75,7 @@ public class SpotifyAlbumDao {
         } else {
             pulledAlbumFutures.add(pullAlbumBatchFuture(api, albumIds));
         }
-        return getAlbumBatchFutures(api, pulledAlbumFutures, albumIds);
+        return getAlbumBatchFutures(api, pulledAlbumFutures);
 
     }
 
@@ -95,9 +95,10 @@ public class SpotifyAlbumDao {
 
     }
 
-    private List<Album> getAlbumBatchFutures(SpotifyApi api, List<Map<String,Future<Album[]>>> pulledAlbumFutures, List<String> albumIds) {
+    private List<Album> getAlbumBatchFutures(SpotifyApi api, List<Map<String, Future<Album[]>>> pulledAlbumFutures) throws InterruptedException {
         List<Album> completedAlbums = new ArrayList<>();
         List<String> retriedAlbumIds = new ArrayList<>();
+        Boolean apiLimitHit = false;
 
         while (pulledAlbumFutures.size() > 0) {
             Iterator<Map<String, Future<Album[]>>> iterator = pulledAlbumFutures.iterator();
@@ -112,6 +113,13 @@ public class SpotifyAlbumDao {
                     } catch (ExecutionException e) {
                         log.error(e.getMessage() + ". Backing off will retry");
                         if (e.getCause() instanceof TooManyRequestsException) {
+                            if (!apiLimitHit){
+                                apiLimitHit = true;
+                                log.error("Album API rate limit exceeded. Will wait {} seconds and retry", ((TooManyRequestsException) e.getCause()).getRetryAfter());
+                                Thread.sleep(((TooManyRequestsException) e.getCause()).getRetryAfter() * 1000);
+                            }else {
+                                apiLimitHit= false;
+                            }
                             String key = nextFutureBatch.keySet().iterator().next();
                             retriedAlbumIds.add(key);
                         }

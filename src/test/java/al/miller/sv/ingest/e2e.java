@@ -106,7 +106,7 @@ public class e2e {
 
     @Test
     public void shouldPullAndSavePlaylist() throws Exception {
-        Playlist playlist = SpotifyPlaylistDao.pullPlaylist(api, "millersinc", "2CTdEa3JWbncC1h8WjnuxZ");
+        Playlist playlist = SpotifyPlaylistDao.pullPlaylistSync(api, "millersinc", "2CTdEa3JWbncC1h8WjnuxZ");
         assert playlist != null;
         RefinedPlaylist expectedPlaylist = DownstreamMapper.mapPlaylist(playlist);
         refinedPlaylistDao.save(expectedPlaylist);

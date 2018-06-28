@@ -8,3 +8,4 @@ ADD target/dependency        /usr/share/Spotify-Visualiser-Ingest/dependency
 # Add the service itself
 ARG JAR_FILE
 ADD target/${JAR_FILE} /usr/share/Spotify-Visualiser-Ingest/Spotify-Visualiser-Ingest.jar
+EXPOSE 5200

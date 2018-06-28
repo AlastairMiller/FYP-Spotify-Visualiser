@@ -41,7 +41,7 @@ public class SpotifyTrackDao {
         }
     }
 
-    public List<Track> pullTracksAsync(SpotifyApi api, List<String> ids) {
+    public List<Track> pullTracksAsync(SpotifyApi api, List<String> ids) throws InterruptedException {
         List<Map<String, Future<Track[]>>> pulledTracksFutures = new ArrayList<>();
 
         if (ids.size() > 50) {
@@ -83,9 +83,10 @@ public class SpotifyTrackDao {
         }
     }
 
-    public List<Track> getTrackBatchFutures(SpotifyApi api, List<Map<String, Future<Track[]>>> pulledTrackFutures) {
+    public List<Track> getTrackBatchFutures(SpotifyApi api, List<Map<String, Future<Track[]>>> pulledTrackFutures) throws InterruptedException {
         List<Track> completedTracks = new ArrayList<>();
         List<String> retriedTrackIds = new ArrayList<>();
+        Boolean apiLimitHit = false;
 
         while (pulledTrackFutures.size() > 0) {
             Iterator<Map<String, Future<Track[]>>> iterator = pulledTrackFutures.iterator();
@@ -98,8 +99,15 @@ public class SpotifyTrackDao {
                     } catch (InterruptedException e) {
                         log.error(e.getMessage(), e);
                     } catch (ExecutionException e) {
-                        log.error(e.getMessage() + ". Backing off will retry");
+
                         if (e.getCause() instanceof TooManyRequestsException) {
+                            if (!apiLimitHit){
+                                apiLimitHit = true;
+                                log.error("Track API rate limit exceeded. Will wait {} seconds and retry", ((TooManyRequestsException) e.getCause()).getRetryAfter());
+                                Thread.sleep(((TooManyRequestsException) e.getCause()).getRetryAfter() * 1000);
+                            }else {
+                                apiLimitHit= false;
+                            }
                             String key = nextFutureBatch.keySet().iterator().next();
                             retriedTrackIds.add(key);
                         }

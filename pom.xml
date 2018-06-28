@@ -62,15 +62,15 @@
                 <executions>
                     <execution>
                         <id>default</id>
+                        <phase>install</phase>
                         <goals>
                             <goal>build</goal>
-                            <goal>push</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <repository>alastairmiller-docker-spotify-visualiser.bintray.io/${project.groupId}/spotify-visualiser-ingest</repository>
-                    <tag>1.0.1-snapshot</tag>
+                    <repository>alastairmiller-docker-spotify-visualiser.bintray.io/com.sv.svi/spotify-visualiser-ingest</repository>
+                    <tag>1.0.2-snapshot</tag>
                     <buildArgs>
                         <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
@@ -120,13 +120,13 @@
         <dependency>
             <groupId>com.sv</groupId>
             <artifactId>mongoDatamodel</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
         </dependency>
 
         <dependency>
             <groupId>com.sv</groupId>
             <artifactId>mongoDao</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
