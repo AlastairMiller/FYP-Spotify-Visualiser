@@ -1,17 +1,15 @@
 package al.miller.sv.ingest.service;
 
-import al.miller.sv.ingest.dao.*;
-import com.mongodb.Block;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.Indexes;
-import com.neovisionaries.i18n.CountryCode;
+import al.miller.sv.ds.dao.AbstractDao;
+import al.miller.sv.ds.dao.RefinedUserDao;
 import al.miller.sv.ingest.MongoHelper;
 import al.miller.sv.ingest.SpotifyAuthenticationHelper;
+import al.miller.sv.ingest.dao.*;
 import al.miller.sv.ingest.utils.DownstreamMapper;
-import com.svd.dao.AbstractDao;
-import com.svd.dao.RefinedUserDao;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
+import com.neovisionaries.i18n.CountryCode;
+
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.special.FeaturedPlaylists;
 import com.wrapper.spotify.model_objects.specification.*;
@@ -118,7 +116,6 @@ public class RefreshDbService {
     private void pullLocationPlaylists(SpotifyApi api) {
         log.info("-----------------------Pulling location playlist's-----------------------");
         int playlistRetrieval = 0;
-        int playlistBatchCounter = 0;
         //Write batches to collection
         List<PlaylistSimplified> playlistSimplifieds = spotifyPlaylistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
                 .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))

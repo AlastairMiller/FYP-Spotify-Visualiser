@@ -70,7 +70,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.vaadin.external.google:android-json:0.0.20131108.vaadin1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:4.3.10.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:3.6.3" level="project" />
-    <orderEntry type="library" name="Maven: com.sv:mongoDatamodel:1.0.5" level="project" />
+    <orderEntry type="library" name="Maven: com.sv:mongoDatamodel:1.0.7" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.1.11" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.1.11" level="project" />
@@ -78,7 +78,7 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.mongodb:mongodb-driver-core:3.2.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.mongodb:bson:3.2.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: de.undercouch:bson4jackson:2.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.sv:mongoDao:1.0.6-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.sv:mongoDao:1.0.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.projectlombok:lombok:1.16.20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.0.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: de.flapdoodle.embed:de.flapdoodle.embed.process:2.0.2" level="project" />

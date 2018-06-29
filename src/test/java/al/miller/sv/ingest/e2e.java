@@ -1,9 +1,9 @@
 package al.miller.sv.ingest;
 
+import al.miller.sv.ds.ClientHandler;
+import al.miller.sv.ds.dao.*;
 import al.miller.sv.ingest.dao.*;
 import al.miller.sv.ingest.utils.DownstreamMapper;
-import com.svd.ClientHandler;
-import com.svd.dao.*;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.specification.*;
 import de.flapdoodle.embed.mongo.MongodExecutable;

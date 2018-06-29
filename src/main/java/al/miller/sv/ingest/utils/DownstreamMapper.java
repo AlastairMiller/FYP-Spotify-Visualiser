@@ -1,6 +1,7 @@
 package al.miller.sv.ingest.utils;
 
-import com.svd.util.RefinedObjectBuilder;
+
+import al.miller.sv.ds.util.RefinedObjectBuilder;
 import com.wrapper.spotify.enums.ReleaseDatePrecision;
 import com.wrapper.spotify.model_objects.specification.*;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,8 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
 
-import static com.svd.mapper.RefinedtoJsonMapper.invokeSimpleGetter;
+import static al.miller.sv.ds.mapper.RefinedtoJsonMapper.invokeSimpleGetter;
+
 
 @Slf4j
 public class DownstreamMapper {

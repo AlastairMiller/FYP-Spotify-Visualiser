@@ -1,8 +1,8 @@
 package al.miller.sv.ingest;
 
-import com.svd.ClientHandler;
-import com.svd.dao.*;
-import com.wrapper.spotify.model_objects.specification.PlaylistSimplified;
+
+import al.miller.sv.ds.ClientHandler;
+import al.miller.sv.ds.dao.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
