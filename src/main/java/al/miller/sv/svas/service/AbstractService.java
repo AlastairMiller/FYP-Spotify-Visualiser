@@ -1,9 +1,8 @@
-package com.sv.svas.service;
+package al.miller.sv.svas.service;
 
-import com.sv.svas.repository.AbstractDao;
+import al.miller.sv.ds.dao.AbstractDao;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

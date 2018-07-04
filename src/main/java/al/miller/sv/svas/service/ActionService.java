@@ -1,4 +1,4 @@
-package com.sv.svas.service;
+package al.miller.sv.svas.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
