@@ -16,6 +16,22 @@ public abstract class AbstractService<T> {
     }
 
     public T getById(String id) {
-        return null;
+        return dao.getById(id);
     }
+
+    public T getBySpotifyUri(String uri){
+        return dao.getBySpotifyUri(uri);
+    }
+
+    public List<T> getMultipleById(List<String> ids){
+        return dao.getMultipleById(ids);
+    }
+
+    public List<T> getAllMatchingName(String name){
+        return dao.getAllMatchingNames(name);
+    }
+
+    public List<T>
+
+
 }

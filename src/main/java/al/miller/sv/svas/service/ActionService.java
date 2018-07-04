@@ -35,7 +35,7 @@ public class ActionService {
     }
 
 
-    public void checkIngestStatus() {
+    private void checkIngestStatus() {
         HttpURLConnection connection = null;
         try {
 
