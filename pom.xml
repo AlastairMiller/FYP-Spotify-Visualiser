@@ -58,13 +58,13 @@
         <dependency>
             <groupId>com.sv</groupId>
             <artifactId>mongoDatamodel</artifactId>
-            <version>1.0.3-RELEASE</version>
+            <version>1.0.7</version>
         </dependency>
 
         <dependency>
             <groupId>com.sv</groupId>
             <artifactId>mongoDao</artifactId>
-            <version>1.0.3-RELEASE</version>
+            <version>1.0.7</version>
         </dependency>
 
         <dependency>

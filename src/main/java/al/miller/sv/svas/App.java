@@ -1,4 +1,4 @@
-package com.sv.svas;
+package al.miller.sv.svas;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

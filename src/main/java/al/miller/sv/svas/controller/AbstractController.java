@@ -1,6 +1,6 @@
-package com.sv.svas.controller;
+package al.miller.sv.svas.controller;
 
-import com.sv.svas.service.AbstractService;
+import al.miller.sv.svas.service.AbstractService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,16 +21,22 @@ public abstract class AbstractController<T> {
         return t;
     }
 
-    @RequestMapping(path = "/mostPopular", method = GET)
+    @RequestMapping(path = "/mostpopular", method = GET)
     public List<T> getMostPopular(int limit, int offset) {
+        inputValidation(offset,limit);
+        return getService().getMostPopular(limit, offset);
+    }
+
+     void inputValidation(int offset, int limit) throws IllegalArgumentException {
         if (limit < 1) {
             throw new IllegalArgumentException("Limit must be greater than 0, but was " + limit);
+        }
+        if (limit > 50) {
+            throw new IllegalArgumentException("Limit cannot be greater then 50, but was " + limit);
         }
         if (offset < 0) {
             throw new IllegalArgumentException("Offset must be 0 or greater, but was " + offset);
         }
-        return getService().getMostPopular(limit, offset);
     }
-
 
 }
