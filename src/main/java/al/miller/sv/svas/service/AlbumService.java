@@ -20,6 +20,7 @@ public class AlbumService extends AbstractService<RefinedAlbumDao> {
 
     public AlbumService(MongoHelper mongoHelper){
         super(mongoHelper);
+        this.dao = mongoHelper.getRefinedAlbumDao();
         refinedTrackDao = mongoHelper.getRefinedTrackDao();
         refinedArtistDao = mongoHelper.getRefinedArtistDao();
     }

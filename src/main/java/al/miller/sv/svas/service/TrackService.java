@@ -12,6 +12,7 @@ public class TrackService extends AbstractService<RefinedTrackDao> {
 
     public TrackService(MongoHelper mongoHelper) {
         super(mongoHelper);
+        this.dao = mongoHelper.getRefinedTrackDao();
     }
 
     public List<RefinedTrack> getAllByArtist(String artistId) {

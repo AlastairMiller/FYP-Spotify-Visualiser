@@ -12,6 +12,7 @@ public class PlaylistService extends AbstractService<RefinedPlaylistDao> {
 
     public PlaylistService(MongoHelper mongoHelper) {
         super(mongoHelper);
+        this.dao = mongoHelper.getRefinedPlaylistDao();
     }
 
     public List<RefinedPlaylist> getAllPlaylistsContainingSong(int offset, int limit, String id) {
