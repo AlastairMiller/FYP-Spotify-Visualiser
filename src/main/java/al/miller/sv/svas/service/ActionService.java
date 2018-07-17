@@ -20,7 +20,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ActionService {
     private String sviBaseURL;
     private int sviPort;
-    private ThreadPoolExecutor executor;
 
     @Autowired
     public ActionService(@Value("${svi.baseURL}") String sviBaseURL, @Value("${svi.port}") int sviPort) {
@@ -28,7 +27,7 @@ public class ActionService {
         this.sviPort = sviPort;
     }
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 50000)
     public void doScheduled() {
         checkIngestStatus();
 

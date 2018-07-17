@@ -13,11 +13,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public abstract class AbstractController<T> {
 
-    protected abstract AbstractService<T> getService();
+    protected abstract AbstractService getService();
 
     @RequestMapping(path = "/{id}", method = GET)
-    public T getById(@PathVariable("id") String id) {
-        T t = getService().getById(id);
+    public Object getById(@PathVariable("id") String id) {
+        Object t = getService().getById(id);
         return t;
     }
 
@@ -39,4 +39,18 @@ public abstract class AbstractController<T> {
         }
     }
 
+    void inputValidationOffsetOnly(int offset) throws IllegalArgumentException {
+        if (offset < 0) {
+            throw new IllegalArgumentException("Offset must be 0 or greater, but was " + offset);
+        }
+    }
+
+    void inputValidationLimitOnly(int limit) throws IllegalArgumentException {
+        if (limit < 1) {
+            throw new IllegalArgumentException("Limit must be greater than 0, but was " + limit);
+        }
+        if (limit > 50) {
+            throw new IllegalArgumentException("Limit cannot be greater then 50, but was " + limit);
+        }
+    }
 }

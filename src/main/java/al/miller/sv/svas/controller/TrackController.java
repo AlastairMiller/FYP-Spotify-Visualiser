@@ -42,7 +42,7 @@ public class TrackController extends AbstractController<RefinedTrack> {
     @RequestMapping(path = "/forPlaylist/{id}?offset={offset}&limit={limit}", method = GET)
     public List<RefinedTrack> getMostPopularTracksFromPlaylist(@PathVariable("id") int playlistId, @PathVariable("offset") int offset, @PathVariable("limit") int limit) throws IllegalArgumentException {
         inputValidation(offset, limit);
-        return trackService.getPopularByPlaylist(playlistId, offset, limit);
+        return trackService.getMostPopularFromPlaylist(offset, limit, playlistId);
     }
 
     @RequestMapping(path = "/forartist/{id}", method = GET)
@@ -51,7 +51,7 @@ public class TrackController extends AbstractController<RefinedTrack> {
     }
 
     @Override
-    protected AbstractService<RefinedTrack> getService() {
+    protected TrackService getService() {
         return trackService;
     }
 }
