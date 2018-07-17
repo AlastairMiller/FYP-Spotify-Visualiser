@@ -21,7 +21,7 @@ public abstract class AbstractController<T> {
         return t;
     }
 
-    @RequestMapping(path = "/mostpopular", method = GET)
+    @RequestMapping(path = "/most-popular", method = GET)
     public List<T> getMostPopular(int limit, int offset) {
         inputValidation(offset,limit);
         return getService().getMostPopular(limit, offset);

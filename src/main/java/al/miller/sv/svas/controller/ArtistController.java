@@ -45,24 +45,24 @@ public class ArtistController extends AbstractController<RefinedArtist> {
         return artistService.getForGenre(offset, limit, genre);
     }
 
-    @RequestMapping(path = "/mostfollowed", method = GET)
+    @RequestMapping(path = "/most-followed", method = GET)
     public List<RefinedArtist> getMostFollowedArtistsDefault() {
         return getMostFollowedArtists(0, 50);
     }
 
-    @RequestMapping(path = "/mostfollowed?offset={offset}", method = GET)
+    @RequestMapping(path = "/most-followed?offset={offset}", method = GET)
     public List<RefinedArtist> getMostFollowedArtistsOffsetOnly(@PathVariable("offset") int offset) {
         inputValidationLimitOnly(offset);
         return getMostFollowedArtists(offset, offset + 50);
     }
 
-    @RequestMapping(path = "/mostfollowed?limit={limit}", method = GET)
+    @RequestMapping(path = "/most-followed?limit={limit}", method = GET)
     public List<RefinedArtist> getMostFollowedArtistsLimitOnly(@PathVariable("limit") int limit) {
         inputValidationLimitOnly(limit);
         return getMostFollowedArtists(0, limit);
     }
 
-    @RequestMapping(path = "/mostfollowed?offset={offset}&limit={limit}", method = GET)
+    @RequestMapping(path = "/most-followed?offset={offset}&limit={limit}", method = GET)
     public List<RefinedArtist> getMostFollowedArtists(@PathVariable("offset") int offset, @PathVariable("limit") int limit) throws IllegalArgumentException {
         inputValidation(offset, limit);
         return artistService.getMostFollowed(offset, limit);
