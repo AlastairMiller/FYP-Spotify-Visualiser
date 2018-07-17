@@ -25,14 +25,30 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
         this.playlistService = playlistService;
     }
 
-    @RequestMapping(path = "/withtrack/{id}", method = GET)
+    @RequestMapping(path = "/with-track/{id}", method = GET)
     public List<RefinedPlaylist> getAllPlaylistsContainingSongDefault(@PathVariable("id") String id) {
         return playlistService.getAllPlaylistsContainingSong(0, 25, id);
     }
 
+    @RequestMapping(path = "/with-track/{id}?offset={offset}", method = GET)
+    public List<RefinedPlaylist> getAllPlaylistsContainingSongOffsetOnly(@PathVariable("id") String id, @PathVariable("offset") int offset) {
+        inputValidation(offset, offset + 25);
+        return playlistService.getAllPlaylistsContainingSong(offset, offset + 25, id);
+    }
 
+    @RequestMapping(path = "/with-track/{id}?limit={limit}", method = GET)
+    public List<RefinedPlaylist> getAllPlaylistsContainingSongLimitOnly(@PathVariable("id") String id, @PathVariable("limit") int limit) {
+        inputValidation(0, limit);
+        return playlistService.getAllPlaylistsContainingSong(0, limit, id);
+    }
 
-    @RequestMapping(path = "/withcountrycode/{id}", method = GET)
+    @RequestMapping(path = "/with-track/{id}?offset={offset}&limit={limit}", method = GET)
+    public List<RefinedPlaylist> getAllPlaylistsContainingSong(@PathVariable("id") String id, @PathVariable("offset") int offset, @PathVariable("limit") int limit) {
+        inputValidation(offset, limit);
+        return playlistService.getAllPlaylistsContainingSong(offset, limit, id);
+    }
+
+    @RequestMapping(path = "/with-country-code/{id}", method = GET)
     public List<RefinedPlaylist> getAllPlaylistsInCountry(@PathVariable("id") String countryCode) throws IllegalArgumentException {
         if (validateCountryCode(countryCode)) {
             return playlistService.getPlaylistsForCountry(countryCode);
@@ -46,7 +62,6 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
         return playlistService;
     }
 
-    //TODO implement here?
     private boolean validateCountryCode(String countryCode) {
         return ISO_COUNTRIES.contains(countryCode);
     }

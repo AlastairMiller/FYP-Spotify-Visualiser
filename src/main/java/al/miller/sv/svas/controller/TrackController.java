@@ -24,28 +24,28 @@ public class TrackController extends AbstractController<RefinedTrack> {
         this.trackService = trackService;
     }
 
-    @RequestMapping(path = "/forPlaylist/{id}", method = GET)
+    @RequestMapping(path = "/for-playlist/{id}", method = GET)
     public List<RefinedTrack> getMostPopularTracksFromPlaylistDefault(@PathVariable("id") int playlistId) {
         return getMostPopularTracksFromPlaylist(playlistId, 0, 0);
     }
 
-    @RequestMapping(path = "/forPlaylist/{id}?offset={offset}", method = GET)
+    @RequestMapping(path = "/for-playlist/{id}?offset={offset}", method = GET)
     public List<RefinedTrack> getMostTracksFromPlaysetOffsetOnly(@PathVariable("id") int playlistId, @PathVariable("offset") int offset) {
         return getMostPopularTracksFromPlaylist(playlistId, offset, offset + 50);
     }
 
-    @RequestMapping(path = "/forPlaylist/{id}?limit={limit}", method = GET)
+    @RequestMapping(path = "/for-playlist/{id}?limit={limit}", method = GET)
     public List<RefinedTrack> getMostTracksFromPlaysetLimitOnly(@PathVariable("id") int playlistId, @PathVariable("limit") int limit) {
         return getMostPopularTracksFromPlaylist(playlistId, 0, limit);
     }
 
-    @RequestMapping(path = "/forPlaylist/{id}?offset={offset}&limit={limit}", method = GET)
+    @RequestMapping(path = "/for-playlist/{id}?offset={offset}&limit={limit}", method = GET)
     public List<RefinedTrack> getMostPopularTracksFromPlaylist(@PathVariable("id") int playlistId, @PathVariable("offset") int offset, @PathVariable("limit") int limit) throws IllegalArgumentException {
         inputValidation(offset, limit);
         return trackService.getMostPopularFromPlaylist(offset, limit, playlistId);
     }
 
-    @RequestMapping(path = "/forartist/{id}", method = GET)
+    @RequestMapping(path = "/for-artist/{id}", method = GET)
     public List<RefinedTrack> getAllTracksForArtist(@PathVariable("id") String artistId) {
         return trackService.getAllByArtist(artistId);
     }
