@@ -11,33 +11,34 @@ import java.util.List;
 
 @Service
 @Slf4j
-public abstract class AbstractService<T extends AbstractDao> {
+public abstract class AbstractService<T extends AbstractDao,S> {
 
     protected T dao;
     protected MongoHelper mongoHelper;
+    protected S daoClazz;
 
     @Autowired
     public AbstractService(MongoHelper mongoHelper) {
         this.mongoHelper = mongoHelper;
     }
 
-    public List<Object> getMostPopular(int limit, int offset) {
+    public List<S> getMostPopular(int limit, int offset) {
         return dao.getMostPopular(limit, offset);
     }
 
-    public Object getById(String id) {
+    public S getById(String id) {
         return dao.getById(id);
     }
 
-    public Object getBySpotifyUri(String uri) {
+    public S getBySpotifyUri(String uri) {
         return dao.getBySpotifyUri(uri);
     }
 
-    public List<Object> getMultipleById(List<String> ids) {
+    public List<S> getMultipleById(List<String> ids) {
         return dao.getMultipleById(ids);
     }
 
-    public List<Object> getAllMatchingName(String name) {
+    public List<S> getAllMatchingName(String name) {
         return dao.getAllMatchingNames(name);
     }
 

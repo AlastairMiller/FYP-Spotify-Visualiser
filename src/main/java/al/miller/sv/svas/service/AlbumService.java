@@ -1,36 +1,38 @@
 package al.miller.sv.svas.service;
 
 import al.miller.sv.ds.dao.RefinedAlbumDao;
-import al.miller.sv.ds.dao.RefinedArtistDao;
-import al.miller.sv.ds.dao.RefinedTrackDao;
+import al.miller.sv.ds.util.SortOrder;
 import al.miller.sv.svas.MongoHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import refinedDataModels.RefinedArtist;
-import refinedDataModels.RefinedTrack;
+import refinedDataModels.RefinedAlbum;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
 @Slf4j
-public class AlbumService extends AbstractService<RefinedAlbumDao> {
+public class AlbumService extends AbstractService<RefinedAlbumDao, RefinedAlbum> {
 
-    private RefinedArtistDao refinedArtistDao;
-    private RefinedTrackDao refinedTrackDao;
-
-    public AlbumService(MongoHelper mongoHelper){
+    public AlbumService(MongoHelper mongoHelper) {
         super(mongoHelper);
         this.dao = mongoHelper.getRefinedAlbumDao();
-        refinedTrackDao = mongoHelper.getRefinedTrackDao();
-        refinedArtistDao = mongoHelper.getRefinedArtistDao();
     }
 
-    public List<RefinedArtist> getAlbumsArtists(String albumId) {
-        List<String> artistIds = dao.getAlbumArtistIds(albumId);
-        return refinedArtistDao.getMultipleById(artistIds);
+    public List<RefinedAlbum> getAllFromArtistId(int offset, int limit, String artistId) {
+        return dao.geAllfromArtistId(offset, limit, artistId);
     }
 
-    public List<RefinedTrack> getAlbumsTracks(String albumId) {
-        return refinedTrackDao.getAllOnAlbum(albumId);
+    public List<RefinedAlbum> getAllContainingTrack(int offset, int limit, String trackId) {
+        return dao.getAllfromTrackId(offset, limit, trackId);
     }
+
+    public List<RefinedAlbum> getByReleaseDate(int offset, int limit, SortOrder sortOrder) {
+        return dao.getByReleaseDate(offset, limit, sortOrder);
+    }
+
+    public List<RefinedAlbum> getAlbumsFromDate(int offset, int limit, Date date) {
+        return dao.getAlbumsFromDate(offset, limit, date);
+    }
+
 }

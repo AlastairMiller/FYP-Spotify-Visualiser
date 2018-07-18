@@ -30,9 +30,7 @@ public class ActionService {
     @Scheduled(fixedRate = 50000)
     public void doScheduled() {
         checkIngestStatus();
-
     }
-
 
     private void checkIngestStatus() {
         HttpURLConnection connection = null;

@@ -8,11 +8,15 @@ import refinedDataModels.RefinedPlaylist;
 import java.util.List;
 
 @Service
-public class PlaylistService extends AbstractService<RefinedPlaylistDao> {
+public class PlaylistService extends AbstractService<RefinedPlaylistDao, RefinedPlaylist> {
 
     public PlaylistService(MongoHelper mongoHelper) {
         super(mongoHelper);
         this.dao = mongoHelper.getRefinedPlaylistDao();
+    }
+
+    public List<RefinedPlaylist> getByUserId(String userId, int offset, int limit) {
+        return dao.getByUserId(userId, offset, limit);
     }
 
     public List<RefinedPlaylist> getAllPlaylistsContainingSong(int offset, int limit, String id) {
@@ -21,6 +25,6 @@ public class PlaylistService extends AbstractService<RefinedPlaylistDao> {
 
     //Todo implement this in datasource
     public List<RefinedPlaylist> getPlaylistsForCountry(String countryCode) {
-        return dao.getAllMatchingNames(countryCode);
+        return null;
     }
 }

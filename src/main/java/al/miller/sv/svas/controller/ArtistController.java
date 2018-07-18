@@ -68,6 +68,11 @@ public class ArtistController extends AbstractController<RefinedArtist> {
         return artistService.getMostFollowed(offset, limit);
     }
 
+    @RequestMapping(path = "/on-album/{id}", method = GET)
+    public List<RefinedArtist> getAlbumsArtists(@PathVariable("id") String albumId) {
+        return artistService.getArtistsOnAlbum(albumId);
+    }
+
     @Override
     protected ArtistService getService() {
         return artistService;

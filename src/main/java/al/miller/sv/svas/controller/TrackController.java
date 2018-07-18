@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import refinedDataModels.RefinedArtist;
 import refinedDataModels.RefinedTrack;
 
 import java.util.List;
@@ -48,6 +49,11 @@ public class TrackController extends AbstractController<RefinedTrack> {
     @RequestMapping(path = "/for-artist/{id}", method = GET)
     public List<RefinedTrack> getAllTracksForArtist(@PathVariable("id") String artistId) {
         return trackService.getAllByArtist(artistId);
+    }
+
+    @RequestMapping(path = "/on-album/{id}", method = GET)
+    public List<RefinedTrack> getAlbumsTracks(@PathVariable("id") String albumId) {
+        return trackService.getAllByAlbum(albumId);
     }
 
     @Override
