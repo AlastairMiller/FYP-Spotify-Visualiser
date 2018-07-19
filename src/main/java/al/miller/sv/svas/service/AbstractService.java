@@ -15,7 +15,6 @@ public abstract class AbstractService<T extends AbstractDao,S> {
 
     protected T dao;
     protected MongoHelper mongoHelper;
-    protected S daoClazz;
 
     @Autowired
     public AbstractService(MongoHelper mongoHelper) {
@@ -27,11 +26,11 @@ public abstract class AbstractService<T extends AbstractDao,S> {
     }
 
     public S getById(String id) {
-        return dao.getById(id);
+        return (S) dao.getById(id);
     }
 
     public S getBySpotifyUri(String uri) {
-        return dao.getBySpotifyUri(uri);
+        return (S) dao.getBySpotifyUri(uri);
     }
 
     public List<S> getMultipleById(List<String> ids) {
