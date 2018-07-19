@@ -4,14 +4,9 @@ import al.miller.sv.ds.dao.RefinedAlbumDao;
 import al.miller.sv.ds.dao.RefinedArtistDao;
 import al.miller.sv.svas.MongoHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import refinedDataModels.RefinedArtist;
-import refinedDataModels.RefinedTrack;
 
 import java.util.List;
-
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Service
 public class ArtistService extends AbstractService<RefinedArtistDao,RefinedArtist> {
