@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import refinedDataModels.RefinedArtist;
 import refinedDataModels.RefinedPlaylist;
 
 import java.util.*;
@@ -60,31 +59,31 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
         return playlistService.getMostPopular(limit, offset);
     }
 
-    @RequestMapping(path = "/{id}/userId", method = GET)
+    @RequestMapping(path = "/by-user-id/{id}", method = GET)
     public List<RefinedPlaylist> getByUserId(@PathVariable("id") String userId) {
         return playlistService.getByUserId(userId, 0, 25);
     }
 
 
-    @RequestMapping(path = "/{id}/userId?offset={offset}&limit={limit}", method = GET)
+    @RequestMapping(path = "/by-user-id/{id}?offset={offset}&limit={limit}", method = GET)
     public List<RefinedPlaylist> getByUserIdOffsetOnly(@PathVariable("id") String userId, @PathVariable("offset") int offset) {
         inputValidationOffsetOnly(offset);
         return playlistService.getByUserId(userId, offset, offset + 25);
     }
 
-    @RequestMapping(path = "/{id}/userId?limit={limit}", method = GET)
+    @RequestMapping(path = "/by-user-id/{id}?limit={limit}", method = GET)
     public List<RefinedPlaylist> getByUserIdLimitOnly(@PathVariable("id") String userId, @PathVariable("limit") int limit) {
         inputValidationLimitOnly(limit);
         return playlistService.getByUserId(userId, 0, limit);
     }
 
-    @RequestMapping(path = "/{id}/userId?offset={offset}&limit={limit}", method = GET)
+    @RequestMapping(path = "/by-user-id/{id}?offset={offset}&limit={limit}", method = GET)
     public List<RefinedPlaylist> getByUserId(@PathVariable("id") String userId, @PathVariable("offset") int offset, @PathVariable("limit") int limit) {
         inputValidation(offset, limit);
         return playlistService.getByUserId(userId, offset, limit);
     }
 
-    @RequestMapping(path = "/with-track/{id}", method = GET)
+    @RequestMapping(path = "/with-track/{id}/track", method = GET)
     public List<RefinedPlaylist> getAllPlaylistsContainingSongDefault(@PathVariable("id") String id) {
         return playlistService.getAllPlaylistsContainingSong(0, 25, id);
     }
@@ -135,14 +134,14 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
     }
 
     @RequestMapping(path = "/with-country-code/{id}?offset={offset}&limit={limit}", method = GET)
-    public List<RefinedPlaylist> getAllPlaylistsInCountry(@PathVariable("id") String countryCode, @PathVariable("offset") int offset,@PathVariable("limit") int limit) throws IllegalArgumentException {
+    public List<RefinedPlaylist> getAllPlaylistsInCountry(@PathVariable("id") String countryCode, @PathVariable("offset") int offset, @PathVariable("limit") int limit) throws IllegalArgumentException {
         if (validateCountryCode(countryCode)) {
             return playlistService.getPlaylistsForCountry(countryCode, offset, limit);
         } else {
             throw new IllegalArgumentException("Invalid Country Code Requested");
         }
     }
-    
+
     @Override
     protected PlaylistService getService() {
         return playlistService;

@@ -57,47 +57,47 @@ public class AlbumController extends AbstractController<RefinedAlbum> {
         return albumService.getMostPopular(limit, offset);
     }
 
-    @RequestMapping(path = "/{id}/artist-id", method = GET)
+    @RequestMapping(path = "/from-artist-id/{id}", method = GET)
     public List<RefinedAlbum> getAllFromArtistIdDefault(@PathVariable("id") String artistId) {
         return albumService.getAllFromArtistId(0, 25, artistId);
     }
 
-    @RequestMapping(path = "/{id}/artist-id?offset={offset}", method = GET)
+    @RequestMapping(path = "/from-artist-id/{id}?offset={offset}", method = GET)
     public List<RefinedAlbum> getAllFromArtistIdOnlyOffset(@PathVariable("id") String artistId, @PathVariable("offset") int offset) {
         inputValidationOffsetOnly(offset);
         return albumService.getAllFromArtistId(offset, offset + 25, artistId);
     }
 
-    @RequestMapping(path = "/{id}/artist-id?limit={limit}", method = GET)
+    @RequestMapping(path = "/from-artist-id/{id}?limit={limit}", method = GET)
     public List<RefinedAlbum> getAllFromArtistIdOnlyLimit(@PathVariable("id") String artistId, @PathVariable("limit") int limit) {
         inputValidationLimitOnly(limit);
         return albumService.getAllFromArtistId(0, limit, artistId);
     }
 
-    @RequestMapping(path = "/{id}/artist-id?offset={offset}&limit={limit}", method = GET)
+    @RequestMapping(path = "/from-artist-id/{id}?offset={offset}&limit={limit}", method = GET)
     public List<RefinedAlbum> getAllFromArtistId(@PathVariable("id") String artistId, @PathVariable("limit") int limit, @PathVariable("offset") int offset) {
         inputValidation(limit, offset);
         return albumService.getAllFromArtistId(offset, limit, artistId);
     }
 
-    @RequestMapping(path = "/{id}/track-id", method = GET)
+    @RequestMapping(path = "from-track-id/{id}", method = GET)
     public List<RefinedAlbum> getAllFromTrackIdDefault(@PathVariable("id") String trackId) {
         return albumService.getAllContainingTrack(0, 25, trackId);
     }
 
-    @RequestMapping(path = "/{id}/track-id?offset={offset}", method = GET)
+    @RequestMapping(path = "from-track-id/{id}?offset={offset}", method = GET)
     public List<RefinedAlbum> getAllFromTrackIdOnlyOffset(@PathVariable("id") String trackId, @PathVariable("offset") int offset) {
         inputValidationOffsetOnly(offset);
         return albumService.getAllContainingTrack(offset, offset + 25, trackId);
     }
 
-    @RequestMapping(path = "/{id}/track-id?limit={limit}", method = GET)
+    @RequestMapping(path = "from-track-id/{id}?limit={limit}", method = GET)
     public List<RefinedAlbum> getAllFromTrackIdOnlyLimit(@PathVariable("id") String trackId, @PathVariable("limit") int limit) {
         inputValidationLimitOnly(limit);
         return albumService.getAllContainingTrack(0, limit, trackId);
     }
 
-    @RequestMapping(path = "/{id}/track-id?offset={offset}&limit={limit}", method = GET)
+    @RequestMapping(path = "from-track-id/{id}?offset={offset}&limit={limit}", method = GET)
     public List<RefinedAlbum> getAllFromTrackId(@PathVariable("id") String trackId, @PathVariable("limit") int limit, @PathVariable("offset") int offset) {
         inputValidation(limit, offset);
         return albumService.getAllContainingTrack(offset, limit, trackId);

@@ -3,7 +3,6 @@ package al.miller.sv.svas.service;
 import al.miller.sv.ds.dao.RefinedPlaylistDao;
 import al.miller.sv.ds.dao.RefinedTrackDao;
 import al.miller.sv.svas.MongoHelper;
-import com.wrapper.spotify.model_objects.specification.Playlist;
 import org.springframework.stereotype.Service;
 import refinedDataModels.RefinedPlaylist;
 import refinedDataModels.RefinedTrack;
