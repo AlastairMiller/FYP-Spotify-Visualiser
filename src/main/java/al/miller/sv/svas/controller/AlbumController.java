@@ -26,7 +26,7 @@ public class AlbumController extends AbstractController<RefinedAlbum> {
 
     @RequestMapping(path = "/{id}", method = GET)
     @Override
-    public RefinedAlbum getById(String albumId) {
+    public RefinedAlbum getById(@PathVariable("id")String albumId) {
         return albumService.getById(albumId);
     }
 

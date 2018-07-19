@@ -26,7 +26,7 @@ public class TrackController extends AbstractController<RefinedTrack> {
 
     @RequestMapping(path = "/{id}", method = GET)
     @Override
-    public RefinedTrack getById(String albumId) {
+    public RefinedTrack getById(@PathVariable("id") String albumId) {
         return trackService.getById(albumId);
     }
 

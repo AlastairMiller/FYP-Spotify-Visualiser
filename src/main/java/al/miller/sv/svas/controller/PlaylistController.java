@@ -28,7 +28,7 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
 
     @RequestMapping(path = "/{id}", method = GET)
     @Override
-    public RefinedPlaylist getById(String albumId) {
+    public RefinedPlaylist getById(@PathVariable("id") String albumId) {
         return playlistService.getById(albumId);
     }
 
