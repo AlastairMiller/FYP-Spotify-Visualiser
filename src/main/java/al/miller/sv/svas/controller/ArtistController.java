@@ -22,6 +22,40 @@ public class ArtistController extends AbstractController<RefinedArtist> {
         this.artistService = artistService;
     }
 
+    @RequestMapping(path = "/{id}", method = GET)
+    @Override
+    public RefinedArtist getById(String albumId) {
+        return artistService.getById(albumId);
+    }
+
+    @RequestMapping(path = "/most-popular", method = GET)
+    @Override
+    public List<RefinedArtist> getMostPopularDefault() {
+        return artistService.getMostPopular(0, 25);
+    }
+
+    @RequestMapping(path = "/most-popular?offset={offset}", method = GET)
+    @Override
+    public List<RefinedArtist> getMostPopularOffsetOnly(@PathVariable("offset") int offset) {
+        inputValidationOffsetOnly(offset);
+        return artistService.getMostPopular(offset + 25, offset);
+    }
+
+    @RequestMapping(path = "/most-popular?limit={limit}", method = GET)
+    @Override
+    public List<RefinedArtist> getMostPopularLimitOnly(@PathVariable("limit") int limit) {
+        inputValidationLimitOnly(limit);
+        return artistService.getMostPopular(limit, 0);
+    }
+
+    @RequestMapping(path = "/most-popular?offset={offset}&limit={limit}", method = GET)
+    @Override
+    public List<RefinedArtist> getMostPopular(@PathVariable("limit") int limit, @PathVariable("offset") int offset) {
+        inputValidation(limit, offset);
+        return artistService.getMostPopular(limit, offset);
+    }
+
+
     @RequestMapping(path = "/genre/{genre}", method = GET)
     public List<RefinedArtist> getAllArtistsForGenreDefault(@PathVariable("genre") String genre) {
         return artistService.getForGenre(0, 50, genre);
