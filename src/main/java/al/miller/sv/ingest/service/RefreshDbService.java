@@ -1,7 +1,7 @@
 package al.miller.sv.ingest.service;
 
 import al.miller.sv.ds.dao.AbstractDao;
-import al.miller.sv.ds.dao.RefinedUserDao;
+import al.miller.sv.ds.dao.RefinedPlaylistDao;
 import al.miller.sv.ingest.MongoHelper;
 import al.miller.sv.ingest.SpotifyAuthenticationHelper;
 import al.miller.sv.ingest.dao.*;
@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -90,25 +91,31 @@ public class RefreshDbService {
 
     private void createIndexes() {
         log.info("----------------------------Created Indexes----------------------------");
-        if (checkIfIndexExists(mongoHelper.getRefinedAlbumDao())) {
-            mongoHelper.getRefinedAlbumDao().getMongoCollection().createIndex(Indexes.ascending("id"));
-            log.info("Created index for Album Id");
+        List<String> indexList = checkIfIndexesExists(mongoHelper.getRefinedAlbumDao());
+        for (String indexName : indexList) {
+            mongoHelper.getRefinedAlbumDao().getMongoCollection().createIndex(Indexes.descending(indexName));
+            mongoHelper.getRefinedAlbumDao().getMongoCollection().createIndex(Indexes.descending("_id", indexName));
+            log.info("Created {} index for Album Id", indexName);
         }
-        if (checkIfIndexExists(mongoHelper.getRefinedArtistDao())) {
-            mongoHelper.getRefinedArtistDao().getMongoCollection().createIndex(Indexes.ascending(("id")));
-            log.info("Created index for Artist Id");
+        indexList = checkIfIndexesExists(mongoHelper.getRefinedArtistDao());
+        for (String indexName : indexList) {
+            mongoHelper.getRefinedArtistDao().getMongoCollection().createIndex(Indexes.descending(indexName));
+            mongoHelper.getRefinedArtistDao().getMongoCollection().createIndex(Indexes.descending("_id", indexName));
+            log.info("Created {} index for Artist Id", indexName);
         }
-        if (checkIfIndexExists(mongoHelper.getRefinedPlaylistDao())) {
-            mongoHelper.getRefinedPlaylistDao().getMongoCollection().createIndex(Indexes.ascending("id"));
-            log.info("Created index for Playlist Id");
+
+        indexList = checkIfIndexesExists(mongoHelper.getRefinedPlaylistDao());
+        for (String indexName : indexList) {
+            mongoHelper.getRefinedPlaylistDao().getMongoCollection().createIndex(Indexes.descending(indexName));
+            mongoHelper.getRefinedPlaylistDao().getMongoCollection().createIndex(Indexes.descending("_id", indexName));
+            log.info("Created {} index for Playlist Id", indexName);
         }
-        if (checkIfIndexExists(mongoHelper.getRefinedTrackDao())) {
-            mongoHelper.getRefinedTrackDao().getMongoCollection().createIndex(Indexes.ascending("id"));
-            log.info("Created index for Track Id");
-        }
-        if (checkIfIndexExists(mongoHelper.getRefinedUserDao())) {
-            mongoHelper.getRefinedUserDao().getMongoCollection().createIndex(Indexes.ascending("id"));
-            log.info("Created index for User Id");
+
+        indexList = checkIfIndexesExists(mongoHelper.getRefinedTrackDao());
+        for (String indexName : indexList) {
+            mongoHelper.getRefinedTrackDao().getMongoCollection().createIndex(Indexes.descending(indexName));
+            mongoHelper.getRefinedTrackDao().getMongoCollection().createIndex(Indexes.descending("_id", indexName));
+            log.info("Created {} index for Track Id", indexName);
         }
 
     }
@@ -120,7 +127,7 @@ public class RefreshDbService {
         List<PlaylistSimplified> playlistSimplifieds = spotifyPlaylistDao.pullPlaylistsForAUser(api, "thesoundsofspotify", playlistRetrieval).stream()
                 .filter(playlist -> playlist.getName().matches(".* [A-Z][A-Z]\\b"))
                 .collect(Collectors.toList());
-        //playlistSimplifieds.subList(1000, playlistSimplifieds.size()).clear();
+
         mongoHelper.getPlaylistSimplifiedDao().getMongoCollection().drop();
         List<BsonDocument> playlistIds = playlistSimplifieds.stream()
                 .map(temp -> {
@@ -296,14 +303,16 @@ public class RefreshDbService {
         }
     }
 
-    private <T extends AbstractDao> boolean checkIfIndexExists(T dao) {
-        Collection daosIndexes = dao.getMongoCollection().listIndexes().into(new ArrayList());
-        return daosIndexes.size() == 0;
+    private <T extends AbstractDao> List<String> checkIfIndexesExists(T dao) {
+        List<Document> daosIndexes = (List<Document>) dao.getMongoCollection().listIndexes().into(new ArrayList());
+        List<String> indexList = new ArrayList<>();
+        indexList.add("id");
+        if (dao.getClazz().equals(RefinedPlaylist.class)) {
+            indexList.add("numOfFollowers");
+        } else {
+            indexList.add("popularity");
+        }
+        daosIndexes.forEach(document -> indexList.remove(document.getString("name")));
+        return indexList;
     }
-
-    private boolean checkIfIndexExists(RefinedUserDao dao) {
-        Collection daosIndexes = dao.getMongoCollection().listIndexes().into(new ArrayList<>());
-        return daosIndexes.size() == 0;
-    }
-
 }

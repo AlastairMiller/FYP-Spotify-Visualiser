@@ -8,6 +8,7 @@
       <configuration>
         <webroots />
         <sourceRoots>
+          <root url="file://$USER_HOME$/Downloads/Spotify-Visualiser-Ingest-Spotify-Visualiser-Ingest-1.0.2/src/main/resources" />
           <root url="file://$MODULE_DIR$/src/main/java" />
           <root url="file://$MODULE_DIR$/src/main/resources" />
         </sourceRoots>
@@ -17,10 +18,13 @@
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <content url="file://$USER_HOME$/Downloads/Spotify-Visualiser-Ingest-Spotify-Visualiser-Ingest-1.0.2/src/main/resources">
+      <sourceFolder url="file://$USER_HOME$/Downloads/Spotify-Visualiser-Ingest-Spotify-Visualiser-Ingest-1.0.2/src/main/resources" type="java-resource" />
+    </content>
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -70,15 +74,12 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.vaadin.external.google:android-json:0.0.20131108.vaadin1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:4.3.10.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:3.6.3" level="project" />
-    <orderEntry type="library" name="Maven: com.sv:mongoDatamodel:1.0.7" level="project" />
+    <orderEntry type="library" name="Maven: al.miller.sv:mongoDatamodel:1.0.8" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.1.11" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.1.11" level="project" />
-    <orderEntry type="library" name="Maven: fr.javatic.mongo:mongo-jackson-codec:3.2.2__0.5" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.mongodb:mongodb-driver-core:3.2.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.mongodb:bson:3.2.2" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: de.undercouch:bson4jackson:2.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.sv:mongoDao:1.0.7" level="project" />
+    <orderEntry type="library" name="Maven: com.neovisionaries:nv-i18n:1.23" level="project" />
+    <orderEntry type="library" name="Maven: al.miller.sv:mongoDao:1.0.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.projectlombok:lombok:1.16.20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.0.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: de.flapdoodle.embed:de.flapdoodle.embed.process:2.0.2" level="project" />
@@ -89,7 +90,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.commons:commons-compress:1.10" level="project" />
     <orderEntry type="library" name="Maven: se.michaelthelin.spotify:spotify-web-api-java:2.0.2" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.1" level="project" />
-    <orderEntry type="library" name="Maven: com.neovisionaries:nv-i18n:1.22" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient-cache:4.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.6" level="project" />
@@ -102,5 +102,9 @@
     <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:24.1-jre" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.mojo:animal-sniffer-annotations:1.14" level="project" />
+    <orderEntry type="library" name="Maven: fr.javatic.mongo:mongo-jackson-codec:3.2.2__0.5" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.mongodb:mongodb-driver-core:3.2.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.mongodb:bson:3.2.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: de.undercouch:bson4jackson:2.7.0" level="project" />
   </component>
 </module>

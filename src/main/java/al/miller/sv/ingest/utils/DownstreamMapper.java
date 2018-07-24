@@ -2,6 +2,7 @@ package al.miller.sv.ingest.utils;
 
 
 import al.miller.sv.ds.util.RefinedObjectBuilder;
+import com.neovisionaries.i18n.CountryCode;
 import com.wrapper.spotify.enums.ReleaseDatePrecision;
 import com.wrapper.spotify.model_objects.specification.*;
 import lombok.extern.slf4j.Slf4j;
@@ -121,6 +122,7 @@ public class DownstreamMapper {
     public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist) throws MalformedURLException, InstantiationException, IllegalAccessException {
         List<String> tracksIds = returnNestedIds(PlaylistTrack.class, Arrays.asList(fullPlaylist.getTracks().getItems()));
         Map<String, Object> map = mapGeneric(fullPlaylist, Playlist.class);
+        CountryCode countryCode = CountryCode.getByCode(fullPlaylist.getName().substring(fullPlaylist.getName().length() - 2, fullPlaylist.getName().length()));
         map.remove("tracks");
         map.remove("collaborative");
         map.remove("description");
@@ -133,6 +135,7 @@ public class DownstreamMapper {
         map.put("numOfFollowers", ((Followers) map.get("followers")).getTotal());
         map.remove("followers");
         map.put("trackIds", tracksIds);
+        map.put("countryCode", countryCode);
         return (RefinedPlaylist) RefinedObjectBuilder.start(RefinedPlaylist.class).with(map).build();
     }
 

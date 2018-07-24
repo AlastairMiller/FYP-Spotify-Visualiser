@@ -8,7 +8,7 @@
         <tag>HEAD</tag>
     </scm>
 
-    <groupId>com.sv.svi</groupId>
+    <groupId>al.miller.sv</groupId>
     <artifactId>Spotify-Visualiser-Ingest</artifactId>
     <version>1.0.3-SNAPSHOT</version>
     <build>
@@ -118,15 +118,15 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sv</groupId>
+            <groupId>al.miller.sv</groupId>
             <artifactId>mongoDatamodel</artifactId>
-            <version>1.0.7</version>
+            <version>1.0.8</version>
         </dependency>
 
         <dependency>
-            <groupId>com.sv</groupId>
+            <groupId>al.miller.sv</groupId>
             <artifactId>mongoDao</artifactId>
-            <version>1.0.7</version>
+            <version>1.0.8</version>
         </dependency>
 
         <dependency>
@@ -153,6 +153,18 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava-testlib</artifactId>
             <version>24.1-jre</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.6.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.javatic.mongo</groupId>
+            <artifactId>mongo-jackson-codec</artifactId>
+            <version>3.2.2__0.5</version>
         </dependency>
 
     </dependencies>
