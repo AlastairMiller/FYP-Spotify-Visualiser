@@ -104,24 +104,24 @@ public class AlbumController extends AbstractController<RefinedAlbum> {
     }
 
 
-    @RequestMapping(path = "/{sortOrder}", method = GET)
+    @RequestMapping(path = "/release-date/{sortOrder}", method = GET)
     public List<RefinedAlbum> getByReleaseDateDefault(@PathVariable("sortOrder") SortOrder sortOrder) {
         return albumService.getByReleaseDate(0, 25, sortOrder);
     }
 
-    @RequestMapping(path = "/{sortOrder}?offset={offset}", method = GET)
+    @RequestMapping(path = "/release-date/{sortOrder}?offset={offset}", method = GET)
     public List<RefinedAlbum> getByReleaseDateOnlyOffset(@PathVariable("sortOrder") SortOrder sortOrder, @PathVariable("offset") int offset) {
         inputValidationOffsetOnly(offset);
         return albumService.getByReleaseDate(offset, offset + 25, sortOrder);
     }
 
-    @RequestMapping(path = "/{sortOrder}?limit={limit}", method = GET)
+    @RequestMapping(path = "/release-date/{sortOrder}?limit={limit}", method = GET)
     public List<RefinedAlbum> getByReleaseDateOnlyLimit(@PathVariable("sortOrder") SortOrder sortOrder, @PathVariable("limit") int limit) {
         inputValidationLimitOnly(limit);
         return albumService.getByReleaseDate(0, limit, sortOrder);
     }
 
-    @RequestMapping(path = "/{sortOrder}?offset={offset}&limit={limit}", method = GET)
+    @RequestMapping(path = "/release-date/{sortOrder}?offset={offset}&limit={limit}", method = GET)
     public List<RefinedAlbum> getByReleaseDate(@PathVariable("sortOrder") SortOrder sortOrder, @PathVariable("limit") int limit, @PathVariable("offset") int offset) {
         inputValidation(limit, offset);
         return albumService.getByReleaseDate(offset, limit, sortOrder);

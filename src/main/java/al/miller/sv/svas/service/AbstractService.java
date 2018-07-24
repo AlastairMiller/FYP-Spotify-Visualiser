@@ -21,7 +21,7 @@ public abstract class AbstractService<T extends AbstractDao,S> {
         this.mongoHelper = mongoHelper;
     }
 
-    public List<S> getMostPopular(int limit, int offset) {
+    public List<S> getMostPopular(int offset, int limit) {
         return dao.getMostPopular(limit, offset);
     }
 

@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import refinedDataModels.RefinedPlaylist;
 import refinedDataModels.RefinedTrack;
 
 import java.util.List;
@@ -60,7 +59,7 @@ public class TrackController extends AbstractController<RefinedTrack> {
 
     @RequestMapping(path = "/for-playlist/{id}", method = GET)
     public List<RefinedTrack> getMostPopularTracksFromPlaylistDefault(@PathVariable("id") String playlistId) {
-        return getMostPopularTracksFromPlaylist(playlistId, 0, 0);
+        return getMostPopularTracksFromPlaylist(playlistId, 0, 25);
     }
 
     @RequestMapping(path = "/for-playlist/{id}?offset={offset}", method = GET)

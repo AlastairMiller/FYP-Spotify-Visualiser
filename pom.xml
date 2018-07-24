@@ -56,15 +56,15 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sv</groupId>
+            <groupId>al.miller.sv</groupId>
             <artifactId>mongoDatamodel</artifactId>
-            <version>1.0.7</version>
+            <version>1.0.8</version>
         </dependency>
 
         <dependency>
-            <groupId>com.sv</groupId>
+            <groupId>al.miller.sv</groupId>
             <artifactId>mongoDao</artifactId>
-            <version>1.0.7</version>
+            <version>1.0.8</version>
         </dependency>
 
         <dependency>
@@ -81,6 +81,23 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.6.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.javatic.mongo</groupId>
+            <artifactId>mongo-jackson-codec</artifactId>
+            <version>3.2.2__0.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.neovisionaries</groupId>
+            <artifactId>nv-i18n</artifactId>
+            <version>1.23</version>
+        </dependency>
 
     </dependencies>
 </project>

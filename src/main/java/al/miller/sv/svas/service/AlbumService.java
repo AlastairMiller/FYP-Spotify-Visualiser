@@ -20,11 +20,11 @@ public class AlbumService extends AbstractService<RefinedAlbumDao, RefinedAlbum>
     }
 
     public List<RefinedAlbum> getAllFromArtistId(int offset, int limit, String artistId) {
-        return dao.geAllfromArtistId(offset, limit, artistId);
+        return dao.getAllFromArtistId(offset, limit, artistId);
     }
 
     public List<RefinedAlbum> getAllContainingTrack(int offset, int limit, String trackId) {
-        return dao.getAllfromTrackId(offset, limit, trackId);
+        return dao.getAllFromTrackId(offset, limit, trackId);
     }
 
     public List<RefinedAlbum> getByReleaseDate(int offset, int limit, SortOrder sortOrder) {

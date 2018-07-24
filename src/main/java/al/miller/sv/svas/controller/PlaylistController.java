@@ -60,12 +60,12 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
     }
 
     @RequestMapping(path = "/by-user-id/{id}", method = GET)
-    public List<RefinedPlaylist> getByUserId(@PathVariable("id") String userId) {
+    public List<RefinedPlaylist> getByUserIdDefault(@PathVariable("id") String userId) {
         return playlistService.getByUserId(userId, 0, 25);
     }
 
 
-    @RequestMapping(path = "/by-user-id/{id}?offset={offset}&limit={limit}", method = GET)
+    @RequestMapping(path = "/by-user-id/{id}?offset={offset}", method = GET)
     public List<RefinedPlaylist> getByUserIdOffsetOnly(@PathVariable("id") String userId, @PathVariable("offset") int offset) {
         inputValidationOffsetOnly(offset);
         return playlistService.getByUserId(userId, offset, offset + 25);
@@ -83,7 +83,7 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
         return playlistService.getByUserId(userId, offset, limit);
     }
 
-    @RequestMapping(path = "/with-track/{id}/track", method = GET)
+    @RequestMapping(path = "/with-track/{id}", method = GET)
     public List<RefinedPlaylist> getAllPlaylistsContainingSongDefault(@PathVariable("id") String id) {
         return playlistService.getAllPlaylistsContainingSong(0, 25, id);
     }

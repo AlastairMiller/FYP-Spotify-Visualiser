@@ -25,6 +25,6 @@ public class PlaylistService extends AbstractService<RefinedPlaylistDao, Refined
 
     //Todo implement this in datasource
     public List<RefinedPlaylist> getPlaylistsForCountry(String countryCode, int offset,int limit) {
-        return null;
+        return dao.getPlaylistByCountry(countryCode, offset, limit);
     }
 }

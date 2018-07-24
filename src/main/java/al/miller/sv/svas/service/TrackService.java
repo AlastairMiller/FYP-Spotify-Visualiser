@@ -30,7 +30,12 @@ public class TrackService extends AbstractService<RefinedTrackDao, RefinedTrack>
 
     public List<RefinedTrack> getMostPopularFromPlaylist(int offset, int limit, String playlistId) {
         RefinedPlaylist refinedPlaylist = refinedPlaylistDao.getById(playlistId);
-        List<String> trackIds = refinedPlaylist.getTrackIds().subList(offset, limit);
-        return dao.getMultipleById(trackIds);
+        if (limit > refinedPlaylist.getTrackIds().size()) limit = refinedPlaylist.getTrackIds().size();
+        if (offset != limit) {
+            List<String> trackIds = refinedPlaylist.getTrackIds().subList(offset, limit);
+            return dao.getMultipleById(trackIds);
+        } else {
+            return null;
+        }
     }
 }
