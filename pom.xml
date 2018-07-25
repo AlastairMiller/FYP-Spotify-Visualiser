@@ -5,12 +5,12 @@
     <scm>
         <developerConnection>scm:git:https://github.com/AlastairMiller/Spotify-Visualiser-Ingest.git
         </developerConnection>
-        <tag>Spotify-Visualiser-Ingest-1.0.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <groupId>al.miller.sv</groupId>
     <artifactId>Spotify-Visualiser-Ingest</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <build>
         <plugins>
             <plugin>
