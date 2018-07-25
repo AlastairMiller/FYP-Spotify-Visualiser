@@ -8,7 +8,7 @@
     </properties>
 
     <scm>
-        <developerConnection>scm:git:https://github.com/AlastairMiller/Spotify-Visualiser-Action-Service.git
+        <developerConnection>scm:git:https://github.com/AlastairMiller/Spotify-Visualiser-Action-Ingest.git
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
