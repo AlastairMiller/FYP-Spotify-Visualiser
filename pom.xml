@@ -42,7 +42,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>dependency</classpathPrefix>
-                            <mainClass>al.miller.sv.ingest.App</mainClass>
+                            <mainClass>al.miller.sv.svas.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
