@@ -8,7 +8,9 @@ import { AppComponent } from './app.component';
     AppComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    CoreModule,
+    HomeModule
   ],
   providers: [],
   bootstrap: [AppComponent]
