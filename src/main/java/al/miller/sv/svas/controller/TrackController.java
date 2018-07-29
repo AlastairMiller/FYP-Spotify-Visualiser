@@ -1,6 +1,7 @@
 package al.miller.sv.svas.controller;
 
 import al.miller.sv.svas.service.TrackService;
+import com.neovisionaries.i18n.CountryCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -88,6 +89,16 @@ public class TrackController extends AbstractController<RefinedTrack> {
     @RequestMapping(path = "/on-album/{id}", method = GET)
     public List<RefinedTrack> getAlbumsTracks(@PathVariable("id") String albumId) {
         return trackService.getAllByAlbum(albumId);
+    }
+
+    @RequestMapping(path = "/random", method = GET)
+    public RefinedTrack getRandom() {
+        return trackService.getRandom();
+    }
+
+    @RequestMapping(path = "{id}/popular-country", method = GET)
+    public CountryCode getPopularCountry(@PathVariable("id") String trackId) {
+        return trackService.mostPopularIn(trackId);
     }
 
     @Override
