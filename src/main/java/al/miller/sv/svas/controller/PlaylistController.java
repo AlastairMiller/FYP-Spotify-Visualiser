@@ -33,7 +33,7 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
         return playlistService.getById(playlistId);
     }
 
-    @RequestMapping(path = "/?multi={ids}", method = GET)
+    @RequestMapping(path = "/{ids}/multi", method = GET)
     @Override
     public List<RefinedPlaylist> getMultipleById(@PathVariable("ids") String ids) {
         List<String> idList = Arrays.asList(ids.split("&"));

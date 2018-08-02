@@ -32,7 +32,7 @@ public class AlbumController extends AbstractController<RefinedAlbum> {
         return albumService.getById(albumId);
     }
 
-    @RequestMapping(path = "/?multi={ids}", method = GET)
+    @RequestMapping(path = "/{ids}/multi", method = GET)
     public List<RefinedAlbum> getMultipleById(@PathVariable("ids") String ids) {
         List<String> idList = Arrays.asList(ids.split("&"));
         return albumService.getMultipleById(idList);

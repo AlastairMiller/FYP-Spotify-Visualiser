@@ -31,7 +31,7 @@ public class TrackController extends AbstractController<RefinedTrack> {
         return trackService.getById(trackId);
     }
 
-    @RequestMapping(path = "/?multi={ids}", method = GET)
+    @RequestMapping(path = "/{ids}/multi", method = GET)
     @Override
     public List<RefinedTrack> getMultipleById(@PathVariable("ids") String ids) {
         List<String> idList = Arrays.asList(ids.split("&"));

@@ -29,7 +29,7 @@ public class ArtistController extends AbstractController<RefinedArtist> {
         return artistService.getById(artistId);
     }
 
-    @RequestMapping(path = "/?multi={ids}", method = GET)
+    @RequestMapping(path = "/{ids}/multi", method = GET)
     @Override
     public List<RefinedArtist> getMultipleById(@PathVariable("ids") String ids) {
         List<String> idList = Arrays.asList(ids.split("&"));
