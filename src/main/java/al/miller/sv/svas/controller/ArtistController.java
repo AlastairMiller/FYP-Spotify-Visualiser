@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import refinedDataModels.RefinedArtist;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -24,8 +25,15 @@ public class ArtistController extends AbstractController<RefinedArtist> {
 
     @RequestMapping(path = "/{id}", method = GET)
     @Override
-    public RefinedArtist getById(@PathVariable("id") String albumId) {
-        return artistService.getById(albumId);
+    public RefinedArtist getById(@PathVariable("id") String artistId) {
+        return artistService.getById(artistId);
+    }
+
+    @RequestMapping(path = "/?multi={ids}", method = GET)
+    @Override
+    public List<RefinedArtist> getMultipleById(@PathVariable("ids") String ids) {
+        List<String> idList = Arrays.asList(ids.split("&"));
+        return artistService.getMultipleById(idList);
     }
 
     @RequestMapping(path = "/most-popular", method = GET)

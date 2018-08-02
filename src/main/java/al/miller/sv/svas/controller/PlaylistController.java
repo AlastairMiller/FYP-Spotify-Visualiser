@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import refinedDataModels.RefinedAlbum;
 import refinedDataModels.RefinedPlaylist;
 
 import java.util.*;
@@ -28,8 +29,15 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
 
     @RequestMapping(path = "/{id}", method = GET)
     @Override
-    public RefinedPlaylist getById(@PathVariable("id") String albumId) {
-        return playlistService.getById(albumId);
+    public RefinedPlaylist getById(@PathVariable("id") String playlistId) {
+        return playlistService.getById(playlistId);
+    }
+
+    @RequestMapping(path = "/?multi={ids}", method = GET)
+    @Override
+    public List<RefinedPlaylist> getMultipleById(@PathVariable("ids") String ids) {
+        List<String> idList = Arrays.asList(ids.split("&"));
+        return playlistService.getMultipleById(idList);
     }
 
     @RequestMapping(path = "/most-popular", method = GET)

@@ -77,7 +77,7 @@
                     <repository>
                         alastairmiller-docker-spotify-visualiser.bintray.io/al.miller.sv/spotify-visualiser-action-service
                     </repository>
-                    <tag>1.0.0</tag>
+                    <tag>1.0.1</tag>
                     <buildArgs>
                         <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>

@@ -13,6 +13,8 @@ public abstract class AbstractController<T> {
 
     protected abstract T getById(String id);
 
+    protected abstract List<T> getMultipleById(String ids);
+
     protected abstract List<T> getMostPopularDefault();
 
     protected abstract List<T> getMostPopularOffsetOnly(int offset);

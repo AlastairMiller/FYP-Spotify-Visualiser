@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import refinedDataModels.RefinedAlbum;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static com.sun.org.apache.xalan.internal.lib.ExsltStrings.split;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
@@ -26,8 +28,14 @@ public class AlbumController extends AbstractController<RefinedAlbum> {
 
     @RequestMapping(path = "/{id}", method = GET)
     @Override
-    public RefinedAlbum getById(@PathVariable("id")String albumId) {
+    public RefinedAlbum getById(@PathVariable("id") String albumId) {
         return albumService.getById(albumId);
+    }
+
+    @RequestMapping(path = "/?multi={ids}", method = GET)
+    public List<RefinedAlbum> getMultipleById(@PathVariable("ids") String ids) {
+        List<String> idList = Arrays.asList(ids.split("&"));
+        return albumService.getMultipleById(idList);
     }
 
     @RequestMapping(path = "/most-popular", method = GET)

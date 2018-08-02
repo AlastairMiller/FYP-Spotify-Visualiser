@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import refinedDataModels.RefinedTrack;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -26,8 +27,15 @@ public class TrackController extends AbstractController<RefinedTrack> {
 
     @RequestMapping(path = "/{id}", method = GET)
     @Override
-    public RefinedTrack getById(@PathVariable("id") String albumId) {
-        return trackService.getById(albumId);
+    public RefinedTrack getById(@PathVariable("id") String trackId) {
+        return trackService.getById(trackId);
+    }
+
+    @RequestMapping(path = "/?multi={ids}", method = GET)
+    @Override
+    public List<RefinedTrack> getMultipleById(@PathVariable("ids") String ids) {
+        List<String> idList = Arrays.asList(ids.split("&"));
+        return trackService.getMultipleById(idList);
     }
 
     @RequestMapping(path = "/most-popular", method = GET)

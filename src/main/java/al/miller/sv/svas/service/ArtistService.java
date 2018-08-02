@@ -11,12 +11,12 @@ import java.util.List;
 @Service
 public class ArtistService extends AbstractService<RefinedArtistDao,RefinedArtist> {
 
-    private RefinedAlbumDao refinedAlbum;
+    private RefinedAlbumDao refinedAlbumDao;
 
     public ArtistService(MongoHelper mongoHelper) {
         super(mongoHelper);
         this.dao = mongoHelper.getRefinedArtistDao();
-        this.refinedAlbum = mongoHelper.getRefinedAlbumDao();
+        this.refinedAlbumDao = mongoHelper.getRefinedAlbumDao();
     }
 
     public List<RefinedArtist> getForGenre(int offset, int limit, String genre) {
@@ -28,7 +28,7 @@ public class ArtistService extends AbstractService<RefinedArtistDao,RefinedArtis
     }
 
     public List<RefinedArtist> getArtistsOnAlbum(String albumId){
-        List<String> artistIds = refinedAlbum.getAlbumArtistIds(albumId);
+        List<String> artistIds = refinedAlbumDao.getAlbumArtistIds(albumId);
         return dao.getMultipleById(artistIds);
     }
 
