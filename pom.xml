@@ -8,12 +8,12 @@
     <scm>
         <developerConnection>scm:git:https://github.com/AlastairMiller/Spotify-Visualiser-Action-Service.git
         </developerConnection>
-        <tag>Spotify-Visualiser-Action-Service-1.0.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <groupId>al.miller.sv</groupId>
     <artifactId>Spotify-Visualiser-Action-Service</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <build>
         <plugins>
             <plugin>
