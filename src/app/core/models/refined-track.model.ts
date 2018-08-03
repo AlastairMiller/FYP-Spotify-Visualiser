@@ -9,7 +9,7 @@ export class RefinedTrack {
   externalURL: URL;
   href: URL;
   name: string;
-  previewURL: URL;
+  previewURL?: URL;
   trackNumber: number;
   popularity: number;
   spotifyURI: string;

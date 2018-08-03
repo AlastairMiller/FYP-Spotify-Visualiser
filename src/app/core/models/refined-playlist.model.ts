@@ -10,6 +10,6 @@ export class RefinedPlaylist {
    userId: string;
    tracksIds: string[];
    spotifyURI: string;
-   countryCode: CountryCode;
+   countryCode: string;
 
 }
