@@ -2,7 +2,7 @@ export class RefinedTrack {
 
   id: string;
   albumId: string;
-  artistsIds: string[];
+  artistIds: string[];
   discNumber: number;
   durationMs: number;
   explicit: boolean;

@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {LoggerService} from './logger.service';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs/internal/Observable';
-import {RefinedArtist, RefinedTrack} from '../models';
+import {RefinedArtist} from '../models';
 import {catchError, tap} from 'rxjs/operators';
 
 @Injectable({providedIn: 'root'})
@@ -12,13 +12,16 @@ export class RefinedArtistService {
               private logger: LoggerService) {
   }
 
-  private url = environment.api_url + '/artist';
+  private url = environment.api_url + '/artists';
 
-  getById(currentTrack: RefinedTrack): Observable<RefinedArtist[]> {
-    const ids = currentTrack.artistsIds;
-    return this.http.get<RefinedArtist[]>(this.url + '/' + ids.toString().replace(',', '&') + '/multi')
-        .pipe(tap(refinedArtist => this.logger.info(`fetched Artists with id=${refinedArtist.toString()}`)),
-          catchError(this.logger.error(`failed to get Artist from id`)));
+  getById(ids: string[]): Observable<RefinedArtist[]> {
+    console.log('idString', ids.toString() );
+    console.log('idStringReplace', ids.toString().replace(new RegExp(',', 'g'), '&'));
+    return this.http.get<RefinedArtist[]>(this.url + '/' + ids.toString().replace(new RegExp(',', 'g'), '&') + '/multi')
+        .pipe(
+          tap(refinedArtist => this.logger.info(`fetched Artists with id=${refinedArtist.toString()}`)),
+          catchError(this.logger.error(`failed to get Artist from id`))
+        );
 
   }
 

@@ -18,11 +18,12 @@ export class RefinedTrackService {
 
   getRandom(): Observable<RefinedTrack> {
     return this.http.get<RefinedTrack>(this.url + '/random')
-      .pipe(tap(refinedTrack => this.logger.info(`fetched track id=${refinedTrack.id}`)),
-      catchError
-      (this.handleError<RefinedTrack>(`getRandom()`))
+      .pipe(
+        tap(refinedTrack => this.logger.info(`fetched track id=${refinedTrack.id}`)),
+        catchError(this.handleError<RefinedTrack>(`getRandom()`))
       );
   }
+
 
   getMostPopularCountry(trackId: string): Observable<String> {
     return this.http.get<string>(this.url + trackId + '/popular-country');

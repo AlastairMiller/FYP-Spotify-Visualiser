@@ -3,14 +3,16 @@
     <div class="row">
       <div class="col-md-12 mt-3 text-center">
         <div id='wordcloud'>
-          <p>{{currentTrack.name}}</p>
-          <p>{{currentTrack.durationMs / 1000}}</p>
-          <p>{{currentTracksAlbum.name}}</p>
-          <p>Popularity: {{currentTrack.popularity}}%</p>
-          <p>{{currentTrack.previewURL}}</p>
-          <li *ngFor = "let trackArtist of currentTracksArtists">
-            {{trackArtist.name}}
+          <p>{{currentTrack?.name}}</p>
+          <p>{{currentTrack?.durationMs | date: "mm:ss"}}</p>
+          <p>{{currentTracksAlbum?.name}}</p>
+          <p>Popularity: {{currentTrack?.popularity}}%</p>
+          <li *ngFor="let trackArtist of currentTracksArtists">
+            {{trackArtist?.name}}
           </li>
+
+          <iframe [src]="currentUriSafe | safe" width="300" height="80"
+                  frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
         </div>
       </div>
     </div>

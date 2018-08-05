@@ -4,6 +4,8 @@ import {RefinedTrackService} from '../core/services/refined-track.service';
 import {RefinedAlbum, RefinedArtist, RefinedTrack} from '../core/models';
 import {RefinedAlbumService} from '../core/services';
 import {RefinedArtistService} from '../core/services/refined-artist.service';
+import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import {SafePipe} from './safe-pipe.pipe';
 
 
 @Component({
@@ -17,11 +19,13 @@ export class HomeComponent implements OnInit {
     private trackService: RefinedTrackService,
     private albumService: RefinedAlbumService,
     private artistService: RefinedArtistService,
+    private safePipe: SafePipe
   ) {
   }
   public currentTrack: RefinedTrack;
   public currentTracksArtists: RefinedArtist[];
   public  currentTracksAlbum: RefinedAlbum;
+  public currentUriSafe: SafeResourceUrl;
 
   ngOnInit() {
    this.getRandomTrack();
@@ -37,11 +41,12 @@ export class HomeComponent implements OnInit {
             this.currentTracksAlbum = refinedAlbum;
           });
 
-        this.artistService.getById(this.currentTrack)
+        this.artistService.getById(this.currentTrack.artistIds)
           .subscribe((refinedArtists) => {
             this.currentTracksArtists = refinedArtists;
           });
 
+        this.currentUriSafe = 'https://open.spotify.com/embed?uri=' + this.currentTrack.spotifyURI;
       });
 
   }
