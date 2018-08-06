@@ -16,13 +16,13 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static al.miller.sv.ds.mapper.RefinedtoJsonMapper.invokeSimpleGetter;
 
 
 @Slf4j
 public class DownstreamMapper {
-    private static List<String> listOfIds = new ArrayList<>();
 
     private static <T> List<String> returnNestedIds(Class<?> clazz, List<T> objects) {
         List<String> nestedIds = new ArrayList<>();
@@ -86,12 +86,9 @@ public class DownstreamMapper {
         map.remove("availableMarkets");
         map.put("previewURL", map.get("previewUrl"));
         map.remove("previewUrl");
-        map.forEach(DownstreamMapper::getArtistIds);
-        map.put("artistIds", listOfIds);
-        listOfIds = new ArrayList<>();
+        map.put("artistIds", getArtistIds("artists", map.get("artists")));
         map.remove("artists");
-        map.forEach(DownstreamMapper::getAlbumIds);
-        map.put("albumId", listOfIds.get(0));
+        map.put("albumId", getAlbumIds("album", map.get("album")).get(0));
         map.remove("album");
         return (RefinedTrack) RefinedObjectBuilder.start(RefinedTrack.class).with(map).build();
     }
@@ -167,20 +164,24 @@ public class DownstreamMapper {
         return instanceMap;
     }
 
-    private static void getArtistIds(String key, Object value) {
+    private static List<String> getArtistIds(String key, Object value) {
+        List<String> artistIds = new ArrayList<>();
         if (key.equals("artists")) {
             for (ArtistSimplified artistSimplified : (ArtistSimplified[]) value) {
-                listOfIds.add(artistSimplified.getId());
+                artistIds.add(artistSimplified.getId());
             }
         }
+        return artistIds;
     }
 
-    private static void getAlbumIds(String key, Object value) {
+    private static List<String> getAlbumIds(String key, Object value) {
+        List<String> albumIds = new ArrayList<>();
         if (key.equals("album")) {
             if (value != null) {
                 AlbumSimplified albumSimplified = (AlbumSimplified) value;
-                listOfIds.add(albumSimplified.getId());
+                albumIds.add(albumSimplified.getId());
             }
         }
+        return albumIds;
     }
 }

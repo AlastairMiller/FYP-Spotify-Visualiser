@@ -41,7 +41,7 @@ public class SpotifyArtistDao {
 
     public List<Artist> pullArtistsAsync(SpotifyApi api, List<String> ids) throws InterruptedException {
         List<Map<String, Future<Artist[]>>> pulledArtistFutures = new ArrayList<>();
-
+        log.info("pullArtistsAsync: " + ids.toString());
         if (ids.size() > 50) {
             Integer numBatches = (int) Math.ceil(ids.size() / 50.0);
             Integer remainder = ids.size() % 50;
@@ -66,6 +66,7 @@ public class SpotifyArtistDao {
     public Map<String, Future<Artist[]>> pullArtistBatchFutures(SpotifyApi api, List<String> artistIds) {
         String idsAsString = artistIds.toString();
         idsAsString = idsAsString.replace("[", "").replace("]", "").replace(" ", "");
+        log.info("PullArtistBatchFutures: "+idsAsString);
         final GetSeveralArtistsRequest request = api.getSeveralArtists(idsAsString).build();
         try {
             Future<Artist[]> futureList = request.executeAsync();

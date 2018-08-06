@@ -63,7 +63,7 @@ public class RefreshDbService {
     private List<Future<RefinedAlbum>> albumFutures = new ArrayList<>();
     private List<Future<?>> futureListOfNestedElements = new ArrayList<>();
 
-    @Scheduled(fixedDelay = 3600000)
+    @Scheduled(fixedDelay = 360000)
     @PostConstruct
     public void refreshToken() {
         log.info("-----------------------Refreshing Api Token-----------------------");
@@ -272,12 +272,14 @@ public class RefreshDbService {
         }
         if (artistIdsToPull.size() >= 50) {
             try {
+                log.info("verifyArtistsArePersisted before subList: "+ artistIdsToPull.toString());
                 List<Artist> artists = spotifyArtistDao.pullArtistsAsync(api, artistIdsToPull);
                 saveArtists(artists);
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
             artistIdsToPull.subList(0, 49).clear();
+            log.info("verifyArtistsArePersisted after subList: "+artistsIds.toString());
         }
     }
 

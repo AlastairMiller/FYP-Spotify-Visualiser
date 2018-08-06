@@ -69,8 +69,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <repository>alastairmiller-docker-spotify-visualiser.bintray.io/com.sv.svi/spotify-visualiser-ingest</repository>
-                    <tag>1.0.2-snapshot</tag>
+                    <repository>alastairmiller-docker-spotify-visualiser.bintray.io/al.miller.sv/spotify-visualiser-ingest</repository>
+                    <tag>1.0.3</tag>
                     <buildArgs>
                         <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
