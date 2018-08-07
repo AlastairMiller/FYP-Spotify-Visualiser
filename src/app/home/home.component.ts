@@ -5,6 +5,9 @@ import {RefinedAlbum, RefinedArtist, RefinedTrack} from '../core/models';
 import {RefinedAlbumService} from '../core/services';
 import {RefinedArtistService} from '../core/services/refined-artist.service';
 import {SafeResourceUrl} from '@angular/platform-browser';
+import {timer} from 'rxjs/internal/observable/timer';
+import {Observable} from 'rxjs/internal/Observable';
+import {interval} from 'rxjs/internal/observable/interval';
 
 
 @Component({
@@ -28,6 +31,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.getRandomTrack();
+    interval(5000).subscribe((t) => this.getRandomTrack());
   }
 
   getRandomTrack(): void {
