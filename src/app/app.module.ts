@@ -10,6 +10,7 @@ import {FormsModule} from '@angular/forms';
 import {FooterComponent, HeaderComponent} from './shared/layout';
 import {LoggerService} from './core/services/logger.service';
 import {ConsoleLoggerService} from './core/services/console-logger.service';
+import {ListModule} from "./list/list.module";
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import {ConsoleLoggerService} from './core/services/console-logger.service';
     CoreModule,
     FormsModule,
     HomeModule,
+    ListModule,
     SharedModule,
     AppRoutingModule
   ],

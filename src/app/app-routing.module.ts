@@ -1,11 +1,14 @@
 import {NgModule} from '@angular/core';
 import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
-import {CommonModule} from '@angular/common';
 import {HomeComponent} from './home/home.component';
+import {ListComponent} from './list/list.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
-  {path: 'home', component: HomeComponent}
+  {path: 'home', component: HomeComponent},
+  {path: 'list', component: ListComponent,
+  loadChildren: './list/list.module#ListModule'},
+  {path: 'undefined', redirectTo: ''}
 ];
 
 @NgModule({

@@ -26,7 +26,7 @@ export class RefinedTrackService {
 
 
   getMostPopularCountry(trackId: string): Observable<String> {
-    return this.http.get<string>(this.url + trackId + '/popular-country');
+    return this.http.get<string>(this.url + '/' + trackId + '/popular-country');
   }
 
   private handleError<T> (operation = 'operation', result?: T) {

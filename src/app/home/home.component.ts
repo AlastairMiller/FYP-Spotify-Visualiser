@@ -4,8 +4,7 @@ import {RefinedTrackService} from '../core/services/refined-track.service';
 import {RefinedAlbum, RefinedArtist, RefinedTrack} from '../core/models';
 import {RefinedAlbumService} from '../core/services';
 import {RefinedArtistService} from '../core/services/refined-artist.service';
-import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {SafePipe} from './safe-pipe.pipe';
+import {SafeResourceUrl} from '@angular/platform-browser';
 
 
 @Component({
@@ -18,23 +17,25 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private trackService: RefinedTrackService,
     private albumService: RefinedAlbumService,
-    private artistService: RefinedArtistService,
-    private safePipe: SafePipe
-  ) {
+    private artistService: RefinedArtistService) {
   }
+
   public currentTrack: RefinedTrack;
   public currentTracksArtists: RefinedArtist[];
-  public  currentTracksAlbum: RefinedAlbum;
+  public currentTracksAlbum: RefinedAlbum;
   public currentUriSafe: SafeResourceUrl;
+  public currentTracksCountryCode: String;
 
   ngOnInit() {
-   this.getRandomTrack();
+    this.getRandomTrack();
   }
 
   getRandomTrack(): void {
     this.trackService.getRandom()
       .subscribe((refinedTrack) => {
         this.currentTrack = refinedTrack;
+
+        this.currentUriSafe = 'https://open.spotify.com/embed?uri=' + this.currentTrack.spotifyURI;
 
         this.albumService.getById(this.currentTrack.albumId)
           .subscribe((refinedAlbum) => {
@@ -46,7 +47,11 @@ export class HomeComponent implements OnInit {
             this.currentTracksArtists = refinedArtists;
           });
 
-        this.currentUriSafe = 'https://open.spotify.com/embed?uri=' + this.currentTrack.spotifyURI;
+        this.trackService.getMostPopularCountry(refinedTrack.id)
+          .subscribe((countryCode) => {
+            this.currentTracksCountryCode = countryCode;
+          });
+
       });
 
   }

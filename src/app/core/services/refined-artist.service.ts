@@ -15,8 +15,6 @@ export class RefinedArtistService {
   private url = environment.api_url + '/artists';
 
   getById(ids: string[]): Observable<RefinedArtist[]> {
-    console.log('idString', ids.toString() );
-    console.log('idStringReplace', ids.toString().replace(new RegExp(',', 'g'), '&'));
     return this.http.get<RefinedArtist[]>(this.url + '/' + ids.toString().replace(new RegExp(',', 'g'), '&') + '/multi')
         .pipe(
           tap(refinedArtist => this.logger.info(`fetched Artists with id=${refinedArtist.toString()}`)),

@@ -1,18 +1,21 @@
-<div class="text-white py-1 bg-primary">
+<div class="text-white bg-dark w-100 h-100 p-5" style="background-image: url(&quot;/assets/bgd02.jpg&quot;); background-position: center center; background-size: cover; background-repeat: no-repeat;">
+
   <div class="container">
     <div class="row">
       <div class="col-md-12 mt-3 text-center">
-        <div id='wordcloud'>
+        <div *ngIf="currentTrack !== undefined">
           <p>{{currentTrack?.name}}</p>
-          <p>{{currentTrack?.durationMs | date: "mm:ss"}}</p>
-          <p>{{currentTracksAlbum?.name}}</p>
+          <p>Length: {{currentTrack?.durationMs | date: "mm:ss"}}</p>
+          <p>From: {{currentTracksAlbum?.name}}</p>
           <p>Popularity: {{currentTrack?.popularity}}%</p>
+          <p>Most popular in: {{currentTracksCountryCode}}</p>
           <li *ngFor="let trackArtist of currentTracksArtists">
             {{trackArtist?.name}}
           </li>
-
-          <iframe [src]="currentUriSafe | safe" width="300" height="80"
-                  frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+          <div *ngIf="currentUriSafe !== undefined">
+            <iframe [src]="currentUriSafe | safe" width="300" height="80"
+                    frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+          </div>
         </div>
       </div>
     </div>

@@ -1,11 +1,12 @@
 import {NgModule} from '@angular/core';
 import {HomeComponent} from './home.component';
-import {BrowserModule} from "@angular/platform-browser";
-import {SafePipe} from "./safe-pipe.pipe";
+import {BrowserModule} from '@angular/platform-browser';
+import {SafePipe} from './safe-pipe.pipe';
+
 
 @NgModule({
   imports: [
- BrowserModule
+    BrowserModule
   ],
   declarations: [
     HomeComponent,
@@ -13,4 +14,5 @@ import {SafePipe} from "./safe-pipe.pipe";
   ],
   providers: [SafePipe]
 })
-export class HomeModule {}
+export class HomeModule {
+}
