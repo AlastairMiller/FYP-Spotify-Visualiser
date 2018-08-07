@@ -29,10 +29,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   public currentUriSafe: SafeResourceUrl;
   public currentTracksCountryCode: String;
   private timedSubscription;
+  private isGetFinished: boolean;
 
   ngOnInit() {
+    this.isGetFinished = true;
     this.getRandomTrack();
-    this.timedSubscription = interval(5000).subscribe((t) => this.getRandomTrack());
+    this.timedSubscription = interval(10000)
+      .subscribe((t) => this.getRandomTrack());
   }
 
   ngOnDestroy() {
@@ -40,29 +43,32 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   getRandomTrack(): void {
-    this.trackService.getRandom()
-      .subscribe((refinedTrack) => {
-        this.currentTrack = refinedTrack;
+    if (this.isGetFinished) {
+      this.isGetFinished = false;
+      this.trackService.getRandom()
+        .subscribe((refinedTrack) => {
+          this.currentTrack = refinedTrack;
 
-        this.currentUriSafe = 'https://open.spotify.com/embed?uri=' + this.currentTrack.spotifyURI;
+          this.currentUriSafe = 'https://open.spotify.com/embed?uri=' + this.currentTrack.spotifyURI;
 
-        this.albumService.getById(this.currentTrack.albumId)
-          .subscribe((refinedAlbum) => {
-            this.currentTracksAlbum = refinedAlbum;
-          });
+          this.albumService.getById(this.currentTrack.albumId)
+            .subscribe((refinedAlbum) => {
+              this.currentTracksAlbum = refinedAlbum;
+            });
 
-        this.artistService.getById(this.currentTrack.artistIds)
-          .subscribe((refinedArtists) => {
-            this.currentTracksArtists = refinedArtists;
-          });
+          this.artistService.getById(this.currentTrack.artistIds)
+            .subscribe((refinedArtists) => {
+              this.currentTracksArtists = refinedArtists;
+            });
 
-        this.trackService.getMostPopularCountry(refinedTrack.id)
-          .subscribe((countryCode) => {
-            this.currentTracksCountryCode = countryCode;
-          });
+          this.trackService.getMostPopularCountry(refinedTrack.id)
+            .subscribe((countryCode) => {
+              this.currentTracksCountryCode = countryCode;
+              this.isGetFinished = true;
+            });
 
-      });
-
+        });
+    }
   }
 
 
