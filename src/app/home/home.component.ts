@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {RefinedTrackService} from '../core/services/refined-track.service';
 import {RefinedAlbum, RefinedArtist, RefinedTrack} from '../core/models';
@@ -15,7 +15,7 @@ import {interval} from 'rxjs/internal/observable/interval';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private trackService: RefinedTrackService,
@@ -28,10 +28,15 @@ export class HomeComponent implements OnInit {
   public currentTracksAlbum: RefinedAlbum;
   public currentUriSafe: SafeResourceUrl;
   public currentTracksCountryCode: String;
+  private timedSubscription;
 
   ngOnInit() {
     this.getRandomTrack();
-    interval(5000).subscribe((t) => this.getRandomTrack());
+    this.timedSubscription = interval(5000).subscribe((t) => this.getRandomTrack());
+  }
+
+  ngOnDestroy() {
+    this.timedSubscription.unsubscribe();
   }
 
   getRandomTrack(): void {
@@ -59,4 +64,6 @@ export class HomeComponent implements OnInit {
       });
 
   }
+
+
 }

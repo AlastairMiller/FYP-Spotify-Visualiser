@@ -1,12 +1,29 @@
-<div class="text-white bg-dark w-100 h-100 p-5" style="background-image: url(&quot;/assets/bgd03.jpg&quot;); background-position: center center; background-size: cover; background-repeat: no-repeat;">
+<div class="text-white bg-dark w-100 h-100 p-5"
+     style="background-image: url(&quot;/assets/bgd03.jpg&quot;); background-position: center center; background-size: cover; background-repeat: no-repeat;">
+
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a *ngIf="currentlyShowing == 'RefinedAlbum'" class="nav-link active" (click)="changeColumn('RefinedAlbum')">Album</a>
+      <a *ngIf="currentlyShowing !== 'RefinedAlbum'" class="nav-link" (click)="changeColumn('RefinedAlbum')">Album</a>
+    </li>
+    <li class="nav-item">
+      <a *ngIf="currentlyShowing == 'RefinedArtist'" class="nav-link active" (click)="changeColumn('RefinedArtist')">Artist</a>
+      <a *ngIf="currentlyShowing !== 'RefinedArtist'" class="nav-link" (click)="changeColumn('RefinedArtist')">Artist</a>
+    </li>
+    <li class="nav-item">
+      <a *ngIf="currentlyShowing == 'RefinedPlaylist'" class="nav-link active" (click)="changeColumn('RefinedPlaylist')">Playlist</a>
+      <a *ngIf="currentlyShowing !== 'RefinedPlaylist'" class="nav-link" (click)="changeColumn('RefinedPlaylist')">Playlist</a>
+    </li>
+    <li class="nav-item">
+      <a *ngIf="currentlyShowing == 'RefinedTrack'" class="nav-link active" (click)="changeColumn('RefinedTrack')">Track</a>
+      <a *ngIf="currentlyShowing !== 'RefinedTrack'" class="nav-link" (click)="changeColumn('RefinedTrack')">Track</a>
+    </li>
+  </ul>
 
   <table class="table table-sm">
     <thead>
     <tr>
-      <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
+      <th *ngFor="let column of columnNames" scope="col">{{column}}</th>
     </tr>
     </thead>
     <tbody>

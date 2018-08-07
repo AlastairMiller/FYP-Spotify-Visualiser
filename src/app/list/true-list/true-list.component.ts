@@ -10,27 +10,48 @@ export class TrueListComponent implements OnInit {
 
   }
 
-  private currentlyShowing;
+  public currentlyShowing;
   public columnNames = [];
+  public rowObjects = [];
 
   ngOnInit() {
-    this.currentlyShowing = 'RefinedArtist';
-    this.columnNames = this.determineColumnNames();
+    this.currentlyShowing = 'RefinedAlbum';
+    this.determineColumnNames();
   }
 
-  private determineColumnNames() {
+  changeColumn(newName: string) {
+    this.currentlyShowing = newName;
+    this.determineColumnNames();
+  }
+
+  determineColumnNames() {
     switch (this.currentlyShowing) {
       case 'RefinedArtist':
-        return ['Name', 'Genres', 'Followers', 'Popularity'];
-      case 'RefinedTrack':
-        return ['Name', 'Artist', 'Album(s)', 'Popularity', 'Duration'];
+        this.columnNames = ['Name', 'Genres', 'Followers', 'Popularity'];
+        return;
       case 'RefinedAlbum':
-        return ['Name', 'Artist', 'Release Date', 'Popularity'];
+        this.columnNames = ['Name', 'Artist', 'Release Date', 'Popularity'];
+        return;
       case 'RefinedPlaylist':
-        return ['Name', 'Country', 'User', 'Number of Followers'];
-
+        this.columnNames = ['Name', 'Country', 'User', 'Number of Followers'];
+        return;
+      case 'RefinedTrack':
+        this.columnNames = ['Name', 'Artist', 'Album(s)', 'Popularity', 'Duration'];
+        return;
     }
   }
 
+  getRows(){
+    switch (this.currentlyShowing) {
+      case 'RefinedArtist':
+        return;
+      case 'RefinedAlbum':
+        return;
+      case 'RefinedPlaylist':
+        return;
+      case 'RefinedTrack':
+        return;
+    }
+  }
 
 }
