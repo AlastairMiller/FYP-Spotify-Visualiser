@@ -1,11 +1,10 @@
 import {Injectable} from '@angular/core';
 import {catchError, map, tap} from 'rxjs/operators';
-import {RefinedTrack} from '../models';
+import {RefinedPlaylist, RefinedTrack} from '../models';
 import {HttpClient} from '@angular/common/http';
 import {LoggerService} from './logger.service';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs/internal/Observable';
-import {of} from 'rxjs/internal/observable/of';
 
 
 @Injectable({providedIn: 'root'})
@@ -18,10 +17,7 @@ export class RefinedTrackService {
 
   getRandom(): Observable<RefinedTrack> {
     return this.http.get<RefinedTrack>(this.url + '/random')
-      .pipe(
-        tap(refinedTrack => this.logger.info(`fetched track id=${refinedTrack.id}`)),
-        catchError(this.handleError<RefinedTrack>(`getRandom()`))
-      );
+      .pipe(tap(refinedTrack => this.logger.info(`fetched track id=${refinedTrack.id}`)),);
   }
 
 
@@ -29,17 +25,9 @@ export class RefinedTrackService {
     return this.http.get<string>(this.url + '/' + trackId + '/popular-country');
   }
 
-  private handleError<T> (operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
+  getMostPopular(offset: number, limit: number): Observable<RefinedTrack[]> {
+    return this.http.get<RefinedTrack[]>(this.url + '/most-popular?offset=' + offset + '&limit=' + limit)
+      .pipe(tap(() => this.logger.info('fetched most popular Tracks')));
 
-      // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
-
-      // TODO: better job of transforming error for user consumption
-      this.logger.error(`${operation} failed: ${error.message}`);
-
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
   }
 }

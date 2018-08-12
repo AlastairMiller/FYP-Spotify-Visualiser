@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 
 import {
-  RefinedAlbumService
+  RefinedAlbumService, RefinedArtistService, RefinedPlaylistService
 } from './services';
 import {LoggerService} from "./services/logger.service";
 import {RefinedTrackService} from "./services/refined-track.service";
@@ -16,6 +16,8 @@ import {RefinedTrack} from "./models";
     RefinedTrack,
     RefinedTrackService,
     RefinedAlbumService,
+    RefinedArtistService,
+    RefinedPlaylistService,
     LoggerService
   ],
   declarations: []

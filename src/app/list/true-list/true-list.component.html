@@ -1,50 +1,69 @@
-<div class="text-white bg-dark w-100 h-100 p-5"
+<div class="text-white bg-dark w-100 p-5"
      style="background-image: url(&quot;/assets/bgd03.jpg&quot;); background-position: center center; background-size: cover; background-repeat: no-repeat;">
 
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a *ngIf="currentlyShowing == 'RefinedAlbum'" class="nav-link active" (click)="changeColumn('RefinedAlbum')">Album</a>
+      <a *ngIf="currentlyShowing == 'RefinedAlbum'" class="nav-link active"
+         (click)="changeColumn('RefinedAlbum')">Album</a>
       <a *ngIf="currentlyShowing !== 'RefinedAlbum'" class="nav-link" (click)="changeColumn('RefinedAlbum')">Album</a>
     </li>
     <li class="nav-item">
       <a *ngIf="currentlyShowing == 'RefinedArtist'" class="nav-link active" (click)="changeColumn('RefinedArtist')">Artist</a>
-      <a *ngIf="currentlyShowing !== 'RefinedArtist'" class="nav-link" (click)="changeColumn('RefinedArtist')">Artist</a>
+      <a *ngIf="currentlyShowing !== 'RefinedArtist'" class="nav-link"
+         (click)="changeColumn('RefinedArtist')">Artist</a>
     </li>
     <li class="nav-item">
-      <a *ngIf="currentlyShowing == 'RefinedPlaylist'" class="nav-link active" (click)="changeColumn('RefinedPlaylist')">Playlist</a>
+      <a *ngIf="currentlyShowing == 'RefinedPlaylist'" class="nav-link active"
+         (click)="changeColumn('RefinedPlaylist')">Playlist</a>
       <a *ngIf="currentlyShowing !== 'RefinedPlaylist'" class="nav-link" (click)="changeColumn('RefinedPlaylist')">Playlist</a>
     </li>
     <li class="nav-item">
-      <a *ngIf="currentlyShowing == 'RefinedTrack'" class="nav-link active" (click)="changeColumn('RefinedTrack')">Track</a>
+      <a *ngIf="currentlyShowing == 'RefinedTrack'" class="nav-link active"
+         (click)="changeColumn('RefinedTrack')">Track</a>
       <a *ngIf="currentlyShowing !== 'RefinedTrack'" class="nav-link" (click)="changeColumn('RefinedTrack')">Track</a>
     </li>
   </ul>
 
-  <table class="table table-sm">
+  <table class="table table-sm table-bordered">
     <thead>
     <tr>
       <th *ngFor="let column of columnNames" scope="col">{{column}}</th>
     </tr>
     </thead>
     <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
+    <tr scope="row" *ngFor="let refinedObject of rowsObject">
+      <th>{{refinedObject.name}}</th>
+      <td *ngIf="currentlyShowing === 'RefinedAlbum'">{{refinedObject?.artistsIds}}</td>
+      <td *ngIf="currentlyShowing === 'RefinedTrack'">{{refinedObject?.artistIds}}</td>
+      <td *ngIf="currentlyShowing === 'RefinedAlbum'">{{refinedObject?.releaseDate | date:'yyyy-MM-dd'}}</td>
+      <td *ngIf="currentlyShowing === 'RefinedArtist'">{{refinedObject?.genres.toString()}}</td>
+      <td *ngIf="currentlyShowing === 'RefinedArtist'">{{refinedObject?.followers / 1000 | number:'1.0-0'}} k</td>
+      <td *ngIf="currentlyShowing === 'RefinedPlaylist'">{{refinedObject?.countryCode}}</td>
+      <td *ngIf="currentlyShowing === 'RefinedPlaylist'">{{refinedObject?.userId}}</td>
+      <td *ngIf="currentlyShowing === 'RefinedPlaylist'">{{refinedObject?.numOfFollowers / 1000 | number:'1.0-0'}}</td>
+      <td *ngIf="currentlyShowing === 'RefinedTrack'">{{refinedObject?.albumId}}</td>
+      <td *ngIf="currentlyShowing !== 'RefinedPlaylist'">{{refinedObject?.popularity}}</td>
+      <td *ngIf="currentlyShowing === 'RefinedTrack'"> {{refinedObject?.durationMs | date: "mm:ss"}}
+
     </tbody>
   </table>
+
+  <nav>
+    <ul class="pagination justify-content-end">
+      <li *ngIf="this.rowPointer === 1" class="page-item disabled">
+        <a class="page-link">Previous</a>
+      </li>
+      <li *ngIf="this.rowPointer !== 1" class="page-item">
+        <a class="page-link" (click)="this.rowPointer = this.rowPointer - 25;getRows()">Previous</a>
+      </li>
+      <li class="page-item disabled" *ngIf="this.rowPointer === 1" ><a class="page-link">{{this.rowPointer / 25 | number:'1.0-0'}}</a></li>
+      <li class="page-item" *ngIf="this.rowPointer !== 1" ><a class="page-link" (click)="this.rowPointer = this.rowPointer - 25; getRows()">{{this.rowPointer / 25 | number:'1.0-0'}}</a></li>
+      <li class="page-item active"><a class="page-link">{{this.rowPointer / 25 + 1 | number:'1.0-0'}}</a></li>
+      <li class="page-item"><a class="page-link" (click)="this.rowPointer = this.rowPointer + 25; getRows()">{{this.rowPointer / 25 + 2 | number:'1.0-0'}}</a></li>
+      <li class="page-item">
+        <a class="page-link" (click)="this.rowPointer = this.rowPointer + 25;getRows()" >Next</a>
+      </li>
+    </ul>
+  </nav>
 
 </div>

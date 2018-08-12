@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   isDebugMode: true,
-  api_url: ' http://localhost:5250/api/v1'
+  api_url: 'http://localhost:5250/api/v1'
 };
 
 /*

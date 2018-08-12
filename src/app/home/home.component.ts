@@ -5,8 +5,6 @@ import {RefinedAlbum, RefinedArtist, RefinedTrack} from '../core/models';
 import {RefinedAlbumService} from '../core/services';
 import {RefinedArtistService} from '../core/services/refined-artist.service';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {timer} from 'rxjs/internal/observable/timer';
-import {Observable} from 'rxjs/internal/Observable';
 import {interval} from 'rxjs/internal/observable/interval';
 
 
@@ -56,7 +54,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               this.currentTracksAlbum = refinedAlbum;
             });
 
-          this.artistService.getById(this.currentTrack.artistIds)
+          this.artistService.getByIds(this.currentTrack.artistIds)
             .subscribe((refinedArtists) => {
               this.currentTracksArtists = refinedArtists;
             });
