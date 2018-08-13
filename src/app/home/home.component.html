@@ -8,7 +8,7 @@
           <p>Length: {{currentTrack?.durationMs | date: "mm:ss"}}</p>
           <p>From: {{currentTracksAlbum?.name}}</p>
           <p>Popularity: {{currentTrack?.popularity}}%</p>
-          <p>Most popular in: {{currentTracksCountryCode}}</p>
+          <p>Most popular in: {{currentTracksCountryCode | codeToCountry}}</p>
           <li *ngFor="let trackArtist of currentTracksArtists">
             {{trackArtist?.name}}
           </li>

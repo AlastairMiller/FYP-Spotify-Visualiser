@@ -7,6 +7,7 @@ import {
 import {LoggerService} from "./services/logger.service";
 import {RefinedTrackService} from "./services/refined-track.service";
 import {RefinedTrack} from "./models";
+import {CountryCodeToNamePipe} from "./pipes/country-code-to-name.pipe";
 
 @NgModule({
   imports: [
@@ -18,8 +19,11 @@ import {RefinedTrack} from "./models";
     RefinedAlbumService,
     RefinedArtistService,
     RefinedPlaylistService,
-    LoggerService
+    LoggerService,
+    CountryCodeToNamePipe
   ],
-  declarations: []
+  exports: [CountryCodeToNamePipe],
+  declarations: [CountryCodeToNamePipe]
 })
-export class CoreModule { }
+export class CoreModule {
+}
