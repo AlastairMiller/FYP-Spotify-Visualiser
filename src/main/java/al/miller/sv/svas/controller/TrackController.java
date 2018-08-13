@@ -5,6 +5,7 @@ import com.neovisionaries.i18n.CountryCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import refinedDataModels.RefinedTrack;
 
@@ -40,51 +41,13 @@ public class TrackController extends AbstractController<RefinedTrack> {
 
     @RequestMapping(path = "/most-popular", method = GET)
     @Override
-    public List<RefinedTrack> getMostPopularDefault() {
-        return trackService.getMostPopular(0, 25);
+    public List<RefinedTrack> getMostPopular(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
+        inputValidation(offset, limit);
+        return trackService.getMostPopular(offset, limit);
     }
-
-    @RequestMapping(path = "/most-popular?offset={offset}", method = GET)
-    @Override
-    public List<RefinedTrack> getMostPopularOffsetOnly(@PathVariable("offset") int offset) {
-        inputValidationOffsetOnly(offset);
-        return trackService.getMostPopular(offset + 25, offset);
-    }
-
-    @RequestMapping(path = "/most-popular?limit={limit}", method = GET)
-    @Override
-    public List<RefinedTrack> getMostPopularLimitOnly(@PathVariable("limit") int limit) {
-        inputValidationLimitOnly(limit);
-        return trackService.getMostPopular(limit, 0);
-    }
-
-    @RequestMapping(path = "/most-popular?offset={offset}&limit={limit}", method = GET)
-    @Override
-    public List<RefinedTrack> getMostPopular(@PathVariable("limit") int limit, @PathVariable("offset") int offset) {
-        inputValidation(limit, offset);
-        return trackService.getMostPopular(limit, offset);
-    }
-
 
     @RequestMapping(path = "/for-playlist/{id}", method = GET)
-    public List<RefinedTrack> getMostPopularTracksFromPlaylistDefault(@PathVariable("id") String playlistId) {
-        return getMostPopularTracksFromPlaylist(playlistId, 0, 25);
-    }
-
-    @RequestMapping(path = "/for-playlist/{id}?offset={offset}", method = GET)
-    public List<RefinedTrack> getMostTracksFromPlaysetOffsetOnly(@PathVariable("id") String playlistId, @PathVariable("offset") int offset) {
-        inputValidationOffsetOnly(offset);
-        return getMostPopularTracksFromPlaylist(playlistId, offset, offset + 25);
-    }
-
-    @RequestMapping(path = "/for-playlist/{id}?limit={limit}", method = GET)
-    public List<RefinedTrack> getMostTracksFromPlaysetLimitOnly(@PathVariable("id") String playlistId, @PathVariable("limit") int limit) {
-        inputValidationLimitOnly(limit);
-        return getMostPopularTracksFromPlaylist(playlistId, 0, limit);
-    }
-
-    @RequestMapping(path = "/for-playlist/{id}?offset={offset}&limit={limit}", method = GET)
-    public List<RefinedTrack> getMostPopularTracksFromPlaylist(@PathVariable("id") String playlistId, @PathVariable("offset") int offset, @PathVariable("limit") int limit) throws IllegalArgumentException {
+    public List<RefinedTrack> getMostPopularTracksFromPlaylist(@PathVariable("id") String playlistId, @RequestParam("offset") int offset, @RequestParam("limit") int limit) throws IllegalArgumentException {
         inputValidation(offset, limit);
         return trackService.getMostPopularFromPlaylist(offset, limit, playlistId);
     }
