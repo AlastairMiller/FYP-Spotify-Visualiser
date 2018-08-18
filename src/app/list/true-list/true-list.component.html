@@ -38,7 +38,7 @@
       <td *ngIf="currentlyShowing === 'RefinedAlbum'">{{refinedObject?.releaseDate | date:'yyyy-MM-dd'}}</td>
       <td *ngIf="currentlyShowing === 'RefinedArtist'">{{refinedObject?.genres.toString()}}</td>
       <td *ngIf="currentlyShowing === 'RefinedArtist'">{{refinedObject?.followers / 1000 | number:'1.0-0'}} k</td>
-      <td *ngIf="currentlyShowing === 'RefinedPlaylist'">{{refinedObject?.countryCode}}</td>
+      <td *ngIf="currentlyShowing === 'RefinedPlaylist'">{{refinedObject?.countryCode }}</td>
       <td *ngIf="currentlyShowing === 'RefinedPlaylist'">{{refinedObject?.userId}}</td>
       <td *ngIf="currentlyShowing === 'RefinedPlaylist'">{{refinedObject?.numOfFollowers / 1000 | number:'1.0-0'}}</td>
       <td *ngIf="currentlyShowing === 'RefinedTrack'">{{refinedObject?.albumId}}</td>

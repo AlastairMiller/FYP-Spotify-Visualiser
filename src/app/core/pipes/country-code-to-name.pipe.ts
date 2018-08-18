@@ -6,6 +6,7 @@ import {Countries} from '../models/countries.model';
 })
 export class CountryCodeToNamePipe implements PipeTransform {
   kvObjectArray = Countries.asObject;
+  // @ts-ignore
   countryMap = new Map(this.kvObjectArray.map(i => [i.Code, i.Name]));
 
 

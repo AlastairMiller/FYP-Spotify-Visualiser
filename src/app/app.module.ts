@@ -11,6 +11,8 @@ import {FooterComponent, HeaderComponent} from './shared/layout';
 import {LoggerService} from './core/services/logger.service';
 import {ConsoleLoggerService} from './core/services/console-logger.service';
 import {ListModule} from "./list/list.module";
+import {LeafletModule} from "@asymmetrik/ngx-leaflet";
+import {LocationModule} from "./location/location.module";
 
 @NgModule({
   declarations: [
@@ -22,8 +24,10 @@ import {ListModule} from "./list/list.module";
     FormsModule,
     HomeModule,
     ListModule,
+    LocationModule,
     SharedModule,
-    AppRoutingModule
+    AppRoutingModule,
+    LeafletModule.forRoot()
   ],
   providers: [{ provide: LoggerService, useClass: ConsoleLoggerService },],
   bootstrap: [AppComponent]
