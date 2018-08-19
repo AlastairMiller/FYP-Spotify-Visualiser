@@ -23,7 +23,7 @@ export class LocationComponent {
 
   geojson = L.geoJSON(this.json, {
     onEachFeature: function (feature, layer) {
-      layer.bindPopup('<button type="button" class="btn btn-secondary">Click to explore ' + feature.properties.name + '</button>');
+      layer.bindPopup('<a class="btn btn-lg border-primary btn-secondary" href="/location/' + feature.properties.name + ' "">Click to explore ' + feature.properties.name + '<a>');
     }
 
   });

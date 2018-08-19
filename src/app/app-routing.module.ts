@@ -5,6 +5,7 @@ import {ListComponent} from './list/list.component';
 import {TrueListComponent} from './list/true-list/true-list.component';
 import {ExploreComponent} from './list/explore/explore.component';
 import {LocationComponent} from "./location/location.component";
+import {LocationDetailComponent} from "./location/location-detail/location-detail.component";
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -12,6 +13,7 @@ const routes: Routes = [
   {path: 'list', component: ListComponent},
   {path: 'true-list', component: TrueListComponent},
   {path: 'location', component: LocationComponent},
+  {path: 'location/:locationName', component: LocationDetailComponent},
   {path: 'explore', component: ExploreComponent},
   {path: 'undefined', redirectTo: ''}
 ];
