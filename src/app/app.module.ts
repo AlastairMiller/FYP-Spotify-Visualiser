@@ -13,6 +13,7 @@ import {ConsoleLoggerService} from './core/services/console-logger.service';
 import {ListModule} from "./list/list.module";
 import {LeafletModule} from "@asymmetrik/ngx-leaflet";
 import {LocationModule} from "./location/location.module";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import {LocationModule} from "./location/location.module";
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     CoreModule,
     FormsModule,
     HomeModule,
