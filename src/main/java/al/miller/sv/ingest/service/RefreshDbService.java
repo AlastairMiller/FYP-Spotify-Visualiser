@@ -272,14 +272,12 @@ public class RefreshDbService {
         }
         if (artistIdsToPull.size() >= 50) {
             try {
-                log.info("verifyArtistsArePersisted before subList: "+ artistIdsToPull.toString());
                 List<Artist> artists = spotifyArtistDao.pullArtistsAsync(api, artistIdsToPull);
                 saveArtists(artists);
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
             artistIdsToPull.subList(0, 49).clear();
-            log.info("verifyArtistsArePersisted after subList: "+artistsIds.toString());
         }
     }
 
