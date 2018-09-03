@@ -45,7 +45,7 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
     @Override
     public List<RefinedPlaylist> getMostPopular(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
         inputValidation(offset, limit);
-        return playlistService.getMostPopular(limit, offset);
+        return playlistService.getMostPopular(offset, limit);
     }
 
     @RequestMapping(path = "/by-user-id/{id}", method = GET)
