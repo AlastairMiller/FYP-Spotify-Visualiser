@@ -1,3 +1,25 @@
 <div class="text-white bg-dark w-100 h-100 p-5"
      style="background-image: url(&quot;/assets/bgd04.jpg&quot;); background-position: center center; background-size: cover; background-repeat: no-repeat;">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-4" style="padding-left: 10%; padding-top: 5%;">
+        <h1 [innerHTML]="currentCountry"></h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-4">
+        <table class="table table-sm table-bordered">
+          <thead>
+          <tr>
+            <th *ngFor="let column of columnNames" scope="col">{{column}}</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr scope="row" *ngFor="let location of currentCountryPlaylists">
+            <th>{{location.name}}</th>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
