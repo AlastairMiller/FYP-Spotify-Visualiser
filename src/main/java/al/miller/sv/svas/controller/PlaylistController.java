@@ -45,7 +45,7 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
     @Override
     public List<RefinedPlaylist> getMostPopular(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
         inputValidation(offset, limit);
-        return playlistService.getMostPopular(offset, limit);
+        return playlistService.getMostPopular(limit, offset);
     }
 
     @RequestMapping(path = "/by-user-id/{id}", method = GET)
@@ -61,7 +61,7 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
         return playlistService.getAllPlaylistsContainingSong(offset, limit, id);
     }
 
-    @RequestMapping(path = "/with-country-code/{id}", method = GET)
+    @RequestMapping(path = "/country-code/{id}", method = GET)
     public List<RefinedPlaylist> getAllPlaylistsInCountry(@PathVariable("id") String countryCode, @RequestParam("offset") int offset, @RequestParam("limit") int limit) throws IllegalArgumentException {
         if (validateCountryCode(countryCode)) {
             return playlistService.getPlaylistsForCountry(countryCode, offset, limit);
