@@ -4,13 +4,14 @@ import {BrowserModule} from '@angular/platform-browser';
 import {SafePipe} from './safe-pipe.pipe';
 import {CommonModule} from '@angular/common';
 import {CoreModule} from '../core';
-import {CountryCodeToNamePipe} from '../core/pipes/country-code-to-name.pipe';
+import {AgWordCloudModule} from 'angular4-word-cloud';
 
 
 @NgModule({
   imports: [
     BrowserModule,
-    CoreModule
+    CoreModule,
+    AgWordCloudModule.forRoot()
   ],
   declarations: [
     HomeComponent,

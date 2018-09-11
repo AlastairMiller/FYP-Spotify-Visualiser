@@ -1,17 +1,17 @@
-<div class="text-white bg-dark w-100 h-100 p-5" style="background-image: url(&quot;/assets/bgd02.jpg&quot;); background-position: center center; background-size: cover; background-repeat: no-repeat;">
+<div class="text-white bg-dark w-100 h-100"
+     style="background-image: url(&quot;/assets/bgd02.jpg&quot;); background-position: center center; background-size: cover; background-repeat: no-repeat;">
 
   <div class="container">
     <div class="row">
       <div class="col-md-12 mt-3 text-center">
         <div *ngIf="currentTrack !== undefined">
-          <p>{{currentTrack?.name}}</p>
-          <p>Length: {{currentTrack?.durationMs | date: "mm:ss"}}</p>
-          <p>From: {{currentTracksAlbum?.name}}</p>
-          <p>Popularity: {{currentTrack?.popularity}}%</p>
-          <p>Most popular in: {{currentTracksCountryCode | codeToCountry}}</p>
-          <li *ngFor="let trackArtist of currentTracksArtists">
-            {{trackArtist?.name}}
-          </li>
+          <div AgWordCloud
+               #word_cloud_chart=ag-word-cloud
+               [wordData]="wordData"
+               [options]="options"
+               [width]="750"
+               [height]="750">
+          </div>
           <div *ngIf="currentUriSafe !== undefined">
             <iframe [src]="currentUriSafe | safe" width="300" height="80"
                     frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>

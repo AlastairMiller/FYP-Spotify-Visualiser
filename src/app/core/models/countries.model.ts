@@ -71,7 +71,7 @@ export class Countries {
     '{"Code": "PH", "Name": "Philippines"},{"Code": "PN", "Name": "Pitcairn"},{"Code": "PL", "Name": "Poland"},' +
     '{"Code": "PT", "Name": "Portugal"},{"Code": "PR", "Name": "Puerto Rico"},{"Code": "QA", "Name": "Qatar"},' +
     '{"Code": "RE", "Name": "R\u00e9union"},{"Code": "RO", "Name": "Romania"},' +
-    '{"Code": "RU", "Name": "Russian Federation"},{"Code": "RW", "Name": "Rwanda"},' +
+    '{"Code": "RU", "Name": "Russia"},{"Code": "RW", "Name": "Rwanda"},' +
     '{"Code": "BL", "Name": "Saint Barth\u00e9lemy"},' +
     '{"Code": "SH", "Name": "Saint Helena, Ascension and Tristan da Cunha"},' +
     '{"Code": "KN", "Name": "Saint Kitts and Nevis"},{"Code": "LC", "Name": "Saint Lucia"},' +
@@ -95,7 +95,7 @@ export class Countries {
     '{"Code": "TC", "Name": "Turks and Caicos Islands"},{"Code": "TV", "Name": "Tuvalu"},' +
     '{"Code": "UG", "Name": "Uganda"},{"Code": "UA", "Name": "Ukraine"},' +
     '{"Code": "AE", "Name": "United Arab Emirates"},{"Code": "GB", "Name": "United Kingdom"},' +
-    '{"Code": "US", "Name": "United States"},{"Code": "UM", "Name": "United States Minor Outlying Islands"},' +
+    '{"Code": "US", "Name": "United States of America"},{"Code": "UM", "Name": "United States Minor Outlying Islands"},' +
     '{"Code": "UY", "Name": "Uruguay"},{"Code": "UZ", "Name": "Uzbekistan"},{"Code": "VU", "Name": "Vanuatu"},' +
     '{"Code": "VE", "Name": "Venezuela, Bolivarian Republic of"},{"Code": "VN", "Name": "Viet Nam"},' +
     '{"Code": "VG", "Name": "Virgin Islands, British"},{"Code": "VI", "Name": "Virgin Islands, U.S."},' +

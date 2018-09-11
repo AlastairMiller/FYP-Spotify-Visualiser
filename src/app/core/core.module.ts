@@ -4,10 +4,11 @@ import {CommonModule} from '@angular/common';
 import {
   RefinedAlbumService, RefinedArtistService, RefinedPlaylistService
 } from './services';
-import {LoggerService} from "./services/logger.service";
-import {RefinedTrackService} from "./services/refined-track.service";
-import {RefinedTrack} from "./models";
-import {CountryCodeToNamePipe} from "./pipes/country-code-to-name.pipe";
+import {LoggerService} from './services/logger.service';
+import {RefinedTrackService} from './services';
+import {RefinedTrack} from './models';
+import {CountryCodeToNamePipe} from './pipes/country-code-to-name.pipe';
+import {CountryNameToCodePipe} from './pipes/country-name-to-code.pipe';
 
 @NgModule({
   imports: [
@@ -20,10 +21,12 @@ import {CountryCodeToNamePipe} from "./pipes/country-code-to-name.pipe";
     RefinedArtistService,
     RefinedPlaylistService,
     LoggerService,
-    CountryCodeToNamePipe
+    CountryCodeToNamePipe,
+    CountryNameToCodePipe
   ],
-  exports: [CountryCodeToNamePipe],
-  declarations: [CountryCodeToNamePipe]
+  exports: [CountryCodeToNamePipe,
+    CountryNameToCodePipe],
+  declarations: [CountryCodeToNamePipe, CountryNameToCodePipe]
 })
 export class CoreModule {
 }

@@ -1,25 +1,41 @@
-<div class="text-white bg-dark w-100 h-100 p-5"
+<div class="text-white bg-dark w-100  p-5"
      style="background-image: url(&quot;/assets/bgd04.jpg&quot;); background-position: center center; background-size: cover; background-repeat: no-repeat;">
   <div class="container-fluid">
     <div class="row">
-      <div class="col-4" style="padding-left: 10%; padding-top: 5%;">
+      <div class="col col-auto" style="padding-left: 10%; padding-top: 5%;">
         <h1 [innerHTML]="currentCountry"></h1>
       </div>
     </div>
     <div class="row">
-      <div class="col-4">
+      <div class="col col-auto" style="padding-top: 50px">
         <table class="table table-sm table-bordered">
-          <thead>
+          <thead class="thead-dark" style="font-size: 24pt; text-indent: 10%"> Cities
           <tr>
-            <th *ngFor="let column of columnNames" scope="col">{{column}}</th>
+            <th *ngFor="let column of columnNames" scope="col" >{{column}}</th>
           </tr>
           </thead>
           <tbody>
-          <tr scope="row" *ngFor="let location of currentCountryPlaylists">
-            <th>{{location.name}}</th>
+          <tr scope="row" *ngFor="let location of currentCountryPlaylists" style="font-size: 16pt; text-indent: 10%" >
+            <th><a href="{{location.externalURL}}">{{location.name.split(" ")[3]}}</a></th>
           </tbody>
         </table>
       </div>
+
+      <div class="col col-6"></div>
+
+      <div class="col col-auto" style="padding-left: 90%; padding-top: 50px">
+        <table class="table table-sm table-bordered">
+          <thead class="thead-dark" style="font-size: 18pt; text-indent: 10%">Most Popular Tracks</thead>
+        </table>
+
+        <table class="table table-sm table-bordered">
+          <thead class="thead-dark" style="font-size: 18pt; text-indent: 10%">Most Popular Artists</thead>
+        </table>
+
+        <table class="table table-sm table-bordered">
+          <thead class="thead-dark" style="font-size: 18pt; text-indent: 10%">Most Popular Genres</thead>
+        </table>
+    </div>
     </div>
   </div>
 </div>

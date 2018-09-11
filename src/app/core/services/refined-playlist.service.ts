@@ -20,7 +20,7 @@ export class RefinedPlaylistService {
   }
 
   getPlaylistLocation(currentCode: string, offset: number, limit: number): Observable<RefinedPlaylist[]> {
-    return this.http.get<RefinedPlaylist[]>(this.url + '/with-country-code/' + currentCode + '?offset=' + offset + '&limit=' + limit)
+    return this.http.get<RefinedPlaylist[]>(this.url + '/country-code/' + currentCode + '?offset=' + offset + '&limit=' + limit)
       .pipe(tap(() => this.logger.info('fetched playlists for ' + currentCode)));
   }
 }
