@@ -13,12 +13,10 @@ import java.util.List;
 @Slf4j
 public abstract class AbstractService<T extends AbstractDao,S> {
 
-    protected T dao;
-    protected MongoHelper mongoHelper;
+    T dao;
 
     @Autowired
-    public AbstractService(MongoHelper mongoHelper) {
-        this.mongoHelper = mongoHelper;
+    public AbstractService() {
     }
 
     public List<S> getMostPopular(int offset, int limit) {

@@ -19,7 +19,7 @@ public class TrackService extends AbstractService<RefinedTrackDao, RefinedTrack>
     private RefinedPlaylistDao refinedPlaylistDao;
 
     public TrackService(MongoHelper mongoHelper) {
-        super(mongoHelper);
+        super();
         this.dao = mongoHelper.getRefinedTrackDao();
         this.refinedPlaylistDao = mongoHelper.getRefinedPlaylistDao();
     }

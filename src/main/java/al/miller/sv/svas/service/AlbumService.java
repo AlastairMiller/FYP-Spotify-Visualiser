@@ -15,7 +15,7 @@ import java.util.List;
 public class AlbumService extends AbstractService<RefinedAlbumDao, RefinedAlbum> {
 
     public AlbumService(MongoHelper mongoHelper) {
-        super(mongoHelper);
+        super();
         this.dao = mongoHelper.getRefinedAlbumDao();
     }
 

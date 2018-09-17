@@ -14,7 +14,7 @@ public class ArtistService extends AbstractService<RefinedArtistDao,RefinedArtis
     private RefinedAlbumDao refinedAlbumDao;
 
     public ArtistService(MongoHelper mongoHelper) {
-        super(mongoHelper);
+        super();
         this.dao = mongoHelper.getRefinedArtistDao();
         this.refinedAlbumDao = mongoHelper.getRefinedAlbumDao();
     }

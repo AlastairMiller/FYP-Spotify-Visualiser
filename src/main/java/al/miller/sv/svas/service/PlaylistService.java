@@ -11,7 +11,7 @@ import java.util.List;
 public class PlaylistService extends AbstractService<RefinedPlaylistDao, RefinedPlaylist> {
 
     public PlaylistService(MongoHelper mongoHelper) {
-        super(mongoHelper);
+        super();
         this.dao = mongoHelper.getRefinedPlaylistDao();
     }
 
