@@ -8,7 +8,6 @@ import {SafeResourceUrl} from '@angular/platform-browser';
 import {interval} from 'rxjs/internal/observable/interval';
 import {AgWordCloudData, AgWordCloudDirective} from 'angular4-word-cloud';
 import {CountryCodeToNamePipe} from '../core/pipes/country-code-to-name.pipe';
-import {color} from 'd3-color';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 
 
@@ -20,11 +19,11 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
     trigger('visibilityChanged', [
       state('shown', style({opacity: 1})),
       state('hidden', style({opacity: 0})),
-      transition('* => *', animate('1s'))
+      transition('* => *', animate('2s')),
     ])
   ]
 })
-export class HomeComponent implements OnInit, OnDestroy, OnChanges {
+export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private trackService: RefinedTrackService,
@@ -40,15 +39,13 @@ export class HomeComponent implements OnInit, OnDestroy, OnChanges {
   public currentTracksCountryCode: String;
   public wordData: Array<AgWordCloudData>;
   public options;
+  private isFirstRun;
+  @Input() fadeState;
+  visibility = 'hidden';
   private timedSubscription;
-  private isGetFinished: boolean;
   @ViewChild('word_cloud_chart') word_cloud_chart: AgWordCloudDirective;
 
-  @Input() isVisible = true;
-  visibility = 'shown';
-
   ngOnInit() {
-
     this.options = {
       settings: {
         minFontSize: 980,
@@ -62,56 +59,58 @@ export class HomeComponent implements OnInit, OnDestroy, OnChanges {
       },
       labels: false
     };
-
-    this.isGetFinished = true;
+    this.isFirstRun = true;
+    console.log(this.visibility);
     this.getRandomTrack();
     this.timedSubscription = interval(10000)
-      .subscribe((t) => this.getRandomTrack());
-  }
-
-  ngOnChanges() {
-    this.visibility = this.isVisible ? 'shown' : 'hidden';
+      .subscribe((t) => this.fadeTranstion());
   }
 
   ngOnDestroy() {
     this.timedSubscription.unsubscribe();
   }
 
+  fadeTranstion(): void {
+    this.fadeState = false;
+    this.visibility = 'hidden';
+    console.log(this.visibility);
+      window.setTimeout(() => {this.getRandomTrack()}, 2000);
+  }
+
   getRandomTrack(): void {
-    if (this.isGetFinished) {
-      this.isGetFinished = false;
-      this.trackService.getRandom()
-        .subscribe((refinedTrack) => {
-          this.currentTrack = refinedTrack;
+    this.trackService.getRandom()
+     .subscribe((refinedTrack) => {
+       this.currentTrack = refinedTrack;
+        this.currentUriSafe = 'https://open.spotify.com/embed?uri=' + this.currentTrack.spotifyURI;
 
-          this.currentUriSafe = 'https://open.spotify.com/embed?uri=' + this.currentTrack.spotifyURI;
+        this.albumService.getById(this.currentTrack.albumId)
+          .subscribe((refinedAlbum) => {
+           this.currentTracksAlbum = refinedAlbum;
+         });
 
-          this.albumService.getById(this.currentTrack.albumId)
-            .subscribe((refinedAlbum) => {
-              this.currentTracksAlbum = refinedAlbum;
-            });
+        this.artistService.getByIds(this.currentTrack.artistIds)
+         .subscribe((refinedArtists) => {
+           this.currentTracksArtists = refinedArtists;
+          });
 
-          this.artistService.getByIds(this.currentTrack.artistIds)
-            .subscribe((refinedArtists) => {
-              this.currentTracksArtists = refinedArtists;
-            });
+        this.trackService.getMostPopularCountry(refinedTrack.id)
+          .subscribe((countryCode) => {
+            this.currentTracksCountryCode = countryCode;
+            this.constructWordMap();
+            this.fadeState = true;
+            this.visibility = 'shown';
+            console.log(this.visibility);
+          });
 
-          this.trackService.getMostPopularCountry(refinedTrack.id)
-            .subscribe((countryCode) => {
-              this.currentTracksCountryCode = countryCode;
-              this.isGetFinished = true;
-              this.constructWordMap();
-            });
+      });
 
-        });
-    }
   }
 
   constructWordMap(): void {
     const currentTracksArtistsMapData: Array<AgWordCloudData> = [];
     for (const i of this.currentTracksArtists) {
       currentTracksArtistsMapData.push(
-        { size: 999, text: 'Artist: ' + i.name, color: 'white'}
+        {size: 999, text: 'Artist: ' + i.name, color: 'white'}
       );
     }
 
@@ -119,16 +118,24 @@ export class HomeComponent implements OnInit, OnDestroy, OnChanges {
       this.word_cloud_chart.wordData = [
         {size: 998, text: ''},
         {size: 999, text: this.currentTrack.name, color: 'white'},
-        {size: 999, text: 'Length: ' + new Date(this.currentTrack.durationMs).getMinutes() + ':' + new Date(this.currentTrack.durationMs).getSeconds(), color: 'white'},
+        {
+          size: 999,
+            text: 'Length: ' + new Date(this.currentTrack.durationMs).getMinutes() + ':' + this.addZero(new Date(this.currentTrack.durationMs).getSeconds()),
+          color: 'white'
+        },
         {size: 999, text: 'Appears On: ' + this.currentTracksAlbum.name.toString(), color: 'white'},
         {size: 999, text: 'Popularity: ' + this.currentTrack.popularity + '%', color: 'white'},
       ];
-     Array.prototype.push.apply(this.word_cloud_chart.wordData, currentTracksArtistsMapData);
+      Array.prototype.push.apply(this.word_cloud_chart.wordData, currentTracksArtistsMapData);
     } else {
       this.word_cloud_chart.wordData = [
         {size: 998, text: ''},
         {size: 999, text: this.currentTrack.name, color: 'white'},
-        {size: 999, text: 'Length: ' + new Date(this.currentTrack.durationMs).getMinutes() + ':' + new Date(this.currentTrack.durationMs).getSeconds() , color: 'white'},
+        {
+          size: 999,
+          text: 'Length: ' + new Date(this.currentTrack.durationMs).getMinutes() + ':' + this.addZero(new Date(this.currentTrack.durationMs).getSeconds()),
+          color: 'white'
+        },
         {size: 999, text: 'Appears On: ' + this.currentTracksAlbum.name.toString(), color: 'white'},
         {size: 999, text: 'Popularity: ' + this.currentTrack.popularity + '%', color: 'white'},
         {size: 999, text: 'Most Popular In: ' + this.codeToName.transform(this.currentTracksCountryCode), color: 'white'},
@@ -136,6 +143,13 @@ export class HomeComponent implements OnInit, OnDestroy, OnChanges {
       Array.prototype.push.apply(this.word_cloud_chart.wordData, currentTracksArtistsMapData);
     }
     this.word_cloud_chart.update();
+  }
+
+   addZero(i) {
+    if (i < 10) {
+      i = '0' + i;
+    }
+    return i;
   }
 
 }
