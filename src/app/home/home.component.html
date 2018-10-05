@@ -3,14 +3,15 @@
 
   <div class="container">
     <div class="row">
-      <div class="col-md-12 mt-3 text-center">
+      <div class="col-md-12 mt-3 text-center" >
         <div *ngIf="currentTrack !== undefined">
           <div AgWordCloud
                #word_cloud_chart=ag-word-cloud
                [wordData]="wordData"
                [options]="options"
                [width]="750"
-               [height]="750">
+               [height]="750"
+               [@visibilityChanged]="visibility">
           </div>
           <div *ngIf="currentUriSafe !== undefined">
             <iframe [src]="currentUriSafe | safe" width="300" height="80"

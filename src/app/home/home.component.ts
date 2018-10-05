@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {RefinedTrackService} from '../core/services/refined-track.service';
 import {RefinedAlbum, RefinedArtist, RefinedTrack} from '../core/models';
@@ -9,14 +9,22 @@ import {interval} from 'rxjs/internal/observable/interval';
 import {AgWordCloudData, AgWordCloudDirective} from 'angular4-word-cloud';
 import {CountryCodeToNamePipe} from '../core/pipes/country-code-to-name.pipe';
 import {color} from 'd3-color';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 
 
 @Component({
   selector: 'app-home-page',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
+  animations: [
+    trigger('visibilityChanged', [
+      state('shown', style({opacity: 1})),
+      state('hidden', style({opacity: 0})),
+      transition('* => *', animate('1s'))
+    ])
+  ]
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit, OnDestroy, OnChanges {
   constructor(
     private router: Router,
     private trackService: RefinedTrackService,
@@ -35,6 +43,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   private timedSubscription;
   private isGetFinished: boolean;
   @ViewChild('word_cloud_chart') word_cloud_chart: AgWordCloudDirective;
+
+  @Input() isVisible = true;
+  visibility = 'shown';
 
   ngOnInit() {
 
@@ -56,6 +67,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.getRandomTrack();
     this.timedSubscription = interval(10000)
       .subscribe((t) => this.getRandomTrack());
+  }
+
+  ngOnChanges() {
+    this.visibility = this.isVisible ? 'shown' : 'hidden';
   }
 
   ngOnDestroy() {

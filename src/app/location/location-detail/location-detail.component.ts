@@ -13,7 +13,7 @@ import {CountryNameToCodePipe} from '../../core/pipes/country-name-to-code.pipe'
 export class LocationDetailComponent implements OnInit {
 
   currentCountry: string;
-  currentCountryName: string;
+  currentCountryCode: string;
   currentCountryPlaylists: RefinedPlaylist[];
   private mostPopularSongsHere: RefinedTrack[];
   private mostPopularGenresHere: string[];
@@ -25,10 +25,14 @@ export class LocationDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentCountry = this.route.snapshot.paramMap.get('locationName');
-    this.playlistService.getPlaylistLocation( this.countryToCodePipe.transform(this.currentCountry), 0, 25)
+    this.currentCountryCode = this.countryToCodePipe.transform(this.currentCountry);
+    this.playlistService.getPlaylistLocation( this.currentCountryCode, 0, 25)
       .subscribe((refinedPlaylists) => {
         this.currentCountryPlaylists = refinedPlaylists;
-
+        for (const currentPlaylist of this.currentCountryPlaylists) {
+          currentPlaylist.name = currentPlaylist.name.split('of ')[1];
+          currentPlaylist.name = currentPlaylist.name.split(this.currentCountryCode)[0];
+        }
       });
 
 
