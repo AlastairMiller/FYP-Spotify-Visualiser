@@ -7,15 +7,15 @@
       </div>
     </div>
     <div class="row">
-      <div class="col col-auto" style="padding-top: 50px">
-        <table class="table table-sm table-bordered">
-          <thead class="thead-dark" style="font-size: 24pt; text-indent: 10%"> Cities
+      <div class="col col-auto" style="padding-top: 50px" >
+        <table class="table table-sm table-bordered" >
+          <thead class="thead-dark" style="font-size: 24pt; text-indent: 10%" *ngIf="columnNames !== undefined"> Cities
           <tr>
             <th *ngFor="let column of columnNames" scope="col" >{{column}}</th>
           </tr>
           </thead>
           <tbody>
-          <tr scope="row" *ngFor="let location of currentCountryPlaylists" style="font-size: 16pt; text-indent: 10%" >
+          <tr scope="row" *ngFor="let location of currentCountryPlaylists" style="font-size: 16pt; text-indent: 10%"  >
             <th><a href="{{location.externalURL}}">{{location.name}}</a></th>
           </tbody>
         </table>
