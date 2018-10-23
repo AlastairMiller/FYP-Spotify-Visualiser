@@ -27,7 +27,7 @@ public class ActionService {
         this.sviPort = sviPort;
     }
 
-    @Scheduled(fixedRate = 50000)
+    @Scheduled(fixedRate = 100000)
     public void doScheduled() {
         checkIngestStatus();
     }
@@ -54,8 +54,12 @@ public class ActionService {
             if (response.toString().equals("true")) {
                 log.info("Refresh in progress");
             } else if (response.toString().equals("false")) {
+                log.info("Refresh completed");
+                //trigger location aggregation
+            } else {
                 log.error(response.toString());
             }
+
         } catch (IOException e) {
             log.error(e.getMessage());
         } finally {

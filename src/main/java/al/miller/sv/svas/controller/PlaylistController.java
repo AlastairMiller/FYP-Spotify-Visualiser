@@ -1,6 +1,8 @@
 package al.miller.sv.svas.controller;
 
 import al.miller.sv.svas.service.PlaylistService;
+import com.neovisionaries.i18n.CountryCode;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import refinedDataModels.RefinedAlbum;
 import refinedDataModels.RefinedPlaylist;
 
+import javax.print.Doc;
 import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -66,6 +69,33 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
         if (validateCountryCode(countryCode)) {
             return playlistService.getPlaylistsForCountry(countryCode, offset, limit);
         } else {
+            throw new IllegalArgumentException("Invalid Country Code Requested");
+        }
+    }
+
+    @RequestMapping(path = "/popular-tracks/{id}", method = GET)
+    public List<Document> getPopularTracks(@PathVariable("id") String countryCode, @RequestParam("offset") int offset, @RequestParam("limit") int limit) throws IllegalArgumentException {
+        if (validateCountryCode(countryCode)) {
+            return playlistService.getMostPopularSongsForCountry(countryCode, offset, limit);
+        } else {
+            throw new IllegalArgumentException("Invalid Country Code Requested");
+        }
+    }
+
+    @RequestMapping(path = "/popular-artists/{id}", method = GET)
+    public List<Document> getPopularArtists(@PathVariable("id") String countryCode, @RequestParam("offset") int offset, @RequestParam("limit") int limit) throws IllegalArgumentException {
+        if(validateCountryCode(countryCode)) {
+            return playlistService.getMostPopularArtistsForCountry(countryCode, offset, limit);
+        } else {
+            throw new  IllegalArgumentException("Invalid Country Code Requested");
+        }
+    }
+
+    @RequestMapping(path = "/popular-genres/{id}", method = GET)
+    public List<Document> getPopularGenres(@PathVariable("id") String countryCode, @RequestParam("offset") int offset, @RequestParam("limit") int limit) throws IllegalArgumentException {
+        if(validateCountryCode(countryCode)){
+            return playlistService.getMostPopularGenresForCountry(countryCode,offset,limit);
+        }else {
             throw new IllegalArgumentException("Invalid Country Code Requested");
         }
     }
