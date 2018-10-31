@@ -84,18 +84,18 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
 
     @RequestMapping(path = "/popular-artists/{id}", method = GET)
     public List<Document> getPopularArtists(@PathVariable("id") String countryCode, @RequestParam("offset") int offset, @RequestParam("limit") int limit) throws IllegalArgumentException {
-        if(validateCountryCode(countryCode)) {
+        if (validateCountryCode(countryCode)) {
             return playlistService.getMostPopularArtistsForCountry(countryCode, offset, limit);
         } else {
-            throw new  IllegalArgumentException("Invalid Country Code Requested");
+            throw new IllegalArgumentException("Invalid Country Code Requested");
         }
     }
 
     @RequestMapping(path = "/popular-genres/{id}", method = GET)
     public List<Document> getPopularGenres(@PathVariable("id") String countryCode, @RequestParam("offset") int offset, @RequestParam("limit") int limit) throws IllegalArgumentException {
-        if(validateCountryCode(countryCode)){
-            return playlistService.getMostPopularGenresForCountry(countryCode,offset,limit);
-        }else {
+        if (validateCountryCode(countryCode)) {
+            return playlistService.getMostPopularGenresForCountry(countryCode, offset, limit);
+        } else {
             throw new IllegalArgumentException("Invalid Country Code Requested");
         }
     }

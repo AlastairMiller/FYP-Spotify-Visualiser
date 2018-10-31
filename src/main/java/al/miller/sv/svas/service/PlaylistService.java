@@ -98,7 +98,7 @@ public class PlaylistService extends AbstractService<RefinedPlaylistDao, Refined
 
         }
 
-        return refinedArtistDao.getMostPopularGenresForCountry(countryCode, limit, offset);
+        return refinedArtistDao.getMostPopularGenresForCountry(countryCode, offset, limit);
     }
 
 
