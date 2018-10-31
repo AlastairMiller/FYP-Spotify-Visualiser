@@ -9,6 +9,7 @@ import {RefinedTrackService} from './services';
 import {RefinedTrack} from './models';
 import {CountryCodeToNamePipe} from './pipes/country-code-to-name.pipe';
 import {CountryNameToCodePipe} from './pipes/country-name-to-code.pipe';
+import {BasicChartComponent} from './charts/basic-chart.component';
 
 @NgModule({
   imports: [
@@ -25,8 +26,8 @@ import {CountryNameToCodePipe} from './pipes/country-name-to-code.pipe';
     CountryNameToCodePipe
   ],
   exports: [CountryCodeToNamePipe,
-    CountryNameToCodePipe],
-  declarations: [CountryCodeToNamePipe, CountryNameToCodePipe]
+    CountryNameToCodePipe, BasicChartComponent],
+  declarations: [CountryCodeToNamePipe, CountryNameToCodePipe, BasicChartComponent]
 })
 export class CoreModule {
 }

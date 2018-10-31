@@ -17,7 +17,11 @@ export class RefinedTrackService {
 
   getRandom(): Observable<RefinedTrack> {
     return this.http.get<RefinedTrack>(this.url + '/random')
-      .pipe(tap(refinedTrack => this.logger.info(`fetched track id=${refinedTrack.id}`)),);
+      .pipe(tap(refinedTrack => this.logger.info(`fetched track id=${refinedTrack.id}`)));
+  }
+
+  getMultiple(ids: string): Observable<RefinedTrack[]> {
+    return this.http.get<RefinedTrack[]>(this.url + '/' + ids + '/multi');
   }
 
 

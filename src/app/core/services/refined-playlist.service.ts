@@ -19,8 +19,25 @@ export class RefinedPlaylistService {
       .pipe(tap(() => this.logger.info('fetched most popular Playlists')));
   }
 
-  getPlaylistLocation(currentCode: string, offset: number, limit: number): Observable<RefinedPlaylist[]> {
-    return this.http.get<RefinedPlaylist[]>(this.url + '/country-code/' + currentCode + '?offset=' + offset + '&limit=' + limit)
-      .pipe(tap(() => this.logger.info('fetched playlists for ' + currentCode)));
+  getPlaylistLocation(countryCode: string, offset: number, limit: number): Observable<RefinedPlaylist[]> {
+    return this.http.get<RefinedPlaylist[]>(this.url + '/country-code/' + countryCode + '?offset=' + offset + '&limit=' + limit)
+      .pipe(tap(() => this.logger.info('fetched playlists for ' + countryCode)));
   }
+
+  getPopularTracks(countryCode: string, offset: number, limit: number): Observable<Map<string, number>> {
+    return this.http.get <Map<string, number>>(this.url + '/popular-tracks/' + countryCode + '?offset=' + offset + '&limit=' + limit)
+      .pipe(tap(() => this.logger.info('fetched most popular tracks for ' + countryCode)));
+  }
+
+  getPopularArtists(countryCode: string, offset: number, limit: number): Observable<Map<string, number>> {
+    return this.http.get <Map<string, number>>(this.url + '/popular-artists/' + countryCode + '?offset=' + offset + '&limit=' + limit)
+      .pipe(tap(() => this.logger.info('fetched most popular artists for ' + countryCode)));
+  }
+
+  getPopularGenres(countryCode: string, offset: number, limit: number): Observable<Map<string, number>> {
+    return this.http.get <Map<string, number>>( this.url + '/popular-genres/' + countryCode + '?offset=' + offset + '&limit=' + limit)
+      .pipe(tap(() => this.logger.info('fetched most popular genres for ' + countryCode)));
+  }
+
+
 }

@@ -9,7 +9,8 @@ import {CommonModule} from '@angular/common';
 @NgModule({
   imports: [BrowserModule,
     CommonModule,
-    CoreModule, LeafletModule.forRoot()],
+    CoreModule,
+    LeafletModule.forRoot()],
   declarations: [LocationComponent,
     LocationDetailComponent]
 })
