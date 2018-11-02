@@ -98,7 +98,7 @@ export class LocationDetailComponent implements OnInit {
 
 
   test(refinedPlaylists): GraphKeyValuePair[] {
-    let aggregatedPlaylists = []
+    const aggregatedPlaylists = [];
     for (const refinedPlaylist of refinedPlaylists) {
       const keyValuePair = new GraphKeyValuePair();
       keyValuePair._id = refinedPlaylist.name ;
