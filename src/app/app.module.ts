@@ -10,10 +10,12 @@ import {FormsModule} from '@angular/forms';
 import {FooterComponent, HeaderComponent} from './shared/layout';
 import {LoggerService} from './core/services/logger.service';
 import {ConsoleLoggerService} from './core/services/console-logger.service';
-import {ListModule} from "./list/list.module";
-import {LeafletModule} from "@asymmetrik/ngx-leaflet";
-import {LocationModule} from "./location/location.module";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {ListModule} from './list/list.module';
+import {LeafletModule} from '@asymmetrik/ngx-leaflet';
+import {LocationModule} from './location/location.module';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BsDropdownModule } from 'ngx-bootstrap';
+import {MatButtonModule, MatMenuModule} from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -22,16 +24,19 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    BsDropdownModule.forRoot(),
     CoreModule,
     FormsModule,
     HomeModule,
     ListModule,
     LocationModule,
+    MatButtonModule,
+    MatMenuModule,
     SharedModule,
     AppRoutingModule,
     LeafletModule.forRoot()
   ],
-  providers: [{ provide: LoggerService, useClass: ConsoleLoggerService },],
+  providers: [{ provide: LoggerService, useClass: ConsoleLoggerService }, ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

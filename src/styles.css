@@ -3,6 +3,7 @@
 */
 
 @import url("https://fonts.googleapis.com/css?family=Roboto");
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 /*!
  * Bootstrap v4.0.0 (https://getbootstrap.com)
  * Copyright 2011-2018 The Bootstrap Authors
@@ -1675,13 +1676,13 @@ fieldset:disabled a.btn {
   border-color: #66CDAA;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075); }
 .btn-secondary:hover {
-  color: #212529;
-  background-color: #49c49a;
-  border-color: #40c095; }
+  color: #fff;
+  background-color: #12bbad;
+  border-color: #66CDAA; }
 .btn-secondary:focus, .btn-secondary.focus {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 0 0.2rem rgba(102, 205, 170, 0.5); }
 .btn-secondary.disabled, .btn-secondary:disabled {
-  color: #212529;
+  color: #fff;
   background-color: #66CDAA;
   border-color: #66CDAA; }
 .btn-secondary:not(:disabled):not(.disabled):active, .btn-secondary:not(:disabled):not(.disabled).active,
@@ -6177,3 +6178,7 @@ html, body {
   height: 100%;
   content: ' ';
   background: linear-gradient(#64717D, rgba(100, 113, 125, 0.8), rgba(100, 113, 125, 0.1), rgba(100, 113, 125, 0)); }
+
+.leaflet-control-attribution a, .leaflet-popup-content a {
+  color: #FFFFFF !important;
+}

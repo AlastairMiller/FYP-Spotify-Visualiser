@@ -28,6 +28,11 @@ export class RefinedAlbumService {
       );
   }
 
+  search(searchTerm: string, offset: number, limit: number): Observable<RefinedAlbum[]> {
+    return this.http.get<RefinedAlbum[]>(this.url + '/name=' + searchTerm + '?offset=' + offset + '&limit=' + limit)
+      .pipe(tap(() => this.logger.info('searched for albums based on term: ' + searchTerm)));
+  }
+
   getMostPopular(offset: number, limit: number): Observable<RefinedAlbum[]> {
     return this.http.get<RefinedAlbum[]>(this.url + '/most-popular?offset=' + offset + '&limit=' + limit)
       .pipe(tap(() => this.logger.info('fetched most popular albums')));

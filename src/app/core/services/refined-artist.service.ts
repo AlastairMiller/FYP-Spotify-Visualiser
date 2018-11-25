@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {LoggerService} from './logger.service';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs/internal/Observable';
-import {RefinedAlbum, RefinedArtist} from '../models';
+import {RefinedAlbum, RefinedArtist, RefinedTrack} from '../models';
 import {catchError, tap} from 'rxjs/operators';
 
 @Injectable({providedIn: 'root'})
@@ -21,6 +21,15 @@ export class RefinedArtistService {
         tap(refinedArtist => this.logger.info(`fetched Artists with id=${refinedArtist.toString()}`)),
         catchError(this.logger.error(`failed to get Artist from id`))
       );
+  }
+
+  getMultiple(ids: string): Observable<RefinedArtist[]> {
+    return this.http.get<RefinedArtist[]>(this.url + '/' + ids + '/multi');
+  }
+
+  search(searchTerm: string, offset: number, limit: number): Observable<RefinedArtist[]> {
+    return this.http.get<RefinedArtist[]>(this.url + '/name=' + searchTerm + '?offset=' + offset + '&limit=' + limit)
+      .pipe(tap(() => this.logger.info('searched for artists based on term: ' + searchTerm)));
   }
 
 

@@ -1,0 +1,12 @@
+.table{
+  background-color: rgba(0,0,0,.5) !important;
+  color: #FFFFFF !important;
+}
+.col {
+  padding-left: 10% !important;
+}
+.thead{
+  font-size: large !important;
+  text-indent: 1em !important;
+  padding-right: 500% !important; ;
+}

@@ -3,7 +3,7 @@ import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
 import {HomeComponent} from './home/home.component';
 import {ListComponent} from './list/list.component';
 import {TrueListComponent} from './list/true-list/true-list.component';
-import {ExploreComponent} from './list/explore/explore.component';
+import {SearchComponent} from './list/search/search.component';
 import {LocationComponent} from "./location/location.component";
 import {LocationDetailComponent} from "./location/location-detail/location-detail.component";
 
@@ -14,7 +14,7 @@ const routes: Routes = [
   {path: 'true-list', component: TrueListComponent},
   {path: 'location', component: LocationComponent},
   {path: 'location/:locationName', component: LocationDetailComponent},
-  {path: 'explore', component: ExploreComponent},
+  {path: 'search', component: SearchComponent},
   {path: 'undefined', redirectTo: ''}
 ];
 

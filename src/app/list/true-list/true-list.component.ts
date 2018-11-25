@@ -22,7 +22,6 @@ export class TrueListComponent implements OnInit, OnDestroy {
     this.counter = setInterval(() => {
       this.numberOfTicks++;
       this.ref.markForCheck();
-      console.log('updating view');
     }, 100);
   }
 

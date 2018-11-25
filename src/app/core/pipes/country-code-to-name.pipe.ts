@@ -10,7 +10,7 @@ export class CountryCodeToNamePipe implements PipeTransform {
   countryMap = new Map(this.kvObjectArray.map(i => [i.Code, i.Name]));
 
 
-  transform(countryCode: string) {
+  transform(countryCode: String) {
     return this.countryMap.get(countryCode);
   }
 }

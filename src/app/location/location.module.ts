@@ -4,10 +4,13 @@ import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {LocationDetailComponent} from './location-detail/location-detail.component';
 import {BrowserModule} from '@angular/platform-browser';
 import {CoreModule} from '../core';
+import {CommonModule} from '@angular/common';
 
 @NgModule({
   imports: [BrowserModule,
-    CoreModule, LeafletModule.forRoot()],
+    CommonModule,
+    CoreModule,
+    LeafletModule.forRoot()],
   declarations: [LocationComponent,
     LocationDetailComponent]
 })

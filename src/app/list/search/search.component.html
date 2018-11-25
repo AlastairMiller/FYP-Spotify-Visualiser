@@ -1,0 +1,33 @@
+<div class="text-dark bg-primary w-100 h-100 p-5"
+     style="background-image: url(&quot;/assets/bgd03.jpg&quot;); background-position: center center; background-size: cover; background-repeat: no-repeat;">
+
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center">
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <button class="mat-button btn-lg border-primary btn-secondary" [matMenuTriggerFor]="menu">{{searchChoice}}
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="dropdownedClicked('Album')">Album</button>
+              <button mat-menu-item (click)="dropdownedClicked('Artist')">Artist</button>
+              <button mat-menu-item (click)="dropdownedClicked('Playlist')">Playlist</button>
+              <button mat-menu-item (click)="dropdownedClicked('Track')">Track</button>
+            </mat-menu>
+          </div>
+          <input #box type="text" class="form-control" (keyup)="searchTerm = box.value">
+          <button class="btn btn-lg border-primary btn-secondary" (click)="search()">Search</button>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="searchResults != undefined">
+      <div class="col-12 text-center" id="d">
+        <table class="table table-sm table-bordered">
+        <tr class="thead-dark" *ngFor="let returnedResult of searchResults">
+          <th id="th"><a href="{{returnedResult.externalURL}}">{{returnedResult.name}}</a></th>
+        </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
