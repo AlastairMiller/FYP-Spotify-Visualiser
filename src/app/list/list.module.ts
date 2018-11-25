@@ -7,7 +7,9 @@ import {BrowserModule} from '@angular/platform-browser';
 import {CoreModule} from '../core';
 import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {BsDropdownModule} from 'ngx-bootstrap';
-
+import {MatMenuModule} from '@angular/material';
+import {MatButtonModule} from '@angular/material';
+import {MatIconModule} from '@angular/material';
 
 @NgModule({
     imports: [
@@ -15,7 +17,10 @@ import {BsDropdownModule} from 'ngx-bootstrap';
       BrowserModule,
       BsDropdownModule.forRoot(),
       CoreModule,
-      LeafletModule.forRoot()
+      LeafletModule.forRoot(),
+      MatMenuModule,
+      MatButtonModule,
+      MatIconModule
     ],
     declarations: [
       ListComponent,

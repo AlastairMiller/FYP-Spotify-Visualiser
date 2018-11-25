@@ -15,6 +15,7 @@ import {LeafletModule} from '@asymmetrik/ngx-leaflet';
 import {LocationModule} from './location/location.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { BsDropdownModule } from 'ngx-bootstrap';
+import {MatButtonModule, MatMenuModule} from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,8 @@ import { BsDropdownModule } from 'ngx-bootstrap';
     HomeModule,
     ListModule,
     LocationModule,
+    MatButtonModule,
+    MatMenuModule,
     SharedModule,
     AppRoutingModule,
     LeafletModule.forRoot()

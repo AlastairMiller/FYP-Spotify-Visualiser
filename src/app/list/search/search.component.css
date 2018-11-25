@@ -5,3 +5,30 @@
   top: 50%;
   transform: translateY(-50%);
 }
+.mat-button {
+  background-color: #12bbad;
+  color: #ffffff;
+  border-color: #64717D !important;
+}
+.mat-menu-item {
+  background-color: #12bbad;
+  color: #ffffff;
+  border-color: #64717D !important;
+}
+.mat-menu-panel {
+  background: #12bbad !important;
+  color: #12bbad;
+  border-color: #64717D !important;
+}
+#d{
+
+  color: #FFFFFF !important;
+  font-size: x-large;
+  border: 10px;
+  padding-bottom: 20px;
+  padding-top: 20px;
+}
+#th{
+  border: 2px solid #ffffff;
+  background-color: rgba(0,0,0,.5) !important;
+}

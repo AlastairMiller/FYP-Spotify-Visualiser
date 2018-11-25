@@ -8,4 +8,5 @@
 .thead{
   font-size: large !important;
   text-indent: 1em !important;
+  padding-right: 500% !important; ;
 }

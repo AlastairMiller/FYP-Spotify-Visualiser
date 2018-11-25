@@ -27,6 +27,11 @@ export class RefinedArtistService {
     return this.http.get<RefinedArtist[]>(this.url + '/' + ids + '/multi');
   }
 
+  search(searchTerm: string, offset: number, limit: number): Observable<RefinedArtist[]> {
+    return this.http.get<RefinedArtist[]>(this.url + '/name=' + searchTerm + '?offset=' + offset + '&limit=' + limit)
+      .pipe(tap(() => this.logger.info('searched for artists based on term: ' + searchTerm)));
+  }
+
 
   getMostPopular(offset: number, limit: number): Observable<RefinedArtist[]> {
       return this.http.get<RefinedArtist[]>(this.url + '/most-popular?offset=' + offset + '&limit=' + limit)

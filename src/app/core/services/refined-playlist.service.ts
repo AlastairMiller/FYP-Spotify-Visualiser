@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {LoggerService} from './logger.service';
-import {RefinedPlaylist} from '../models';
+import {RefinedAlbum, RefinedPlaylist} from '../models';
 import {Observable} from 'rxjs/internal/Observable';
 import {tap} from 'rxjs/operators';
 import {environment} from '../../../environments/environment';
@@ -13,6 +13,12 @@ export class RefinedPlaylistService {
   }
 
   private url = environment.api_url + '/playlists';
+
+  search(searchTerm: string, offset:number, limit: number): Observable<RefinedPlaylist[]> {
+    return this.http.get<RefinedPlaylist[]>(this.url + '/name=' + searchTerm + '?offset=' + offset + '&limit=' + limit)
+      .pipe(tap(() => this.logger.info('searched for playlists based on term: ' + searchTerm)));
+  }
+
 
   getMostPopular(offset: number, limit: number): Observable<RefinedPlaylist[]> {
     return this.http.get<RefinedPlaylist[]>(this.url + '/most-popular?offset=' + offset + '&limit=' + limit)
