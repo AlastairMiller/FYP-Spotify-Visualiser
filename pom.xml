@@ -6,7 +6,7 @@
     </properties>
 
     <scm>
-        <developerConnection>scm:git:https://github.com/AlastairMiller/Spotify-Visualiser-Action-Service.git
+        <developerConnection>scm:git:https://www.github.com/AlastairMiller/Spotify-Visualiser-Action-Service.git
         </developerConnection>
         <tag>Spotify-Visualiser-Action-Service-1.0.6</tag>
     </scm>
