@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import refinedDataModels.RefinedAlbum;
 import refinedDataModels.RefinedTrack;
 
 import java.util.Arrays;
@@ -37,6 +38,11 @@ public class TrackController extends AbstractController<RefinedTrack> {
     public List<RefinedTrack> getMultipleById(@PathVariable("ids") String ids) {
         List<String> idList = Arrays.asList(ids.split("&"));
         return trackService.getMultipleById(idList);
+    }
+    @RequestMapping(path = "/name={searchTerm}", method = GET)
+    @Override
+    protected List<RefinedTrack> search(@PathVariable("searchTerm") String searchTerm,  @RequestParam("offset") int offset, @RequestParam("limit") int limit) {
+        return trackService.search(searchTerm, offset, limit);
     }
 
     @RequestMapping(path = "/most-popular", method = GET)

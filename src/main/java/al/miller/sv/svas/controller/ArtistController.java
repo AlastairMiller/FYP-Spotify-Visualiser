@@ -37,6 +37,12 @@ public class ArtistController extends AbstractController<RefinedArtist> {
         return artistService.getMultipleById(idList);
     }
 
+    @RequestMapping(path = "/name={searchTerm}", method = GET)
+    @Override
+    protected List<RefinedArtist> search(@PathVariable("searchTerm") String searchTerm, @RequestParam("offset") int offset, @RequestParam("limit") int limit) {
+        return artistService.search(searchTerm, offset, limit);
+    }
+
     @RequestMapping(path = "/most-popular", method = GET)
     @Override
     public List<RefinedArtist> getMostPopular(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {

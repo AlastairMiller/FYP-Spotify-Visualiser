@@ -15,6 +15,8 @@ public abstract class AbstractController<T> {
 
     protected abstract List<T> getMultipleById(String ids);
 
+    protected abstract List<T> search(String searchTerm, int offset, int limit);
+
     protected abstract List<T> getMostPopular(int limit, int offset);
 
     void inputValidation(int offset, int limit) throws IllegalArgumentException {

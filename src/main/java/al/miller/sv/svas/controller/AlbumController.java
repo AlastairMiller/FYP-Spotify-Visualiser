@@ -38,6 +38,12 @@ public class AlbumController extends AbstractController<RefinedAlbum> {
         return albumService.getMultipleById(idList);
     }
 
+    @RequestMapping(path = "/name={searchTerm}", method = GET)
+    @Override
+    public List<RefinedAlbum> search(@PathVariable("searchTerm") String searchTerm, @RequestParam("offset") int offset, @RequestParam("limit") int limit) {
+        return albumService.search(searchTerm, offset, limit);
+    }
+
     @RequestMapping(path = "/most-popular", method = GET)
     public List<RefinedAlbum> getMostPopular(@RequestParam("offset") int offset,
                                              @RequestParam("limit") int limit) {
@@ -46,7 +52,7 @@ public class AlbumController extends AbstractController<RefinedAlbum> {
     }
 
     @RequestMapping(path = "/from-artist-id/{id}", method = GET)
-    public List<RefinedAlbum> getAllFromArtistId(@PathVariable("id") String artistId, @RequestParam(value ="offset") int offset, @RequestParam(value="limit") int limit) {
+    public List<RefinedAlbum> getAllFromArtistId(@PathVariable("id") String artistId, @RequestParam(value = "offset") int offset, @RequestParam(value = "limit") int limit) {
         inputValidation(offset, limit);
         return albumService.getAllFromArtistId(offset, limit, artistId);
     }

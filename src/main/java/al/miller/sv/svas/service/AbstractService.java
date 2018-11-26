@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public abstract class AbstractService<T extends AbstractDao,S> {
+public abstract class AbstractService<T extends AbstractDao, S> {
 
     T dao;
 
@@ -35,8 +35,8 @@ public abstract class AbstractService<T extends AbstractDao,S> {
         return dao.getMultipleById(ids);
     }
 
-    public List<S> getAllMatchingName(String name) {
-        return dao.getAllMatchingNames(name);
+    public List<S> search(String searchTerm, int offset, int limit) {
+        return dao.getAllMatchingNames(searchTerm, limit, offset);
     }
 
 }

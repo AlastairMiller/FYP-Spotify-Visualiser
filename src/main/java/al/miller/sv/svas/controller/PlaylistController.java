@@ -44,6 +44,12 @@ public class PlaylistController extends AbstractController<RefinedPlaylist> {
         return playlistService.getMultipleById(idList);
     }
 
+    @RequestMapping(path = "/name={searchTerm}", method = GET)
+    @Override
+    protected List<RefinedPlaylist> search(@PathVariable("searchTerm") String searchTerm, @RequestParam("offset") int offset, @RequestParam("limit") int limit) {
+        return playlistService.search(searchTerm, offset, limit);
+    }
+
     @RequestMapping(path = "/most-popular", method = GET)
     @Override
     public List<RefinedPlaylist> getMostPopular(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
