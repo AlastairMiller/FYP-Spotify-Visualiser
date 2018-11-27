@@ -16,7 +16,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static al.miller.sv.ds.mapper.RefinedtoJsonMapper.invokeSimpleGetter;
 
@@ -119,7 +118,12 @@ public class DownstreamMapper {
     public static RefinedPlaylist mapPlaylist(Playlist fullPlaylist) throws MalformedURLException, InstantiationException, IllegalAccessException {
         List<String> tracksIds = returnNestedIds(PlaylistTrack.class, Arrays.asList(fullPlaylist.getTracks().getItems()));
         Map<String, Object> map = mapGeneric(fullPlaylist, Playlist.class);
-        CountryCode countryCode = CountryCode.getByCode(fullPlaylist.getName().substring(fullPlaylist.getName().length() - 2, fullPlaylist.getName().length()));
+        String countryCode = fullPlaylist.getName().substring(fullPlaylist.getName().length() - 2);
+        CountryCode countryCodeConfirmed = CountryCode.UNDEFINED;
+        if (countryCode.length() == 2) {
+            countryCodeConfirmed = CountryCode.getByCode(countryCode);
+        }
+
         map.remove("tracks");
         map.remove("collaborative");
         map.remove("description");
@@ -132,11 +136,11 @@ public class DownstreamMapper {
         map.put("numOfFollowers", ((Followers) map.get("followers")).getTotal());
         map.remove("followers");
         map.put("trackIds", tracksIds);
-        map.put("countryCode", countryCode);
+        map.put("countryCode", countryCodeConfirmed);
         return (RefinedPlaylist) RefinedObjectBuilder.start(RefinedPlaylist.class).with(map).build();
     }
 
-    public static <T> Map<String, Object> mapGeneric(T instance, Class<T> clazz) throws MalformedURLException {
+    private static <T> Map<String, Object> mapGeneric(T instance, Class<T> clazz) throws MalformedURLException {
         Map<String, Object> instanceMap = new HashMap<>();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
