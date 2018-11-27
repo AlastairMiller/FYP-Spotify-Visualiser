@@ -23,17 +23,18 @@ public class SpotifyPlaylistDao {
     private Integer retries = 0;
 
     public List<PlaylistSimplified> pullPlaylistsForAUser(SpotifyApi api, String userId, int offset) {
+        List<PlaylistSimplified> usersPlaylist = new ArrayList<>();
         final GetListOfUsersPlaylistsRequest request = api.getListOfUsersPlaylists(userId).limit(50).offset(offset).build();
         try {
-            List<PlaylistSimplified> usersPlaylist = new ArrayList<>(Arrays.asList(request.execute().getItems()));
+            usersPlaylist = new ArrayList<>(Arrays.asList(request.execute().getItems()));
             log.info("Pulled {} simple playlists for user {}", offset, userId);
             if (usersPlaylist.size() == 50) {
                 usersPlaylist.addAll(pullPlaylistsForAUser(api, userId, offset + 50));
             }
             return usersPlaylist;
         } catch (Exception e) {
-            log.error("Failed to grab user's: {} playlist", userId);
-            return null;
+            log.error("Failed to grab user's: {} playlist. Error details {}", userId, e.getMessage());
+            return usersPlaylist;
         }
     }
 
@@ -67,12 +68,12 @@ public class SpotifyPlaylistDao {
                         log.error(e.getMessage(), e);
                     } catch (ExecutionException e) {
                         if (e.getCause() instanceof TooManyRequestsException) {
-                            if (!apiLimitHit){
+                            if (!apiLimitHit) {
                                 apiLimitHit = true;
                                 log.error("Playlist API rate limit exceeded. Will wait {} seconds and retry", ((TooManyRequestsException) e.getCause()).getRetryAfter());
                                 Thread.sleep(((TooManyRequestsException) e.getCause()).getRetryAfter() * 1000);
-                            }else {
-                                apiLimitHit= false;
+                            } else {
+                                apiLimitHit = false;
                             }
                             String[] key = stringFutureMap.keySet().iterator().next().split("_");
                             retriedPlaylists.add(pullPlaylistAsync(api, key[0], key[1]));
@@ -99,16 +100,15 @@ public class SpotifyPlaylistDao {
         try {
             return request.execute();
         } catch (Exception e) {
-            if(e instanceof TooManyRequestsException){
+            if (e instanceof TooManyRequestsException) {
                 log.error("Playlist API rate limit exceeded. Will wait {} seconds and retry", ((TooManyRequestsException) e.getCause()).getRetryAfter());
                 Thread.sleep(((TooManyRequestsException) e).getRetryAfter() * 1000);
-               return pullPlaylistSync(api,ownerId,playlistId);
+                return pullPlaylistSync(api, ownerId, playlistId);
             }
             log.error("Failed to download metadata for playlist {}, HTTP error code: {}", playlistId, e.getMessage());
             return null;
         }
     }
-
 
 
     private static Map<String, Future<Playlist>> pullPlaylistAsync(SpotifyApi api, String ownerId, String playlistId) {
