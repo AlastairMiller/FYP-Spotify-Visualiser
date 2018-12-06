@@ -93,7 +93,7 @@ public class RefreshDbService {
         log.info("----------------------------Creating Indexes----------------------------");
         List<String> indexList = checkIfIndexesExists(mongoHelper.getRefinedAlbumDao());
         for (String indexName : indexList) {
-            if (indexName != "name") {
+            if (!indexName.equals("name")) {
                 mongoHelper.getRefinedAlbumDao().getMongoCollection().createIndex(Indexes.descending(indexName));
                 mongoHelper.getRefinedAlbumDao().getMongoCollection().createIndex(Indexes.descending("_id", indexName));
             } else {
@@ -103,33 +103,33 @@ public class RefreshDbService {
         }
         indexList = checkIfIndexesExists(mongoHelper.getRefinedArtistDao());
         for (String indexName : indexList) {
-            if (indexName != "name") {
+            if (!indexName.equals("name")) {
                 mongoHelper.getRefinedArtistDao().getMongoCollection().createIndex(Indexes.descending(indexName));
                 mongoHelper.getRefinedArtistDao().getMongoCollection().createIndex(Indexes.descending("_id", indexName));
             } else {
-                mongoHelper.getRefinedAlbumDao().getMongoCollection().createIndex(Indexes.text("name"));
+                mongoHelper.getRefinedArtistDao().getMongoCollection().createIndex(Indexes.text("name"));
             }
             log.info("Created {} index for Artist Id", indexName);
         }
 
         indexList = checkIfIndexesExists(mongoHelper.getRefinedPlaylistDao());
         for (String indexName : indexList) {
-            if (indexName != "name") {
+            if (!indexName.equals("name")) {
                 mongoHelper.getRefinedPlaylistDao().getMongoCollection().createIndex(Indexes.descending(indexName));
                 mongoHelper.getRefinedPlaylistDao().getMongoCollection().createIndex(Indexes.descending("_id", indexName));
             } else {
-                mongoHelper.getRefinedAlbumDao().getMongoCollection().createIndex(Indexes.text("name"));
+                mongoHelper.getRefinedPlaylistDao().getMongoCollection().createIndex(Indexes.text("name"));
             }
             log.info("Created {} index for Playlist Id", indexName);
         }
 
         indexList = checkIfIndexesExists(mongoHelper.getRefinedTrackDao());
         for (String indexName : indexList) {
-            if (indexName != "name") {
+            if (!indexName.equals("name")) {
                 mongoHelper.getRefinedTrackDao().getMongoCollection().createIndex(Indexes.descending(indexName));
                 mongoHelper.getRefinedTrackDao().getMongoCollection().createIndex(Indexes.descending("_id", indexName));
             } else {
-                mongoHelper.getRefinedAlbumDao().getMongoCollection().createIndex(Indexes.text("name"));
+                mongoHelper.getRefinedTrackDao().getMongoCollection().createIndex(Indexes.text("name"));
             }
             log.info("Created {} index for Track Id", indexName);
         }

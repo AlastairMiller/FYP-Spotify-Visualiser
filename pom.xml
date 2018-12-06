@@ -70,7 +70,7 @@
                 </executions>
                 <configuration>
                     <repository>alastairmiller-docker-spotify-visualiser.bintray.io/al.miller.sv/spotify-visualiser-ingest</repository>
-                    <tag>1.0.5</tag>
+                    <tag>1.0.6</tag>
                     <buildArgs>
                         <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
