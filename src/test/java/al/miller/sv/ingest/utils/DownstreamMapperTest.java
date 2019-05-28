@@ -1,4 +1,4 @@
-package al.miller.sv.ingest.mapper;
+package al.miller.sv.ingest.utils;
 
 public class DownstreamMapperTest {
 }
