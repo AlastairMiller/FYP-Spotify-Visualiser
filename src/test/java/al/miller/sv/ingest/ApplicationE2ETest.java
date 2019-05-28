@@ -33,7 +33,7 @@ import java.io.IOException;
 @SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @PropertySource("classpath:application.properties")
-public class e2e {
+public class ApplicationE2ETest {
 
     @Autowired
     private SpotifyAuthenticationHelper authenticationHelper;

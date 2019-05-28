@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.SynchronousQueue;
 
+/*
+Not used at the moment due to Spotify API rate limiting
+ */
 @AllArgsConstructor
 public class PullAlbumFutureJob implements Runnable {
     private SynchronousQueue<Future<Album>> futures;
