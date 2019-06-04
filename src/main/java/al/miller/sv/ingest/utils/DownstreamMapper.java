@@ -61,6 +61,7 @@ public class DownstreamMapper {
         map.remove("genres");
         map.remove("images");
         map.remove("label");
+        map.put("imageURL", fullAlbum.getImages()[0].getUrl());
         LocalDate localDate = translateDate(map.get("releaseDate").toString(), (ReleaseDatePrecision) map.get("releaseDatePrecision"));
         map.put("releaseDate", new Date(localDate.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()));
         map.remove("releaseDatePrecision");
