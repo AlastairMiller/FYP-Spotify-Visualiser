@@ -1,0 +1,17 @@
+CREATE TABLE REFINED_SONG (
+
+  DISC_NUM          INT,
+  DURATION_MS       INT,
+  EXPLICIT         BOOLEAN,
+  EXTERNALURL      VARCHAR(2083),
+  HREF             VARCHAR(2083),
+  ID               VARCHAR(50),
+  ISPLAYABLE       BOOLEAN,
+  LINKEDFROM       VARCHAR(2083),
+  NAME             VARCHAR(200),
+  PREVIEWURL       VARCHAR(2083),
+  TRACK_NUMBER      INT,
+  POPULARITY       INT,
+  URI              VARCHAR(2083)
+
+);

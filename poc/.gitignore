@@ -1,0 +1,8 @@
+*.tar.gz
+.env
+.idea/
+/finalyearproject.iml
+/target/
+application-test.properties
+application.properties
+application-prod.properties
