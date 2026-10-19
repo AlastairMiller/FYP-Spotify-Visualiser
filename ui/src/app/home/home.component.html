@@ -1,0 +1,24 @@
+<div class="text-white bg-dark w-100 h-100"
+     style="background-image: url(&quot;/assets/bgd02.jpg&quot;); background-position: center center; background-size: cover; background-repeat: no-repeat;">
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 mt-3 text-center" [@visibilityChanged]="visibility" >
+        <div *ngIf="currentTrack !== undefined">
+          <div AgWordCloud
+               #word_cloud_chart=ag-word-cloud
+               [wordData]="wordData"
+               [options]="options"
+               [width]="750"
+               [height]="750">
+          </div>
+          <div *ngIf="currentUriSafe !== undefined">
+            <iframe [src]="currentUriSafe | safe" width="300" height="80"
+                    frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
