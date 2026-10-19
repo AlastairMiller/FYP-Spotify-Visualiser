@@ -1,0 +1,23 @@
+version: "3"
+services:
+    mongo:
+        image: mongo:latest
+        environment:
+          - MONGODB_USER=mongo
+          - MONGODB_PASS=mongo
+          - MONGODB_DATABASE=spotify
+        network_mode: "host"
+        ports:
+         - "27017:27017"
+    spotify-visualiser-ingest:
+        image: alastairmiller-docker-spotify-visualiser.bintray.io/al.miller.sv/spotify-visualiser-ingest:1.0.3
+        network_mode: "host"
+    spotify-visualiser-action-service:
+        image: alastairmiller-docker-spotify-visualiser.bintray.io/al.miller.sv/spotify-visualiser-action-service:1.0.0
+        network_mode: "host"
+         
+networks:
+    default:
+       external:
+         name: host
+    
