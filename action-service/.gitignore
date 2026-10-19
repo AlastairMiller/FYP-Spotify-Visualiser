@@ -1,0 +1,10 @@
+*.tar.gz
+.env
+.idea/
+/target/
+application-test.properties
+application.properties
+application-prod.properties
+/pom.xml.releaseBackup
+/release.properties
+/Spotify-Visualiser-Action-Service.iml
